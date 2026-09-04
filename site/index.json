@@ -5,5 +5,47 @@
   "headline": "",
   "items": 54,
   "parties": 14
+ },
+ {
+  "week": "2023-W05",
+  "range": "30 Jan – 05 Feb 2023",
+  "headline": "",
+  "items": 8,
+  "parties": 5
+ },
+ {
+  "week": "2023-W04",
+  "range": "23 Jan – 29 Jan 2023",
+  "headline": "",
+  "items": 15,
+  "parties": 8
+ },
+ {
+  "week": "2023-W03",
+  "range": "16 Jan – 22 Jan 2023",
+  "headline": "",
+  "items": 23,
+  "parties": 10
+ },
+ {
+  "week": "2023-W02",
+  "range": "09 Jan – 15 Jan 2023",
+  "headline": "",
+  "items": 27,
+  "parties": 8
+ },
+ {
+  "week": "2023-W01",
+  "range": "02 Jan – 08 Jan 2023",
+  "headline": "",
+  "items": 35,
+  "parties": 9
+ },
+ {
+  "week": "2022-W52",
+  "range": "26 Dec – 01 Jan 2023",
+  "headline": "",
+  "items": 3,
+  "parties": 3
  }
 ]
