@@ -1,0 +1,44 @@
+name: 2 · Weekly issue
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monitoring-data
+  cancel-in-progress: false
+
+jobs:
+  issue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Collect, analyse, and build
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          DIP_API_KEY: ${{ secrets.DIP_API_KEY }}
+        run: python run.py weekly
+
+      - name: Save the new issue and research record
+        run: |
+          git config user.name "radical-watch-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f data/items.db site
+          for path in snapshots exports background; do
+            [ ! -e "$path" ] || git add -f "$path"
+          done
+          git diff --staged --quiet || git commit -m "Weekly issue $(date -u +%F)"
+          git push
