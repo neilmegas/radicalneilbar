@@ -14,6 +14,7 @@ REPORT_CSS = r"""
 .builder .wide{grid-column:1/-1}.builder .actions{grid-column:1/-1;display:flex;gap:.6rem;flex-wrap:wrap}
 .builder button{border:1px solid var(--ink);background:var(--ink);color:white;padding:.5rem .8rem;
   font:inherit;cursor:pointer}.builder button.secondary{background:white;color:var(--ink)}
+.history-action{margin:1rem 0}.history-action a{font-weight:700}
 .report-group{margin:2rem 0}.report-card{padding:.8rem 0;border-bottom:1px solid var(--hair)}
 .report-card h4{margin:0}.report-card .summary{margin:.3rem 0}.report-empty{padding:1rem;border:1px dashed var(--hair)}
 @media(max-width:600px){.builder{grid-template-columns:1fr}.builder .wide,.builder .actions{grid-column:1}}
@@ -26,6 +27,12 @@ BODY = r"""
 <p class="lede">Filter the archived items, choose how to group them, then print to PDF or
 download the matching rows as CSV. Everything runs in your browser.</p>
 <p class="meta">Corpus configured for __PARTIES__ parties in __COUNTRIES__ countries.</p>
+<div class="box history-action no-print">
+  <h4>Need dates that are not in the archive?</h4>
+  <p>The builder filters existing data. Historical collection runs privately inside your
+  GitHub repository, where the API key stays protected.</p>
+  <p><a id="history-link" hidden target="_blank" rel="noreferrer">Open historical collection in GitHub Actions →</a></p>
+</div>
 
 <form class="builder" id="builder">
   <label>From<input type="date" id="from"></label>
@@ -58,6 +65,17 @@ const el=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={israel_palestine:'Israel and Palestine',jews_antisemitism:'Jews and antisemitism',immigration:'Immigration'};
 let corpus=[], interps={}, shown=[];
+
+function setHistoryLink(){
+  const suffix='.github.io';
+  if(!location.hostname.endsWith(suffix))return;
+  const owner=location.hostname.slice(0,-suffix.length);
+  const parts=location.pathname.split('/').filter(Boolean);
+  const repo=parts.length&& !parts[0].endsWith('.html')?parts[0]:`${owner}.github.io`;
+  const link=el('history-link');
+  link.href=`https://github.com/${owner}/${repo}/actions/workflows/backfill.yml`;
+  link.hidden=false;
+}
 
 async function loadCorpus(){
   try{
@@ -125,7 +143,8 @@ function csv(){
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='radical-party-watch-report.csv';a.click();URL.revokeObjectURL(a.href);
 }
-el('builder').addEventListener('submit',build);el('csv').addEventListener('click',csv);loadCorpus();
+el('builder').addEventListener('submit',build);el('csv').addEventListener('click',csv);
+setHistoryLink();loadCorpus();
 </script>
 """
 

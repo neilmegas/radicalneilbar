@@ -20,12 +20,16 @@
   python run.py backtrans    back-translation check on quotes you cannot verify
   python run.py reliability  blind coding round (--report <id> for agreement)
   python run.py weekly       the whole chain
+  python run.py backfill     collect an exact historical range (see --from/--to)
   python run.py demo         offline sample portal, no keys needed
 """
 
 import argparse
+import copy
 import json
+import math
 import os
+import shutil
 import sys
 from datetime import datetime, timedelta, timezone
 
@@ -103,6 +107,56 @@ def week_bounds(week):
     return monday, monday + timedelta(days=6, hours=23, minutes=59)
 
 
+def collection_bounds(args):
+    """Return an exact historical window, or the ordinary rolling window.
+
+    Historical ``until`` is exclusive internally so the user's ``--to`` day
+    remains inclusive without time-of-day edge cases.
+    """
+    requested = bool(args.dfrom or args.dto)
+    if requested and not (args.dfrom and args.dto):
+        raise SystemExit("Historical collection needs both --from and --to (YYYY-MM-DD).")
+    if not requested:
+        return co.window_start(args.days), None, False
+    try:
+        since = datetime.strptime(args.dfrom, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        until = (datetime.strptime(args.dto, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                 + timedelta(days=1))
+    except ValueError as exc:
+        raise SystemExit("Dates must use YYYY-MM-DD, for example 2023-01-01.") from exc
+    if until <= since:
+        raise SystemExit("The To date must be the same as or later than the From date.")
+    if until > datetime.now(timezone.utc) + timedelta(days=2):
+        raise SystemExit("The historical collection date cannot be in the future.")
+    return since, until, True
+
+
+def selected_parties(cfg, args):
+    """Resolve optional IDs/names and country codes used by a backfill run."""
+    parties = list(cfg["parties"])
+    countries = {str(x).strip().casefold() for x in (args.country or []) if str(x).strip()}
+    if countries:
+        parties = [p for p in parties if str(p.get("country", "")).casefold() in countries]
+    selectors = [str(x).strip().casefold() for x in (args.party or []) if str(x).strip()]
+    if selectors:
+        def matched(p):
+            names = {str(p.get(k, "")).strip().casefold() for k in ("id", "name", "short")}
+            return any(s in names for s in selectors)
+        parties = [p for p in parties if matched(p)]
+    if (countries or selectors) and not parties:
+        allowed = ", ".join(p["id"] for p in cfg["parties"])
+        raise SystemExit(f"No parties matched. Valid party IDs are: {allowed}")
+    return parties
+
+
+def iso_week(value: str, fallback: str) -> str:
+    dt = co._as_datetime(value)
+    if not dt:
+        return fallback
+    year, week, _ = dt.isocalendar()
+    return f"{year}-W{week:02d}"
+
+
 def _enrich(items, cfg, codes=None, extras=None):
     by_id = {p["id"]: p for p in cfg["parties"]}
     codes = codes or {}
@@ -176,8 +230,17 @@ def cmd_probe(cfg, args):
 
 def cmd_collect(cfg, args):
     conn = st.connect()
-    week = args.week or current_week()
-    since = co.window_start(args.days)
+    removed_demo = st.remove_demo_data(conn)
+    if removed_demo:
+        print(f"Removed {removed_demo} demonstration items before live collection.")
+        for path in ("exports/2026-W35.csv", "exports/2026-W36.csv"):
+            try:
+                os.remove(path)
+            except FileNotFoundError:
+                pass
+    since, until, historical = collection_bounds(args)
+    week = args.week or (iso_week(since.isoformat(), current_week()) if historical
+                         else current_week())
     yt_key = os.environ.get("YOUTUBE_API_KEY")
     new = total = 0
 
@@ -192,18 +255,33 @@ def cmd_collect(cfg, args):
             st.log_collection(conn, week, p["id"], name, False, 0, str(ex))
             return []
 
-    for p in cfg["parties"]:
+    for p in selected_parties(cfg, args):
         items = []
         if p.get("feeds"):
             for feed in p["feeds"]:
-                items += run_channel(p, "site_feed", lambda f=feed: co.from_feed(p, f, since))
-        elif p.get("site"):
+                items += run_channel(
+                    p, "site_feed",
+                    lambda f=feed: co.from_feed(p, f, since, until),
+                )
+        if historical and p.get("site"):
+            items += run_channel(
+                p, "party_archive",
+                lambda: co.from_sitemaps(p, since, until),
+            )
+        elif not p.get("feeds") and p.get("site"):
             items += run_channel(p, "site_scrape", lambda: co.from_site_scrape(p, since))
-        items += run_channel(p, "press", lambda: co.from_google_news(p, since, days=args.days))
+        items += run_channel(
+            p, "press",
+            lambda: co.from_google_news(p, since, days=args.days, until=until),
+        )
         if p.get("telegram"):
-            items += run_channel(p, "telegram", lambda: co.from_telegram(p, since))
+            items += run_channel(
+                p, "telegram", lambda: co.from_telegram(p, since, until),
+            )
         if p.get("youtube_channel"):
-            items += run_channel(p, "youtube", lambda: co.from_youtube(p, since, yt_key))
+            items += run_channel(
+                p, "youtube", lambda: co.from_youtube(p, since, yt_key, until),
+            )
         parl, perr = [], None
         if p.get("parliament"):
             try:
@@ -217,19 +295,87 @@ def cmd_collect(cfg, args):
         kept = 0
         for it in items:
             total += 1
+            if historical and not co._within(it.get("published"), since, until):
+                continue
             iid = st.item_id(p["id"], it.get("url"), it.get("title"))
             if st.seen(conn, iid):
                 continue
+            item_week = iso_week(it.get("published"), week) if historical else week
             it["id"] = iid
-            it["week"] = week
-            it["snapshot_path"] = st.write_snapshot(week, iid, it.get("body"))
+            it["week"] = item_week
+            it["snapshot_path"] = st.write_snapshot(item_week, iid, it.get("body"))
             st.save(conn, it)
             new += 1
             kept += 1
         flag = f"  [parl {len(parl)}]" if parl else ("  [parl err]" if perr else "")
         print(f"{p['short']:<14} {kept:>3} new / {len(items):>3} seen{flag}")
 
-    print(f"\n{new} new items ({total} fetched) for {week}")
+    if historical:
+        label = f"{args.dfrom} to {args.dto}"
+    else:
+        label = week
+    print(f"\n{new} new items ({total} fetched) for {label}")
+
+
+def _weeks_in_window(since, until):
+    labels, seen = [], set()
+    cursor = since
+    while cursor < until:
+        label = iso_week(cursor.isoformat(), current_week())
+        if label not in seen:
+            labels.append(label)
+            seen.add(label)
+        cursor += timedelta(days=7)
+    last = iso_week((until - timedelta(seconds=1)).isoformat(), current_week())
+    if last not in seen:
+        labels.append(last)
+    return labels
+
+
+def cmd_backfill(cfg, args):
+    """Collect an exact past range in bounded chunks, then rebuild the corpus."""
+    since, until, historical = collection_bounds(args)
+    if not historical:
+        raise SystemExit("Backfill needs --from and --to.")
+    parties = selected_parties(cfg, args)
+    days = (until - since).days
+    chunks = math.ceil(days / 31)
+    work_units = len(parties) * chunks
+    if work_units > 156:
+        per_run = max(1, 156 // len(parties)) * 31
+        raise SystemExit(
+            f"This request is too large for one safe GitHub job ({len(parties)} parties × "
+            f"{chunks} date chunks). Use at most about {per_run} days with this party "
+            "selection, or select fewer party IDs. Existing data is preserved between runs."
+        )
+
+    print(f"Historical collection: {args.dfrom} to {args.dto}; "
+          f"{len(parties)} parties; {chunks} chunk(s).")
+    cursor = since
+    while cursor < until:
+        stop = min(cursor + timedelta(days=31), until)
+        chunk_args = copy.copy(args)
+        chunk_args.dfrom = cursor.date().isoformat()
+        chunk_args.dto = (stop - timedelta(seconds=1)).date().isoformat()
+        chunk_args.days = (stop - cursor).days
+        chunk_args.week = None
+        print(f"\n=== Collecting {chunk_args.dfrom} to {chunk_args.dto} ===")
+        cmd_collect(cfg, chunk_args)
+        cursor = stop
+
+    conn = st.connect()
+    for week in _weeks_in_window(since, until):
+        if not st.week_items(conn, week):
+            continue
+        step_args = copy.copy(args)
+        step_args.week = week
+        print(f"\n=== Analysing {week} ===")
+        cmd_analyze(cfg, step_args)
+        if args.with_interpretation:
+            cmd_interpret(cfg, step_args)
+        cmd_export(cfg, step_args)
+    cmd_site(cfg, args)
+    print("\nHistorical collection complete. The database and report corpus are ready to publish.")
 
 
 def cmd_analyze(cfg, args):
@@ -594,6 +740,10 @@ def cmd_site(cfg, args):
     conn = st.connect()
     countries = load_countries()
     names = country_names(countries)
+    # These directories are generated views of the database.  Recreate them
+    # so removed demo records (or corrected records) cannot leave stale pages.
+    for generated in ("issues", "data", "corpus", "speakers", "parties"):
+        shutil.rmtree(os.path.join(SITE_DIR, generated), ignore_errors=True)
     st_site.write_assets(SITE_DIR)
 
     weeks = st.all_weeks(conn)
@@ -1042,7 +1192,7 @@ def main():
         "discover", "probe", "collect", "analyze", "refresh", "brief",
         "archive", "export", "site", "diff", "roster", "code", "interpret",
         "world", "report", "checklinks", "backtrans", "reliability",
-        "weekly", "demo"])
+        "weekly", "backfill", "demo"])
     ap.add_argument("--round", dest="round_id")
     ap.add_argument("--report", dest="report_round")
     ap.add_argument("--n", type=int, default=20)
@@ -1062,6 +1212,8 @@ def main():
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--with-interpretation", action="store_true",
+                    help="also create model interpretations during a historical backfill")
     args = ap.parse_args()
     cfg = load_config()
 
@@ -1075,6 +1227,8 @@ def main():
         cmd_archive(cfg, args)
         cmd_export(cfg, args)
         cmd_site(cfg, args)
+    elif args.command == "backfill":
+        cmd_backfill(cfg, args)
     else:
         {"discover": cmd_discover, "probe": cmd_probe, "collect": cmd_collect,
          "analyze": cmd_analyze, "refresh": cmd_refresh, "brief": cmd_brief,

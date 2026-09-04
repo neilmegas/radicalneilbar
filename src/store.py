@@ -173,6 +173,34 @@ def seen(conn, iid):
     return conn.execute("SELECT 1 FROM items WHERE id=?", (iid,)).fetchone() is not None
 
 
+def remove_demo_data(conn):
+    """Remove the bundled demonstration fixtures before the first live run.
+
+    The exact IDs are intentionally fixed in ``run.py``.  Cleanup only happens
+    while those fixtures still exist, so later real collection logs for the
+    same calendar weeks are not repeatedly removed.
+    """
+    demo_ids = tuple(f"d{i}" for i in range(1, 8))
+    placeholders = ",".join("?" for _ in demo_ids)
+    found = conn.execute(
+        f"SELECT COUNT(*) FROM items WHERE id IN ({placeholders})", demo_ids
+    ).fetchone()[0]
+    if not found:
+        return 0
+    for table, column in [
+        ("analysis_meta", "item_id"), ("link_checks", "item_id"),
+        ("annotations", "item_id"), ("relations", "item_id"),
+        ("blind_codes", "item_id"), ("codes", "item_id"),
+    ]:
+        conn.execute(f"DELETE FROM {table} WHERE {column} IN ({placeholders})", demo_ids)
+    conn.execute(f"DELETE FROM items WHERE id IN ({placeholders})", demo_ids)
+    conn.execute("DELETE FROM briefings WHERE week IN ('2026-W35','2026-W36')")
+    conn.execute("DELETE FROM collection_log WHERE week IN "
+                 "('2026-W33','2026-W34','2026-W35','2026-W36')")
+    conn.commit()
+    return found
+
+
 def write_snapshot(week, iid, body):
     """Keep the source text on disk. Party sites edit and delete; a quote in
     the newsletter is worthless six months on if nothing preserved it."""
