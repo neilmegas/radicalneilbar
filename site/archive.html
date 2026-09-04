@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Archive</title>
+<link rel="stylesheet" href="assets/style.css">
+</head><body><div class="wrap">
+<nav class="top">
+  <a class="brand" href="index.html">Radical Party Watch</a>
+  <a href="archive.html">Archive</a>
+  <a href="parties.html">Parties</a>
+  <a href="speakers.html">Speakers</a>
+  <a href="report.html">Report</a>
+  <a href="network.html">Network</a>
+  <a href="health.html">Health</a>
+  <span class="spacer"></span>
+  <span class="meta">1 issues</span>
+</nav>
+<h1>Archive</h1>
+<p class="lede">Every issue built, oldest at the bottom. Issues are permanent —
+nothing is regenerated once published, so a quote you cited last March still
+reads as it did then.</p>
+<p><input class="q" id="q" placeholder="Filter issues" autocomplete="off"></p>
+<table class="idx"><thead><tr><th>Week</th><th>Dates</th><th>Lead</th><th>Volume</th><th>Data</th></tr></thead>
+<tbody id="rows"><tr><td class="n"><a href="issues/2026-W36.html">2026-W36</a></td><td class="n">31 Aug – 06 Sep 2026</td><td></td><td class="n">54 items · 14 parties</td><td class="n"><a href="data/2026-W36.csv">CSV</a></td></tr></tbody></table>
+<script>
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{
+  const v=q.value.toLowerCase();
+  for(const tr of document.querySelectorAll('#rows tr'))
+    tr.style.display = tr.textContent.toLowerCase().includes(v) ? '' : 'none';
+});
+</script>
+<footer class="meta">
+Research monitoring archive. Every item links to its source and, where the
+capture succeeded, to an archived copy; source text is snapshotted at
+collection time and committed alongside each issue.
+</footer>
+</div></body></html>
