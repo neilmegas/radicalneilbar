@@ -292,9 +292,19 @@ def cmd_collect(cfg, args):
                 st.log_collection(conn, week, p["id"], "parliament", False, 0, str(ex))
         items += parl
 
+        fetched_here = len(items)
+        unique = {}
+        for item in items:
+            key = st.item_id(p["id"], item.get("url"), item.get("title"))
+            unique.setdefault(key, item)
+        items = sorted(unique.values(), key=lambda item: item.get("published") or "",
+                       reverse=True)
+        if args.max_items_per_party and args.max_items_per_party > 0:
+            items = items[:args.max_items_per_party]
+        total += fetched_here
+
         kept = 0
         for it in items:
-            total += 1
             if historical and not co._within(it.get("published"), since, until):
                 continue
             iid = st.item_id(p["id"], it.get("url"), it.get("title"))
@@ -308,7 +318,9 @@ def cmd_collect(cfg, args):
             new += 1
             kept += 1
         flag = f"  [parl {len(parl)}]" if parl else ("  [parl err]" if perr else "")
-        print(f"{p['short']:<14} {kept:>3} new / {len(items):>3} seen{flag}")
+        selected = f"; newest {len(items)} processed" if len(items) < fetched_here else ""
+        print(f"{p['short']:<14} {kept:>3} new / {fetched_here:>3} fetched"
+              f"{selected}{flag}")
 
     if historical:
         label = f"{args.dfrom} to {args.dto}"
@@ -1212,6 +1224,10 @@ def main():
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--fast", action="store_true",
+                    help="weekly core collection and analysis without slow enrichment/archiving")
+    ap.add_argument("--max-items-per-party", type=int, default=0,
+                    help="process at most this many newest fetched items per party (0 = unlimited)")
     ap.add_argument("--with-interpretation", action="store_true",
                     help="also create model interpretations during a historical backfill")
     args = ap.parse_args()
@@ -1219,12 +1235,13 @@ def main():
 
     if args.command == "weekly":
         cmd_collect(cfg, args)
-        cmd_diff(cfg, args)
         cmd_analyze(cfg, args)
-        cmd_brief(cfg, args)
-        cmd_interpret(cfg, args)
-        cmd_world(cfg, args)
-        cmd_archive(cfg, args)
+        if not args.fast:
+            cmd_diff(cfg, args)
+            cmd_brief(cfg, args)
+            cmd_interpret(cfg, args)
+            cmd_world(cfg, args)
+            cmd_archive(cfg, args)
         cmd_export(cfg, args)
         cmd_site(cfg, args)
     elif args.command == "backfill":

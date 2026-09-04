@@ -17,7 +17,7 @@ from dateutil import parser as dateparser
 
 UA = "RadicalPartyWatch/1.0 (+research monitoring; contact via repository)"
 HEADERS = {"User-Agent": UA, "Accept-Language": "en,*;q=0.5"}
-TIMEOUT = 25
+TIMEOUT = 15
 
 
 def window_start(days: int = 7) -> datetime:
@@ -125,7 +125,8 @@ def from_google_news(party: dict, since: datetime, days: int = 7,
                      until: datetime | None = None) -> list[dict]:
     terms = list(dict.fromkeys((party.get("queries") or []) + [party.get("name", "")]))
     out, seen = [], set()
-    for term in [t for t in terms if t][:6]:
+    term_limit = 6 if until else 3
+    for term in [t for t in terms if t][:term_limit]:
         if until:
             # Google treats ``after`` and ``before`` as boundaries.  Move the
             # first one back a day so the user's first date is included; our
@@ -155,7 +156,7 @@ def from_google_news(party: dict, since: datetime, days: int = 7,
                 party, "press", entry.get("title"), link, pub,
                 _clean_html(entry.get("summary") or ""), outlet or "Google News",
             ))
-    return out[:240 if until else 80]
+    return out[:240 if until else 30]
 
 
 def _extract_page(url: str) -> tuple[str, str]:
@@ -295,18 +296,21 @@ def from_site_scrape(party: dict, since: datetime) -> list[dict]:
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
     candidates = []
-    for article in soup.select("article")[:30]:
+    for article in soup.select("article")[:12]:
         link = article.find("a", href=True)
         if link:
             candidates.append((link.get_text(" ", strip=True), urljoin(response.url, link["href"])))
     if not candidates:
-        for link in soup.select("main a[href], .content a[href], #content a[href]")[:80]:
+        for link in soup.select("main a[href], .content a[href], #content a[href]")[:30]:
             text = link.get_text(" ", strip=True)
             href = urljoin(response.url, link.get("href"))
             if len(text) >= 20 and urlparse(href).netloc == urlparse(response.url).netloc:
                 candidates.append((text, href))
     out, seen = [], set()
-    for title, url in candidates[:25]:
+    # Homepage fallbacks are expensive because each candidate is another
+    # network request.  Eight recent pages plus press results are enough for a
+    # bounded weekly pass; exact historical runs use the sitemap collector.
+    for title, url in candidates[:8]:
         if url in seen:
             continue
         seen.add(url)
