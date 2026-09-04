@@ -1,0 +1,19 @@
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Generated local-only files
+.DS_Store
+reports/*.html
+roster/candidates.yaml
+
+# Keep the generated website, database, exports, snapshots, and background
+# files in Git: the scheduled workflows use them as the project's history.
