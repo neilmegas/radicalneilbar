@@ -15,7 +15,7 @@ concurrency:
 jobs:
   issue:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -24,13 +24,13 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
 
-      - name: Collect, analyse, and build
+      - name: Collect, analyse, and build with live progress
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           DIP_API_KEY: ${{ secrets.DIP_API_KEY }}
-        run: python run.py weekly
+        run: python -u run.py weekly --fast --max-items-per-party 8
 
       - name: Save the new issue and research record
         run: |
