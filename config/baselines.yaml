@@ -1,0 +1,38 @@
+# Survey baselines shown alongside each country, so a statement reads against
+# the attitudinal context rather than in isolation. A Greek line means
+# something different against 67% than against the Western European average
+# of 24%.
+#
+# Figures below are from the sources named. Check them against the editions
+# you actually cite before using any of this in writing — they are here as
+# reading context, not as data.
+
+sources:
+  adl: "ADL Global 100 (2019)"
+  apl: "Action and Protection League EU survey (2019–20)"
+
+baselines:
+  GR:
+    - {label: "Antisemitic attitudes index", value: 67, unit: "%", source: adl,
+       note: "Highest in Western Europe; the next highest was France at 37%."}
+    - {label: "Believe in a 'secret Jewish network' governing global affairs",
+       value: 58, unit: "%", source: apl}
+    - {label: "Call the crucifixion an unforgivable sin committed by Jews",
+       value: 39, unit: "%", source: apl, note: "EU average 13%."}
+  FR:
+    - {label: "Antisemitic attitudes index", value: 37, unit: "%", source: adl,
+       note: "Second highest in the Western European comparison."}
+  DE: []
+  AT: []
+  IT: []
+  NL: []
+  BE: []
+  SE: []
+  FI: []
+  ES: []
+  GB: []
+  IL: []
+
+# Western European average on the ADL index, for reference on any country block.
+reference:
+  {label: "Western European average", value: 24, unit: "%", source: adl}

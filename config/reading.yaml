@@ -1,0 +1,11 @@
+# Secondary sources for the weekly "Worth reading" section.
+# Feed failures are harmless; edit this list to match your own reading routine.
+feeds:
+  - https://www.europarl.europa.eu/rss/doc/top-stories/en.xml
+  - https://www.osce.org/odihr/press-releases/rss
+queries:
+  - European radical right parties analysis
+  - European radical left parties analysis
+  - antisemitism political parties Europe survey
+  - migration European party politics analysis
+limit: 30

@@ -1,0 +1,10 @@
+coder: researcher
+
+# Starter categories only. Replace these with your own coding instrument before
+# using the coding queue for research.
+categories:
+  - Not coded
+  - Israel-related, not antisemitic on its face
+  - Criticism of Israel using antisemitic framing
+  - Antisemitic claim unrelated to Israel
+  - Unclear / needs context

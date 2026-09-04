@@ -1,0 +1,34 @@
+# Starter roster. URLs and leader queries change: run the "Check configuration"
+# workflow and correct any source you know to be wrong before relying on coverage.
+parties:
+  - {id: ellinikilisi, name: Greek Solution, short: Greek Solution, country: GR, camp: right, lang: el, site: "https://elliniki-lisi.gr", queries: ["Ελληνική Λύση", "Κυριάκος Βελόπουλος"]}
+  - {id: niki, name: NIKI, short: NIKI, country: GR, camp: right, lang: el, site: "https://nikh.gr", queries: ["ΝΙΚΗ κόμμα", "Δημήτρης Νατσιός"]}
+  - {id: spartiates, name: Spartans, short: Spartans, country: GR, camp: right, lang: el, site: "https://spartiates.gr", queries: ["Σπαρτιάτες κόμμα"]}
+  - {id: fonilogikis, name: Voice of Reason, short: Voice of Reason, country: GR, camp: right, lang: el, site: "https://fonilogikis.gr", queries: ["Φωνή Λογικής", "Αφροδίτη Λατινοπούλου"]}
+  - {id: mera25, name: MeRA25, short: MeRA25, country: GR, camp: left, lang: el, site: "https://mera25.gr", queries: ["ΜέΡΑ25", "Γιάνης Βαρουφάκης"]}
+
+  - {id: afd, name: Alternative für Deutschland, short: AfD, country: DE, camp: right, lang: de, site: "https://www.afd.de", queries: ["Alternative für Deutschland", "Alice Weidel", "Tino Chrupalla"], watch_pages: ["https://www.afd.de/grundsatzprogramm/"]}
+  - {id: dritteweg, name: Der III. Weg, short: Der III. Weg, country: DE, camp: right, lang: de, site: "https://der-dritte-weg.info", queries: ["Der III. Weg"]}
+  - {id: heimat, name: Die Heimat, short: Die Heimat, country: DE, camp: right, lang: de, site: "https://die-heimat.de", queries: ["Die Heimat Partei"]}
+
+  - {id: rn, name: Rassemblement National, short: RN, country: FR, camp: right, lang: fr, site: "https://rassemblementnational.fr", queries: ["Rassemblement National", "Marine Le Pen", "Jordan Bardella"]}
+  - {id: lfi, name: La France insoumise, short: LFI, country: FR, camp: left, lang: fr, site: "https://lafranceinsoumise.fr", queries: ["La France insoumise", "Jean-Luc Mélenchon"]}
+
+  - {id: fpo, name: Freiheitliche Partei Österreichs, short: FPÖ, country: AT, camp: right, lang: de, site: "https://www.fpoe.at", queries: ["FPÖ", "Herbert Kickl"]}
+  - {id: pvv, name: Partij voor de Vrijheid, short: PVV, country: NL, camp: right, lang: nl, site: "https://www.pvv.nl", queries: ["Partij voor de Vrijheid", "Geert Wilders"]}
+  - {id: vlaamsbelang, name: Vlaams Belang, short: Vlaams Belang, country: BE, camp: right, lang: nl, site: "https://www.vlaamsbelang.org", queries: ["Vlaams Belang", "Tom Van Grieken"]}
+  - {id: sd, name: Sweden Democrats, short: SD, country: SE, camp: right, lang: sv, site: "https://www.sd.se", queries: ["Sverigedemokraterna", "Jimmie Åkesson"]}
+  - {id: nmr, name: Nordic Resistance Movement, short: NMR, country: SE, camp: right, lang: sv, site: "https://nordicresistancemovement.org", queries: ["Nordic Resistance Movement", "Nordiska motståndsrörelsen"]}
+  - {id: finns, name: Finns Party, short: Finns Party, country: FI, camp: right, lang: fi, site: "https://www.perussuomalaiset.fi", queries: ["Perussuomalaiset", "Riikka Purra"]}
+
+  - {id: fdi, name: Brothers of Italy, short: FdI, country: IT, camp: right, lang: it, site: "https://www.fratelli-italia.it", queries: ["Fratelli d'Italia", "Giorgia Meloni"]}
+  - {id: casapound, name: CasaPound Italia, short: CasaPound, country: IT, camp: right, lang: it, site: "https://www.casapounditalia.org", queries: ["CasaPound Italia"]}
+  - {id: vox, name: Vox, short: Vox, country: ES, camp: right, lang: es, site: "https://www.voxespana.es", queries: ["Vox España", "Santiago Abascal"]}
+  - {id: podemos, name: Podemos, short: Podemos, country: ES, camp: left, lang: es, site: "https://podemos.info", queries: ["Podemos partido", "Ione Belarra"]}
+  - {id: reformuk, name: Reform UK, short: Reform UK, country: GB, camp: right, lang: en, site: "https://www.reformparty.uk", queries: ["Reform UK", "Nigel Farage"]}
+  - {id: wpb, name: Workers Party of Britain, short: WPB, country: GB, camp: left, lang: en, site: "https://workerspartybritain.org", queries: ["Workers Party of Britain", "George Galloway"]}
+
+  - {id: otzma, name: Otzma Yehudit, short: Otzma Yehudit, country: IL, camp: right, lang: he, rtl: true, site: "https://ozma-yeudit.co.il", queries: ["עוצמה יהודית", "איתמר בן גביר", "Otzma Yehudit"]}
+  - {id: noam, name: Noam, short: Noam, country: IL, camp: right, lang: he, rtl: true, site: "https://noamparty.org.il", queries: ["מפלגת נעם", "אבי מעוז", "Noam party Israel"]}
+  - {id: hadash, name: Hadash, short: Hadash, country: IL, camp: left, lang: he, rtl: true, site: "https://hadash.org.il", queries: ["חד״ש", "Hadash party"]}
+  - {id: balad, name: Balad, short: Balad, country: IL, camp: left, lang: ar, rtl: true, site: "https://www.balad.org", queries: ["בל״ד", "التجمع الوطني الديمقراطي", "Balad party Israel"]}
