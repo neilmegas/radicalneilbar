@@ -31,8 +31,8 @@ DEFAULT_CONFIG = {
         "international politics governments conflict",
     ],
     "queries": [
-        "European radical right parties analysis",
-        "European radical left parties analysis",
+        "European far-right parties analysis",
+        "European far-left parties analysis",
     ],
     "limit_per_panel": 6,
     "minimum_per_panel": 2,

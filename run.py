@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Neil's Parties Report — weekly monitoring portal.
+"""RAPPORT — Radicalism and Party Politics: Observation, Reporting and Tracking.
 
   python run.py discover     probe party sites, fill in feeds
   python run.py probe        test the parliamentary adapters
@@ -18,7 +18,6 @@
   python run.py report       frozen report for a date range (see --from/--to)
   python run.py checklinks   re-check collected URLs for deletions and revisions
   python run.py backtrans    back-translation check on quotes you cannot verify
-  python run.py reliability  blind coding round (--report <id> for agreement)
   python run.py weekly       the whole chain
   python run.py backfill     collect an exact historical range (see --from/--to)
   python run.py demo         offline sample portal, no keys needed
@@ -60,6 +59,7 @@ import trends as tr           # noqa: E402
 CONFIG = os.environ.get("RW_CONFIG", "config/sources.yaml")
 COUNTRIES = os.environ.get("RW_COUNTRIES", "config/countries.yaml")
 REVISIONS = os.environ.get("RW_REVISIONS", "config/revisions.yaml")
+REPRESENTATION = os.environ.get("RW_REPRESENTATION", "config/representation.yaml")
 SITE_DIR = os.environ.get("RW_SITE", "site")
 DATA_DIR = os.environ.get("RW_EXPORTS", "exports")
 BG_DIR = os.environ.get("RW_BACKGROUND", "background")
@@ -98,6 +98,14 @@ def load_revisions():
             return (yaml.safe_load(f) or {}).get("revisions", [])
     except FileNotFoundError:
         return []
+
+
+def load_representation():
+    try:
+        with open(REPRESENTATION, encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        return {}
 
 
 def country_names(countries):
@@ -616,7 +624,7 @@ GROUPERS = {
     "country": lambda i: [i.get("country") or "—"],
     "party":   lambda i: [i.get("party_name") or "—"],
     "actor":   lambda i: (i.get("analysis") or {}).get("actors") or ["(no named actor)"],
-    "camp":    lambda i: ["Radical left" if i.get("camp") == "left" else "Far right"],
+    "camp":    lambda i: ["far-left" if i.get("camp") == "left" else "far-right"],
     "source":  lambda i: [i.get("provenance") or "—"],
     "month":   lambda i: [(i.get("published") or "")[:7] or "—"],
     "none":    lambda i: ["All"],
@@ -802,6 +810,8 @@ def cmd_site(cfg, args):
     conn = st.connect()
     countries = load_countries()
     names = country_names(countries)
+    representation = load_representation()
+    party_lookup = {p["id"]: p for p in cfg["parties"]}
     # These directories are generated views of the database.  Recreate them
     # so removed demo records (or corrected records) cannot leave stale pages.
     for generated in ("issues", "data", "corpus", "speakers", "parties"):
@@ -860,7 +870,11 @@ def cmd_site(cfg, args):
         if not hl:
             hl = dg.highlights(items, limit=6, minimum=2)
         sizes = _cluster_sizes(items)
-        previous_week = weeks[week_index + 1] if week_index + 1 < len(weeks) else ""
+        current_monday = week_bounds(week)[0]
+        previous_dt = current_monday - timedelta(weeks=1)
+        previous_week = f"{previous_dt.isocalendar().year}-W{previous_dt.isocalendar().week:02d}"
+        if previous_week not in weeks:
+            previous_week = ""
         previous_items = (_enrich(st.week_items(conn, previous_week, analyzed_only=True),
                                   cfg, codes) if previous_week else [])
         one_minute = tr.week_in_one_minute(items, hl)
@@ -868,6 +882,25 @@ def cmd_site(cfg, args):
         coverage = tr.coverage_report(week, cfg["parties"], items,
                                       collection_history)
         watch = tr.watch_next(items)
+        four_week_periods = []
+        for offset in range(4):
+            timeline_dt = current_monday - timedelta(weeks=offset)
+            timeline_iso = timeline_dt.isocalendar()
+            timeline_week = f"{timeline_iso.year}-W{timeline_iso.week:02d}"
+            timeline_items = (_enrich(
+                st.week_items(conn, timeline_week, analyzed_only=True), cfg, codes)
+                              if timeline_week in weeks else [])
+            four_week_periods.append((timeline_week, timeline_items))
+        start_date = week_bounds(week)[0].date().isoformat()
+        end_date = week_bounds(week)[1].date().isoformat()
+        representation_changes = []
+        for party_id, profile in (representation.get("parties") or {}).items():
+            party = party_lookup.get(party_id, {})
+            for change in profile.get("changes") or []:
+                if start_date <= str(change.get("date") or "") <= end_date:
+                    representation_changes.append({**change,
+                                                   "party_id": party_id,
+                                                   "party": party.get("short") or party_id})
 
         csv_path = os.path.join(DATA_DIR, f"{week}.csv")
         # Exports are generated views, so rebuild them when the report schema
@@ -886,7 +919,9 @@ def cmd_site(cfg, args):
                                       f"{week_bounds(week)[1].strftime('%d %b %Y')}",
                            retractions=retractions, minute=one_minute,
                            changes=changes, coverage=coverage, watch=watch,
-                           previous_week=previous_week)
+                           previous_week=previous_week,
+                           representation_changes=representation_changes,
+                           four_week_periods=four_week_periods)
 
         relevant = [i for i in items if (i.get("analysis") or {}).get("relevant")]
         start, end = week_bounds(week)
@@ -905,7 +940,7 @@ def cmd_site(cfg, args):
         pitems = _enrich(st.party_items(conn, p["id"]), cfg)
         rel = [i for i in pitems if (i.get("analysis") or {}).get("relevant")]
         totals[p["id"]] = len(rel)
-        st_site.party_page(p, [], rel, SITE_DIR)
+        st_site.party_page(p, [], rel, SITE_DIR, representation=representation)
 
     # Speakers: disaggregate what the party pages aggregate.
     spk = tr.speaker_index(conn, cfg["parties"], st)
@@ -933,6 +968,8 @@ def cmd_site(cfg, args):
     rb.report_page(SITE_DIR, len(cfg["parties"]),
                    len({p.get("country") for p in cfg["parties"]}))
     st_site.search_page(SITE_DIR)
+    st_site.dataset_page(index, cfg["parties"], yrs, SITE_DIR)
+    st_site.citation_page(SITE_DIR)
     prompt_versions = st.prompt_versions(conn)
     st_site.methodology_page(cfg["parties"], prompt_versions,
                              load_revisions(), SITE_DIR)
@@ -952,7 +989,8 @@ def cmd_site(cfg, args):
 
     st_site.archive_page(index, SITE_DIR)
     st_site.parties_page(cfg["parties"], totals, SITE_DIR)
-    st_site.home_page(index[0] if index else None, index, SITE_DIR)
+    st_site.home_page(index[0] if index else None, index,
+                      cfg["parties"], names, SITE_DIR)
     st_site.write_index_json(index, SITE_DIR)
     print(f"\nPortal built: {len(index)} issue(s), {len(cfg['parties'])} party pages -> {SITE_DIR}/")
 
@@ -1036,38 +1074,38 @@ def cmd_demo(cfg, args):
     conn = st.connect()
     fixtures = [
         ("d1", "afd", "party_site", "https://example.org/afd", "Landtag programme", "2026-09-01",
-         {"relevant": True, "topics": ["immigration"], "confidence": "high", "actors": [],
+         {"relevant": True, "confidence": "high", "actors": [],
           "summary": "The party published its state election programme.", "quotes": []}),
         ("d2", "wpb", "press", "https://example.org/wpb", "Broadcast interview", "2026-09-02",
-         {"relevant": True, "topics": ["israel_palestine"], "confidence": "medium",
+         {"relevant": True, "confidence": "medium",
           "actors": ["George Galloway"], "quotes": [],
           "summary": "Galloway restated the party's call for a full arms embargo."}),
         ("d3", "rn", "parliament", "https://example.org/rn", "Séance publique", "2026-08-31",
-         {"relevant": True, "topics": ["immigration"], "confidence": "high",
+         {"relevant": True, "confidence": "high",
           "actors": ["Demo Speaker A"],
           "summary": "Floor speech arguing that le regroupement familial should be suspended.",
           "quotes": [{"original": "Le regroupement familial doit être suspendu.",
                       "translation": "Family reunification must be suspended.",
                       "speaker": "Demo Speaker A"}]}),
         ("d5", "lfi", "parliament", "https://example.org/lfi", "Séance publique", "2026-09-01",
-         {"relevant": True, "topics": ["immigration"], "confidence": "high",
+         {"relevant": True, "confidence": "high",
           "actors": ["Demo Speaker B"],
           "summary": "Floor speech opposing the suspension of le regroupement familial.",
           "quotes": [{"original": "Le regroupement familial n'est pas négociable.",
                       "translation": "Family reunification is not negotiable.",
                       "speaker": "Demo Speaker B"}]}),
         ("d6", "otzma", "party_site", "https://example.org/otzma", "הודעת מפלגה", "2026-09-01",
-         {"relevant": True, "topics": ["jews_antisemitism"], "confidence": "high",
+         {"relevant": True, "confidence": "high",
           "actors": ["Demo Speaker C"],
           "summary": "Party statement on the annual Kahane memorial and its legal status.",
           "quotes": [{"original": "הציבור לא ישכח.", "translation": "The public will not forget.",
                       "speaker": "Demo Speaker C"}]}),
         ("d7", "hadash", "parliament", "https://example.org/hadash", "ישיבת מליאה", "2026-09-02",
-         {"relevant": True, "topics": [], "confidence": "high", "actors": ["Demo Speaker D"],
+         {"relevant": True, "confidence": "high", "actors": ["Demo Speaker D"],
           "summary": "Floor speech opposing a bill on party registration criteria.",
           "quotes": []}),
         ("d4", "fonilogikis", "press", "https://example.org/fl", "Grammos and Vitsi commemoration", "2026-08-30",
-         {"relevant": True, "topics": [], "confidence": "high", "actors": ["Αφροδίτη Λατινοπούλου"],
+         {"relevant": True, "confidence": "high", "actors": ["Αφροδίτη Λατινοπούλου"],
           "summary": "The only party to issue a formal announcement on the Grammos and Vitsi commemorations.",
           "quotes": []}),
     ]
@@ -1103,7 +1141,7 @@ def cmd_demo(cfg, args):
                "watch": "Whether the phrasing migrates into coalition-negotiation language.",
                "frameworks": ["Horseshoe convergence"], "caveat": ""},
         "d5": {"significance": "notable", "confidence": "medium",
-               "reading": "Contests the same ground in the same words as the far right, from the opposing side. The shared vocabulary is the point: both parties have accepted that this is the terrain the argument happens on.",
+               "reading": "Contests the same ground in the same words as the far-right, from the opposing side. The shared vocabulary is the point: both parties have accepted that this is the terrain the argument happens on.",
                "why_now": "Same sitting as the opposing speech; the two are in direct exchange.",
                "continuity": "consistent", "continuity_note": "Consistent with the party's standing position.",
                "comparison": "Direct mirror of the far-right intervention the same day.",
@@ -1174,7 +1212,6 @@ def cmd_demo(cfg, args):
         "Demo fixture. In a real issue this is the Israeli national context for the week.")
     st.set_briefing(conn, "2026-W36", "FR",
                     "Demo fixture data — quotes are attributed to placeholder speakers.")
-    st.set_code(conn, "d3", 0, "Israel-related, not antisemitic on its face (JDA 11–15)", "NB")
     st.set_briefing(conn, "2026-W36", DIFF_SCOPE, json.dumps([{
         "party_id": "sd", "party": "SD", "url": "https://www.sd.se/valplattform/",
         "since": "2026-08-24", "added_total": 2, "removed_total": 1, "similarity": 0.96,
@@ -1182,8 +1219,8 @@ def cmd_demo(cfg, args):
         "removed": ["Frivillig återvandring ska fortsatt uppmuntras."],
     }], ensure_ascii=False))
     st.set_briefing(conn, "2026-W36", OVERVIEW_SCOPE,
-                    "A quiet week. Immigration dominated on the right while Israel-related "
-                    "output was confined to the radical left.")
+                    "A quiet demo week, with activity concentrated in parliamentary speech "
+                    "and one newly published state-election programme.")
     st.set_briefing(conn, "2026-W36", "DE",
                     "The Bundestag was in recess and the Saxony-Anhalt campaign dominated.")
     st.set_briefing(conn, "2026-W35", OVERVIEW_SCOPE,
@@ -1242,11 +1279,6 @@ def cmd_demo(cfg, args):
         for iid in ["d1", "d2", "d3", "d4", "d5", "d6", "d7"]:
             st.set_meta(conn, iid, stage, an.MODEL, ver)
     st.set_meta(conn, "d1", "analyze", an.MODEL, "analyze/2")
-    for iid, themes in [("d1", ["immigration"]), ("d2", []), ("d3", ["immigration"]),
-                        ("d4", []), ("d5", ["immigration"]), ("d6", ["jews_antisemitism"]),
-                        ("d7", ["immigration"])]:
-        st.set_blind_code(conn, iid, "2026-09", "NB", themes)
-
     cmd_site(cfg, args)
 
 
@@ -1256,7 +1288,7 @@ def main():
     ap.add_argument("command", choices=[
         "discover", "probe", "collect", "analyze", "refresh", "brief",
         "archive", "export", "site", "diff", "roster", "code", "interpret",
-        "world", "report", "checklinks", "backtrans", "reliability",
+        "world", "report", "checklinks", "backtrans",
         "weekly", "backfill", "demo"])
     ap.add_argument("--round", dest="round_id")
     ap.add_argument("--report", dest="report_round")
@@ -1307,7 +1339,6 @@ def main():
          "diff": cmd_diff, "roster": cmd_roster, "code": cmd_code,
          "interpret": cmd_interpret, "world": cmd_world, "report": cmd_report,
          "checklinks": cmd_checklinks, "backtrans": cmd_backtrans,
-         "reliability": cmd_reliability,
          "demo": cmd_demo}[args.command](cfg, args)
 
 

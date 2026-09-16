@@ -15,6 +15,10 @@ FIELDS = [
 ]
 
 
+def camp_label(value: str) -> str:
+    return {"left": "far-left", "right": "far-right"}.get(value, value or "")
+
+
 def rows_for(items: list[dict], cluster_sizes: dict | None = None) -> list[dict]:
     cluster_sizes = cluster_sizes or {}
     rows = []
@@ -32,7 +36,7 @@ def rows_for(items: list[dict], cluster_sizes: dict | None = None) -> list[dict]
                 "country": item.get("country", ""),
                 "party_id": item.get("party_id", ""),
                 "party": item.get("party_name", item.get("party_id", "")),
-                "camp": item.get("camp", ""),
+                "camp": camp_label(item.get("camp", "")),
                 "source_type": item.get("source_type", ""),
                 "provenance": item.get("provenance", ""),
                 "outlet": item.get("outlet", ""),

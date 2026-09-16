@@ -1,0 +1,110 @@
+# Official institutional sources used on party pages.  Party-specific seat
+# figures belong under `parties:` only after they have been checked against
+# the linked parliament or election authority.  The site deliberately shows
+# an explicit verification-pending state instead of guessing or carrying a
+# stale number forward.
+checked_on: "2026-09-16"
+european_parliament:
+  label: European Parliament members
+  url: "https://www.europarl.europa.eu/meps/en/search/advanced"
+
+country_sources:
+  GR:
+    parliament: {label: Hellenic Parliament, url: "https://www.hellenicparliament.gr/en/"}
+    elections: {label: Ministry of the Interior election results, url: "https://www.ypes.gr/ekloges/"}
+    eu_member: true
+  DE:
+    parliament: {label: German Bundestag, url: "https://www.bundestag.de/en"}
+    elections: {label: Federal Returning Officer, url: "https://www.bundeswahlleiterin.de/en/"}
+    eu_member: true
+  FR:
+    parliament: {label: National Assembly, url: "https://www.assemblee-nationale.fr/"}
+    elections: {label: Ministry of the Interior election results, url: "https://www.resultats-elections.interieur.gouv.fr/"}
+    eu_member: true
+  AT:
+    parliament: {label: Austrian Parliament, url: "https://www.parlament.gv.at/ENGL/"}
+    elections: {label: Federal Ministry of the Interior elections, url: "https://www.bmi.gv.at/412_english/"}
+    eu_member: true
+  NL:
+    parliament: {label: House of Representatives, url: "https://www.houseofrepresentatives.nl/"}
+    elections: {label: Electoral Council, url: "https://english.kiesraad.nl/"}
+    eu_member: true
+  BE:
+    parliament: {label: Belgian Chamber of Representatives, url: "https://www.dekamer.be/"}
+    elections: {label: Federal election results, url: "https://elections.fgov.be/"}
+    eu_member: true
+  SE:
+    parliament: {label: Swedish Riksdag, url: "https://www.riksdagen.se/en/"}
+    elections: {label: Swedish Election Authority, url: "https://www.val.se/"}
+    eu_member: true
+  FI:
+    parliament: {label: Parliament of Finland, url: "https://www.eduskunta.fi/EN/"}
+    elections: {label: Elections Finland, url: "https://vaalit.fi/en/frontpage"}
+    eu_member: true
+  IT:
+    parliament: {label: Chamber of Deputies, url: "https://www.camera.it/leg19/1"}
+    elections: {label: Ministry of the Interior election results, url: "https://elezioni.interno.gov.it/"}
+    eu_member: true
+  ES:
+    parliament: {label: Congress of Deputies, url: "https://www.congreso.es/en/home"}
+    elections: {label: Ministry of the Interior election results, url: "https://infoelectoral.interior.gob.es/en/"}
+    eu_member: true
+  GB:
+    parliament: {label: UK Parliament, url: "https://www.parliament.uk/"}
+    elections: {label: Electoral Commission, url: "https://www.electoralcommission.org.uk/"}
+    eu_member: false
+  IL:
+    parliament: {label: Knesset, url: "https://main.knesset.gov.il/EN/Pages/default.aspx"}
+    elections: {label: Central Elections Committee, url: "https://www.gov.il/en/departments/units/central-elections-committee/govil-landing-page"}
+    eu_member: false
+  CY:
+    parliament: {label: House of Representatives, url: "https://www.parliament.cy/en"}
+    elections: {label: Central Electoral Service, url: "https://www.elections.gov.cy/"}
+    eu_member: true
+  PT:
+    parliament: {label: Assembly of the Republic, url: "https://www.parlamento.pt/sites/EN/Pages/default.aspx"}
+    elections: {label: National Election Commission, url: "https://www.cne.pt/"}
+    eu_member: true
+  "NO":
+    parliament: {label: Storting, url: "https://www.stortinget.no/en/In-English/"}
+    elections: {label: Norwegian Directorate of Elections, url: "https://www.valg.no/en/"}
+    eu_member: false
+  DK:
+    parliament: {label: Danish Parliament, url: "https://www.thedanishparliament.dk/"}
+    elections: {label: Elections and referendums, url: "https://www.elections.im.dk/"}
+    eu_member: true
+  IE:
+    parliament: {label: Houses of the Oireachtas, url: "https://www.oireachtas.ie/en/"}
+    elections: {label: Electoral Commission, url: "https://www.electoralcommission.ie/"}
+    eu_member: true
+  LU:
+    parliament: {label: Chamber of Deputies, url: "https://www.chd.lu/en"}
+    elections: {label: Official elections portal, url: "https://elections.public.lu/en.html"}
+    eu_member: true
+  CH:
+    parliament: {label: Federal Assembly, url: "https://www.parlament.ch/en"}
+    elections: {label: Federal Statistical Office elections, url: "https://www.bfs.admin.ch/bfs/en/home/statistics/politics/elections.html"}
+    eu_member: false
+  IS:
+    parliament: {label: Althingi, url: "https://www.althingi.is/english/"}
+    elections: {label: National Electoral Commission, url: "https://www.landskjor.is/english/"}
+    eu_member: false
+
+# Optional party records use this shape:
+# parties:
+#   example:
+#     checked_on: "YYYY-MM-DD"
+#     links:
+#       domestic: {label: Parliamentary group, url: "https://..."}
+#       european: {label: European Parliament delegation, url: "https://..."}
+#     current:
+#       national: {seats: 0, total: 0, as_of: "YYYY-MM-DD", source: "https://..."}
+#       european: {seats: 0, total: 0, as_of: "YYYY-MM-DD", source: "https://..."}
+#       regional:
+#         - {name: State parliament, seats: 0, total: 0, as_of: "YYYY-MM-DD", source: "https://..."}
+#     elections:
+#       national:
+#         - {date: "YYYY-MM-DD", seats: 0, total: 0, vote_share: 0.0, source: "https://..."}
+#     changes:
+#       - {date: "YYYY-MM-DD", text: "Representation changed from … to …", source: "https://..."}
+parties: {}

@@ -61,7 +61,7 @@ its top level will not stop this project from working.
 
 1. Go to the repository's main **Code** page.
 2. Click **Add file → Upload files**.
-3. On your computer, open the unzipped `radical-party-watch` folder.
+3. On your computer, open the unzipped RAPPORT update folder.
 4. Select **everything inside it**, including `.github`, `config`, and `src`.
 5. Drag the selection into GitHub's upload box.
 6. Wait until every file is listed.
@@ -76,10 +76,8 @@ GitHub you should see `run.py`, `config`, and `src` immediately at the top level
 On GitHub, open `.github`, then `workflows`. You should see:
 
 - `pages.yml`
-- `setup.yml`
 - `weekly.yml`
-- `monthly-refresh.yml`
-- `daily.yml`
+- `backfill.yml`
 
 If `.github` did not upload, repeat the upload just for that folder after
 showing hidden files on your computer.
@@ -114,25 +112,26 @@ Your address will normally be:
 https://YOUR-GITHUB-NAME.github.io/YOUR-REPOSITORY-NAME/
 ```
 
-For example, if the account is `neilmegas` and the repository is
-`radical-party-watch`, the likely URL is:
+For example, for the repository shown in this project, the likely URL is:
 
 ```text
-https://neilmegas.github.io/radical-party-watch/
+https://neilmegas.github.io/radicalneilbar/
 ```
 
 You can always find the exact link again under **Settings → Pages**.
 
 Use the top menu after publication:
 
+- **Reports** opens the latest report, archive, and custom report builder.
+- **Explore** opens countries and parties, speakers, and the party network.
+- **Research** opens Methodology, Dataset and exports, Suggested citation, and
+  Collection status.
 - **Search** searches titles, summaries, actors, quotations, parties, and
   action labels across the archive.
-- **Parties** opens the week-by-week timeline for each monitored party.
-- **Report** filters the archive, compares two weeks, downloads CSV, or prints
-  a PDF.
-- **Health** shows whether each configured source was actually reached.
-- **Method** explains the collection rules, evidence hierarchy, limitations,
-  prompt versions, and revision history.
+
+The custom report builder is safe to leave public. It only filters the
+already-published dataset in the visitor's browser; it cannot call Claude,
+read the GitHub secret, or spend API tokens.
 
 If the action has a red cross, click it, open the failed step, and read the
 last red message. The most common cause is that **Settings → Pages → Source**
@@ -142,7 +141,7 @@ was not changed to **GitHub Actions**.
 
 ## Step 6 — check the project configuration
 
-The starter list contains 27 parties. Websites and leader names change, so do
+The starter list contains 65 parties. Websites and leader names change, so do
 not assume every address is correct.
 
 1. Go to **Actions**.
@@ -192,8 +191,7 @@ table before treating the result as research data.
 |---|---|---|
 | Publish website | after repository changes | rebuilds and publishes the URL |
 | Weekly issue | Monday at 05:00 UTC | collects and builds a full issue |
-| Monthly refresh | first day of each month | refreshes country primers and roster suggestions |
-| Daily watch | Tuesday–Friday at 06:00 UTC | light collection and link checks |
+| Historical collection | only when you manually run it | adds a date range in manageable chunks |
 
 To stop any schedule: open **Actions**, choose the workflow, click the `…`
 menu, and choose **Disable workflow**.

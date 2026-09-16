@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser as dateparser
 
 
-UA = "NeilsPartiesReport/1.0 (+research monitoring; contact via repository)"
+UA = "RAPPORTResearchMonitor/1.0 (+academic research; https://www.neilbar.com)"
 HEADERS = {"User-Agent": UA, "Accept-Language": "en,*;q=0.5"}
 TIMEOUT = 15
 

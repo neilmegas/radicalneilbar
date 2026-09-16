@@ -24,9 +24,12 @@ REPORT_CSS = r"""
 
 
 BODY = r"""
-<h1>Build an archive report</h1>
+<h1>Build a RAPPORT archive report</h1>
 <p class="lede">Filter the archived items, choose how to group them, then print to PDF or
 download the matching rows as CSV. Everything runs in your browser.</p>
+<p class="research-note"><strong>No API calls and no token spending:</strong> this public
+builder only filters the already-published archive in the visitor's browser. It cannot run
+Claude, collect new material, or use the repository's private API key.</p>
 <p class="meta">Corpus configured for __PARTIES__ parties in __COUNTRIES__ countries.</p>
 <div class="box history-action no-print">
   <h4>Need dates that are not in the archive?</h4>
@@ -41,7 +44,7 @@ download the matching rows as CSV. Everything runs in your browser.</p>
   <label>Country<select id="country"><option value="">All countries</option></select></label>
   <label>Party<select id="party"><option value="">All parties</option></select></label>
   <label>Camp<select id="camp"><option value="">Both camps</option>
-    <option value="left">Radical left</option><option value="right">Far/right radical right</option></select></label>
+    <option value="left">far-left</option><option value="right">far-right</option></select></label>
   <label>Action type<select id="action"><option value="">All actions</option></select></label>
   <label>Group by<select id="group"><option value="country">Country</option>
     <option value="party">Party</option>
@@ -125,7 +128,7 @@ function groupKeys(x){
   switch(el('group').value){
     case 'country':return[x.c||'—'];case 'party':return[x.pn||x.p];
     case 'actor':return x.ac.length?x.ac:['No named actor'];case 'month':return[x.d.slice(0,7)||'—'];
-    case 'camp':return[x.cm==='left'?'Radical left':'Far/right radical right'];case 'source':return[x.pr||'—'];default:return['All items'];
+    case 'camp':return[x.cm==='left'?'far-left':'far-right'];case 'source':return[x.pr||'—'];default:return['All items'];
   }
 }
 
@@ -172,9 +175,9 @@ async function build(ev){
 function csv(){
   const fields=['date','country','party','camp','action_type','provenance','actors','title','summary','source_url','archive_url'];
   const quote=v=>'"'+String(v??'').replaceAll('"','""')+'"';
-  const lines=[fields.join(',')].concat(shown.map(x=>[x.d,x.c,x.pn,x.cm,x.at,x.pr,(x.ac||[]).join('; '),x.ti,x.s,x.u,x.au].map(quote).join(',')));
+  const lines=[fields.join(',')].concat(shown.map(x=>[x.d,x.c,x.pn,x.cm==='left'?'far-left':'far-right',x.at,x.pr,(x.ac||[]).join('; '),x.ti,x.s,x.u,x.au].map(quote).join(',')));
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='neils-parties-report.csv';a.click();URL.revokeObjectURL(a.href);
+  a.href=URL.createObjectURL(blob);a.download='rapport-archive-report.csv';a.click();URL.revokeObjectURL(a.href);
 }
 el('builder').addEventListener('submit',build);el('csv').addEventListener('click',csv);el('compare').addEventListener('click',compareWeeks);
 setHistoryLink();loadCorpus();

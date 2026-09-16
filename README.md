@@ -1,14 +1,18 @@
-# Neil's Parties Report
+# RAPPORT
+
+**Radicalism and Party Politics: Observation, Reporting and Tracking**
 
 A Python program that collects public political-party material, stores a
 longitudinal record in SQLite, and generates a plain static website suitable
 for GitHub Pages.
 
-The generated site includes concise weekly summaries, evidence-linked changes
-from the preceding week, action-type labels, collection coverage, follow-up
-watchpoints, party timelines, archive search, two-week comparison, and
-original-language controls. The methodology and revision log are generated
-from the same archive metadata.
+The generated site includes an interactive monitoring map, concise weekly
+summaries, evidence-linked changes from the preceding week, action-type labels,
+collection coverage, follow-up watchpoints, party timelines, archive search,
+two-week comparison, four-week report timelines, representation panels,
+dataset exports, stable citations, and original-language controls. The map
+counts and party lists come directly from the source roster, while the
+methodology and revision log are generated from the archive metadata.
 
 For browser-only setup instructions, read **[GUIDE.md](GUIDE.md)**.
 
@@ -65,12 +69,19 @@ Run `python run.py --help` for the complete list.
 - `config/reading.yaml`: secondary-reading feeds and search terms.
 - `config/backtranslate.yaml`: languages excluded from round-trip checking.
 - `config/revisions.yaml`: the public methodology revision log.
+- `config/representation.yaml`: official institutional links and verified seat
+  and election-history records. Unverified figures are deliberately left blank.
+- `config/map_geometry.json`: bundled Natural Earth country outlines used by
+  the no-dependency front-page map.
 
 The supplied source roster is a starting point. Every weekly run tries each
 party's direct channels, then searches the official domain when a website
 blocks crawling, and finally uses ordinary web and news search as fallbacks.
-Run `discover` and audit Source health before trusting coverage. No automated
+Run `discover` and audit Collection status before trusting coverage. No automated
 collector can guarantee access to private, logged-in, or non-indexed material.
+The public site consistently uses only the two requested roster labels,
+`far-left` and `far-right`. They are operational monitoring buckets, not a
+claim of academic consensus or party self-identification.
 
 ## Secrets and environment variables
 
@@ -111,3 +122,5 @@ the website from that database.
 
 GitHub Pages is public unless you have a separate enterprise access-control
 arrangement. Do not publish material you are not prepared to make public.
+The public report builder cannot call Claude or read repository secrets: it
+only filters already-published JSON in the visitor's browser.

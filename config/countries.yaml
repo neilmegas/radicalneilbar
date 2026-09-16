@@ -53,3 +53,35 @@ countries:
     name: Israel
     languages: [he, ar, en]
     news_queries: [Israel Knesset party politics]
+  - code: CY
+    name: Cyprus
+    languages: [el, tr, en]
+    news_queries: [Cyprus politics parliament parties]
+  - code: PT
+    name: Portugal
+    languages: [pt, en]
+    news_queries: [Portugal politics Assembleia parties]
+  - code: "NO"
+    name: Norway
+    languages: ["no", nn, en]
+    news_queries: [Norway politics Storting parties]
+  - code: DK
+    name: Denmark
+    languages: [da, en]
+    news_queries: [Denmark politics Folketing parties]
+  - code: IE
+    name: Ireland
+    languages: [en, ga]
+    news_queries: [Ireland politics Dáil parties]
+  - code: LU
+    name: Luxembourg
+    languages: [lb, fr, de, en]
+    news_queries: [Luxembourg politics Chamber of Deputies parties]
+  - code: CH
+    name: Switzerland
+    languages: [de, fr, it, en]
+    news_queries: [Switzerland politics Federal Assembly cantonal elections parties]
+  - code: IS
+    name: Iceland
+    languages: [is, en]
+    news_queries: [Iceland politics Althing parties]

@@ -6,8 +6,8 @@ minimum_per_panel: 2
 limit_per_panel: 6
 
 highlights_queries:
-  - European radical right OR far right parties politics
-  - European radical left parties politics
+  - European far-right parties politics
+  - European far-left parties politics
   - Israel political parties Knesset
 
 world_queries:
@@ -22,7 +22,7 @@ feeds:
   - https://www.osce.org/odihr/press-releases/rss
 
 queries:
-  - European radical right parties analysis
-  - European radical left parties analysis
+  - European far-right parties analysis
+  - European far-left parties analysis
   - Israel party politics analysis
   - European party system elections analysis

@@ -5,8 +5,8 @@ issue ever built, and a page per party showing that party's whole run rather
 than one week of it. No server, no build step, no framework — plain files that
 any static host will serve.
 
-Camp colour follows the parties' own vernacular: deep red for the radical
-left, navy for the far right. It encodes a real dimension of the data, so
+Camp colour follows the two roster buckets: cyan for far-left and navy for
+far-right. It encodes a real dimension of the data, so
 scanning a page tells you the composition of a week before you read a word.
 """
 
@@ -17,6 +17,11 @@ import shutil
 
 from evidence import PROVENANCE
 import trends as trend_utils
+
+SITE_NAME = "RAPPORT"
+SITE_EXPANSION = "Radicalism and Party Politics: Observation, Reporting and Tracking"
+SITE_DESCRIPTION = ("A weekly record of what monitored European and Israeli far-left "
+                    "and far-right parties did and said.")
 
 CSS = """
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap&subset=latin,latin-ext,greek,hebrew');
@@ -39,13 +44,27 @@ a{color:var(--accent-dk)} a:hover{color:var(--ink)}
 a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [dir="rtl"]{text-align:right}
 
-nav.top{border-bottom:3px solid var(--ink);padding:1.4rem 0 .7rem;margin-bottom:1.6rem;
-  display:flex;flex-wrap:wrap;gap:.5rem 1.3rem;align-items:baseline}
+nav.top{border-bottom:3px solid var(--ink);padding:1.15rem 0 .75rem;margin-bottom:1.6rem;
+  display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;position:relative;z-index:20}
 nav.top .brand{font-weight:700;font-size:1.2rem;letter-spacing:-.02em;
   text-decoration:none;color:var(--ink)}
-nav.top a:not(.brand){font-size:13px;color:var(--muted);text-decoration:none}
+nav.top a:not(.brand),nav.top summary{font-size:13px;color:var(--muted);text-decoration:none}
 nav.top a:not(.brand):hover{color:var(--accent-dk)}
 nav.top .spacer{flex:1}
+.nav-menu{position:relative}
+.nav-menu summary{cursor:pointer;list-style:none;padding:.28rem .15rem;white-space:nowrap}
+.nav-menu summary::-webkit-details-marker{display:none}
+.nav-menu summary::after{content:' ▾';font-size:.68em;color:var(--accent-dk)}
+.nav-menu[open] summary{color:var(--ink);font-weight:600}
+.nav-menu[open] summary::after{content:' ▴'}
+.nav-dropdown{position:absolute;left:-.65rem;top:calc(100% + .35rem);min-width:205px;
+  padding:.45rem;background:var(--paper);border:1px solid var(--hair);
+  box-shadow:0 8px 24px rgba(10,27,46,.14);display:grid;z-index:30}
+.nav-dropdown a{padding:.42rem .55rem;white-space:nowrap}
+.nav-dropdown a:hover{background:var(--surface)}
+.brand-lockup{display:flex;flex-direction:column;line-height:1.05;margin-right:.25rem}
+.brand-lockup small{font-size:.55rem;color:var(--muted);font-weight:500;
+  letter-spacing:.025em;margin-top:.18rem;max-width:235px}
 
 h1{font-size:clamp(2rem,5.4vw,2.9rem);font-weight:700;letter-spacing:-.03em;
   line-height:1.02;margin:0 0 .35rem}
@@ -208,6 +227,33 @@ details[open].timeline-period>summary::before{content:'−'}
 .compare-table .pos{color:var(--accent-dk);font-weight:600}
 .compare-table .neg{color:#8A4A3A;font-weight:600}
 .comparison{overflow-x:auto}
+.profile-links{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 1.35rem}
+.profile-links a{display:inline-block;padding:.38rem .58rem;border:1px solid var(--hair);
+  background:var(--surface);font-size:.8rem;text-decoration:none}
+.representation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;
+  margin:.8rem 0 1rem}
+.seat-card{border:1px solid var(--hair);padding:.75rem;background:var(--surface)}
+.seat-card h3{font-size:.85rem;margin:0 0 .35rem}.seat-card .seat-value{font-family:'Source Serif 4',Georgia,serif;
+  font-size:1.75rem;line-height:1.1}.seat-bar{height:.45rem;background:var(--track);margin:.55rem 0 .3rem}
+.seat-bar i{display:block;height:100%;background:var(--accent);min-width:0}
+.seat-pending{color:var(--muted);font-size:.83rem;line-height:1.4}
+.election-comparison{display:flex;align-items:flex-end;gap:.65rem;min-height:145px;
+  border-bottom:2px solid var(--ink);padding:.75rem .4rem 0;margin:.65rem 0 1rem}
+.election-result{flex:1;min-width:72px;text-align:center}.election-result .column{display:block;
+  max-width:70px;margin:0 auto .35rem;background:var(--accent);min-height:2px}
+.election-result strong,.election-result small{display:block}.election-result small{color:var(--muted);font-size:.68rem}
+.research-pages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin:1rem 0}
+.research-pages .box{margin:0}
+.report-tools{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem .7rem;
+  border:1px solid var(--hair);background:var(--surface);padding:.7rem .8rem;margin:1rem 0}
+.report-tools .citation-text{flex:1 1 420px;font-size:.78rem;color:#2B3947}
+.report-tools a,.report-tools button{border:1px solid var(--hair);background:white;color:var(--ink);
+  padding:.3rem .5rem;font:inherit;font-size:.76rem;cursor:pointer;text-decoration:none}
+.representation-change{border-left-color:var(--ink)}
+.four-week-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin:.65rem 0 1.4rem}
+.four-week-card{border:1px solid var(--hair);padding:.65rem;background:var(--surface);min-width:0}
+.four-week-card h3{font-size:.86rem;margin:0 0 .3rem}.four-week-card ul{margin:.2rem 0 0;padding-left:1rem}
+.four-week-card li{font-size:.75rem;line-height:1.35;margin:.42rem 0}.four-week-card .meta{font-size:.67rem}
 .method-step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;padding:.65rem 0;
   border-bottom:1px solid var(--hair)}
 .method-step .step{font-family:'Source Serif 4',Georgia,serif;font-size:1.35rem;
@@ -293,12 +339,97 @@ table.rev tr.filtered td{color:var(--muted)}
   color:var(--accent);font-variant-numeric:tabular-nums}
 .stat .k{font-size:12px;color:var(--muted);margin-top:.2rem}
 
+/* homepage monitoring map */
+.research-note{max-width:57rem;margin:.9rem 0 1.35rem;padding:.65rem .8rem;
+  border-left:4px solid var(--accent);background:var(--surface);color:#2B3947;
+  font-size:.93rem}
+.research-note .email{white-space:nowrap;color:var(--ink);font-weight:500}
+.front-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;
+  max-width:35rem;margin:1.35rem 0 1.15rem}
+.front-stat{display:flex;align-items:baseline;gap:.65rem;padding:.8rem .95rem;
+  border:1px solid var(--hair);border-top:4px solid var(--accent);background:var(--surface)}
+.front-stat .v{font-family:'Source Serif 4',Georgia,serif;font-size:2.2rem;
+  line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.front-stat .k{font-size:.78rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.04em}
+.map-section{margin:1.1rem 0 2.1rem}
+.map-section-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;
+  gap:.35rem 1rem;margin-bottom:.65rem}
+.map-section-head h2{flex:1;margin:0;min-width:15rem}
+.map-legend{display:flex;gap:.8rem;font-size:.74rem;color:var(--muted)}
+.map-legend span{display:inline-flex;align-items:center;gap:.32rem}
+.map-legend i{display:inline-block;width:.78rem;height:.78rem;border:1px solid #A9BBC2;
+  background:#EDF2F4}
+.map-legend i.watched{background:var(--accent);border-color:var(--accent-dk)}
+.map-shell{display:grid;grid-template-columns:minmax(0,2.25fr) minmax(240px,.75fr);
+  border:1px solid var(--hair);background:var(--surface)}
+.map-visual{position:relative;min-width:0;overflow:hidden;background:#F4FAFC;
+  border-right:1px solid var(--hair)}
+.map-svg{display:block;width:100%;height:auto;max-height:600px}
+.map-sea{fill:#F4FAFC}
+.map-country{fill:#E8EEF1;stroke:#FFFFFF;stroke-width:1.25;
+  vector-effect:non-scaling-stroke;transition:fill .12s ease,stroke .12s ease}
+.map-country-link{cursor:pointer}
+.map-country-link .map-country{fill:var(--accent);stroke:#FFFFFF;stroke-width:1.4}
+.map-country-link:hover .map-country,
+.map-country-link:focus .map-country,
+.map-country-link.selected .map-country{fill:var(--ink);stroke:var(--accent);stroke-width:2.5}
+.map-country-link:focus{outline:none}
+.map-inset-box{fill:rgba(255,255,255,.94);stroke:var(--ink);stroke-width:1.25}
+.map-inset-label{fill:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:12px;
+  font-weight:700;text-anchor:middle;pointer-events:none}
+.map-inset-note{fill:var(--muted);font-family:'IBM Plex Sans',sans-serif;font-size:8px;
+  text-anchor:middle;pointer-events:none}
+.map-hit{fill:transparent;pointer-events:all}
+.map-pin{fill:#FFFFFF;stroke:var(--accent-dk);stroke-width:3;
+  vector-effect:non-scaling-stroke;pointer-events:none}
+.map-country-link:hover .map-pin,.map-country-link:focus .map-pin,
+.map-country-link.selected .map-pin{fill:var(--ink);stroke:#FFFFFF}
+.map-tooltip{position:absolute;z-index:2;max-width:270px;padding:.55rem .65rem;
+  border:1px solid var(--ink);background:rgba(255,255,255,.97);box-shadow:0 4px 16px rgba(10,27,46,.14);
+  font-size:.76rem;line-height:1.35;pointer-events:none}
+.map-tooltip strong{display:block;margin-bottom:.16rem;color:var(--ink);font-size:.84rem}
+.map-tooltip span{display:block;color:#2B3947}
+.map-detail{padding:1rem 1.05rem;background:var(--paper);min-width:0}
+.map-detail .eyebrow{font-size:.68rem;color:var(--accent-dk);font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em}
+.map-detail h3{margin:.25rem 0 .35rem;font-size:1.18rem}
+.map-detail p{font-size:.85rem;color:var(--muted);line-height:1.45}
+.map-party-list{display:grid;gap:.35rem;margin-top:.75rem}
+.map-party{display:flex;align-items:center;gap:.45rem;padding:.38rem .48rem;
+  border:1px solid var(--hair);background:var(--surface);color:var(--ink);
+  font-size:.79rem;line-height:1.3;text-decoration:none}
+.map-party:hover{border-color:var(--accent);color:var(--ink)}
+.map-party .camp-dot{width:.48rem;height:.48rem;flex:0 0 .48rem;
+  border-radius:50%;background:var(--right)}
+.map-party.left .camp-dot{background:var(--left);border:1px solid var(--accent-dk)}
+.map-party small{margin-left:auto;color:var(--muted);font-size:.65rem}
+.map-credit{margin:.45rem 0 0;font-size:.67rem;color:var(--muted)}
+.country-directory{margin:.65rem 0 0;border-top:1px solid var(--hair)}
+.country-directory>summary{cursor:pointer;color:var(--accent-dk);font-size:.82rem;
+  padding:.6rem 0}
+.country-directory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:.45rem 1rem;padding:.25rem 0 .8rem}
+.country-directory-item{border-bottom:1px solid var(--hair);padding:.35rem 0}
+.country-directory-item strong{display:block;font-size:.82rem}
+.country-directory-item span{font-size:.73rem;color:var(--muted)}
+
 input.q{font-size:14px;padding:.5rem .6rem;border:1px solid var(--hair);
   background:var(--surface);width:100%;max-width:340px;color:var(--ink);
   font-family:inherit}
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule)}
-@media(max-width:850px){.weekly-panels{grid-template-columns:1fr}.wrap{max-width:880px}}
-@media(max-width:650px){.timeline-tools input,.search-tools input{min-width:0;width:100%}}
+@media(max-width:850px){.weekly-panels{grid-template-columns:1fr}.wrap{max-width:880px}
+  .four-week-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .map-shell{grid-template-columns:1fr}.map-visual{border-right:0;border-bottom:1px solid var(--hair)}}
+@media(max-width:650px){.timeline-tools input,.search-tools input{min-width:0;width:100%}
+  .front-stats{gap:.5rem}.front-stat{display:block;padding:.65rem .7rem}
+  .front-stat .k{display:block;margin-top:.2rem}.country-directory-grid{grid-template-columns:1fr}
+  .map-section-head h2{min-width:100%}
+  nav.top{align-items:flex-start;gap:.35rem .8rem}.brand-lockup{width:100%;margin-bottom:.25rem}
+  .representation-grid,.research-pages,.four-week-grid{grid-template-columns:1fr}
+  .nav-menu{position:static}.nav-dropdown{position:static;box-shadow:none;border:0;
+    border-left:2px solid var(--rule);padding:.2rem 0 .2rem .45rem;min-width:0}}
+@media(prefers-reduced-motion:reduce){.map-country{transition:none}}
 """
 
 from reportbuilder import REPORT_CSS  # noqa: E402
@@ -310,36 +441,50 @@ def e(s):
     return html.escape(str(s or ""))
 
 
+def camp_label(value):
+    """Public label for the compact internal left/right roster value."""
+    return "far-left" if value == "left" else "far-right"
+
+
 def layout(title, body, depth=0, subtitle=""):
     up = "../" * depth
-    page_title = (title if title == "Neil's Parties Report"
-                  else f"{title} · Neil's Parties Report")
+    page_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="{e(SITE_DESCRIPTION)}">
 <title>{e(page_title)}</title>
 <link rel="stylesheet" href="{up}assets/style.css">
 </head><body><div class="wrap">
 <nav class="top">
-  <a class="brand" href="{up}index.html">Neil's Parties Report</a>
-  <a href="{up}archive.html">Archive</a>
+  <span class="brand-lockup"><a class="brand" href="{up}index.html">{SITE_NAME}</a>
+    <small>{e(SITE_EXPANSION)}</small></span>
+  <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
+    <a href="{up}index.html#latest">Latest weekly report</a>
+    <a href="{up}archive.html">Report archive</a>
+    <a href="{up}report.html">Build custom report</a>
+  </div></details>
+  <details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown">
+    <a href="{up}parties.html">Countries and parties</a>
+    <a href="{up}speakers.html">Speakers</a>
+    <a href="{up}network.html">Party network</a>
+  </div></details>
+  <details class="nav-menu"><summary>Research</summary><div class="nav-dropdown">
+    <a href="{up}methodology.html">Methodology</a>
+    <a href="{up}dataset.html">Dataset and exports</a>
+    <a href="{up}citation.html">Suggested citation</a>
+    <a href="{up}health.html">Collection status</a>
+  </div></details>
   <a href="{up}search.html">Search</a>
-  <a href="{up}parties.html">Parties</a>
-  <a href="{up}speakers.html">Speakers</a>
-  <a href="{up}report.html">Report</a>
-  <a href="{up}network.html">Network</a>
-  <a href="{up}health.html">Health</a>
-  <a href="{up}methodology.html">Method</a>
   <span class="spacer"></span>
   <span class="meta">{e(subtitle)}</span>
 </nav>
 {body}
 <footer class="meta">
-Research monitoring archive. Every item links to its source and, where the
-capture succeeded, to an archived copy; source text is snapshotted at
-collection time and committed alongside each issue.
+<strong>{SITE_NAME}</strong> — {e(SITE_EXPANSION)}. Automated research monitoring
+powered by the Claude API. AI-generated material may contain errors; consult the
+cited primary sources. <a href="https://www.neilbar.com" rel="me">Dr. Neil Bar</a>.
 </footer>
 </div></body></html>"""
 
@@ -586,7 +731,7 @@ def panel_html(title, rows, item_by_id):
         )
     if not entries:
         entries.append('<li><span class="meta">No verified result was retrieved. '
-                       'Check Source health before treating this as a quiet week.</span></li>')
+                       'Check Collection status before treating this as a quiet week.</span></li>')
     return f'<section class="weekly-card"><h2>{e(title)}</h2><ul>{"".join(entries)}</ul></section>'
 
 
@@ -621,6 +766,62 @@ def changes_html(rows, previous_week):
             '<p class="meta">A comparison of action types and direct-document volume, not '
             'a claim about ideological movement.</p>'
             f'<ul class="change-list">{"".join(entries)}</ul></section>')
+
+
+def representation_changes_html(rows):
+    """Verified seat, membership, or parliamentary-status changes in the week."""
+    entries = []
+    for row in rows or []:
+        source = (f' <a href="{e(row.get("source"))}" rel="noreferrer">source</a>'
+                  if row.get("source") else "")
+        party = row.get("party") or row.get("party_id") or "Party"
+        entries.append(f'<li><strong>{e(party)}</strong>: {e(row.get("text"))}{source}</li>')
+    if not entries:
+        entries.append('<li class="meta">No verified representation change was recorded '
+                       'for this reporting week.</li>')
+    return ('<section class="change-box representation-change" id="representation-changes">'
+            '<h2>Representation changes</h2><p class="meta">Changes in seats or formal '
+            'parliamentary status are included only when an institutional source has been '
+            'checked.</p><ul class="change-list">' + "".join(entries) + '</ul></section>')
+
+
+def four_week_timeline_html(periods):
+    """Compact, stable-link timeline covering this issue and the prior three."""
+    cards = []
+    for week, rows in periods or []:
+        retained = [row for row in rows if (row.get("analysis") or {}).get("relevant")]
+        ordered = sorted(retained, key=lambda row: row.get("published") or "",
+                         reverse=True)
+        ordered.sort(key=lambda row: not is_party_document(row))
+        entries = []
+        for row in ordered[:4]:
+            title = (row.get("title") or (row.get("analysis") or {}).get("summary")
+                     or "Recorded activity")
+            entries.append(f'<li><a href="../issues/{e(week)}.html#item-{e(row.get("id"))}">'
+                           f'{e(row.get("party_name") or row.get("party_id"))}</a>: '
+                           f'{e(title[:92])}</li>')
+        if not entries:
+            entries.append('<li class="meta">No retained records.</li>')
+        cards.append(f'<section class="four-week-card"><h3>{e(week)}</h3>'
+                     f'<span class="meta">{len(retained)} retained</span>'
+                     f'<ul>{"".join(entries)}</ul></section>')
+    if not cards:
+        return ""
+    return ('<section id="four-week-timeline"><h2>Four-week timeline</h2>'
+            '<p class="meta">A compact view of retained party activity. Each party name '
+            'opens the stable evidence record in its original weekly issue.</p>'
+            f'<div class="four-week-grid">{"".join(cards)}</div></section>')
+
+
+def issue_tools_html(week, week_range):
+    citation = (f'Bar, Neil. “RAPPORT: Week {week} ({week_range}).” '
+                'Radicalism and Party Politics: Observation, Reporting and Tracking.')
+    return (f'<aside class="report-tools" aria-label="Citation and export">'
+            f'<span class="citation-text"><strong>Cite this report:</strong> {e(citation)}</span>'
+            f'<button type="button" data-copy-text="{e(citation)}">Copy citation</button>'
+            '<button type="button" data-copy-link>Copy stable link</button>'
+            f'<a href="../data/{e(week)}.csv" download>CSV</a>'
+            '<button type="button" onclick="window.print()">Print / PDF</button></aside>')
 
 
 def coverage_html(report):
@@ -677,10 +878,10 @@ function setQuoteMode(mode){{
   document.body.classList.remove('quotes-both','quotes-english','quotes-original');
   document.body.classList.add('quotes-'+mode);
   document.querySelectorAll('[data-quote-mode]').forEach(b=>b.classList.toggle('active',b.dataset.quoteMode===mode));
-  try{{localStorage.setItem('npr-quote-mode',mode)}}catch(_e){{}}
+  try{{localStorage.setItem('rapport-quote-mode',mode)}}catch(_e){{}}
 }}
 document.querySelectorAll('[data-quote-mode]').forEach(b=>b.addEventListener('click',()=>setQuoteMode(b.dataset.quoteMode)));
-let savedMode='both';try{{savedMode=localStorage.getItem('npr-quote-mode')||'both'}}catch(_e){{}}
+let savedMode='both';try{{savedMode=localStorage.getItem('rapport-quote-mode')||'both'}}catch(_e){{}}
 setQuoteMode(['both','english','original'].includes(savedMode)?savedMode:'both');
 {extra}
 </script>"""
@@ -693,7 +894,8 @@ def issue_page(week, items, overview, briefings, country_names, parties,
                all_items=None, page_changes=None,
                editors_cut=None, world=None, highlights=None, reading=None,
                week_range="", retractions=None, minute=None, changes=None,
-               coverage=None, watch=None, previous_week=""):
+               coverage=None, watch=None, previous_week="",
+               representation_changes=None, four_week_periods=None):
     """Order follows how the issue is read: the world, then the headlines,
     then country by country and party by party, then what to read."""
     relevant = [i for i in items if (i.get("analysis") or {}).get("relevant")]
@@ -708,6 +910,7 @@ def issue_page(week, items, overview, briefings, country_names, parties,
             f'{flagged} flagged · {len(all_items)} reviewed · '
             f'<a href="../data/{e(week)}.csv">coding rows (CSV)</a></p>']
     body.append(quote_toolbar())
+    body.append(issue_tools_html(week, week_range))
     body.append(minute_html(minute))
 
     # Three short lists share one row. Highlights are drawn from monitored
@@ -722,6 +925,8 @@ def issue_page(week, items, overview, briefings, country_names, parties,
         body.append(f'<p class="brief"><strong>The monitored week:</strong> {e(overview)}</p>')
 
     body.append(changes_html(changes, previous_week))
+    body.append(representation_changes_html(representation_changes))
+    body.append(four_week_timeline_html(four_week_periods))
     body.append(coverage_html(coverage))
     body.append(watch_html(watch))
 
@@ -803,7 +1008,7 @@ def issue_page(week, items, overview, briefings, country_names, parties,
                 site = (f' <a href="{e(p["site"])}" rel="noreferrer">Check official site</a>.'
                         if p.get("site") else "")
                 body.append('<p class="meta">No substantive activity was retained for this '
-                            f'week.{site} Collection attempts remain visible on Source health.</p>')
+                            f'week.{site} Collection attempts remain visible on Collection status.</p>')
             elif not direct:
                 body.append('<p class="meta">No direct party document was captured; the linked '
                             'items above are secondary coverage.</p>')
@@ -856,6 +1061,14 @@ function revealLinkedItem(){
 }
 window.addEventListener('hashchange',revealLinkedItem);
 revealLinkedItem();
+document.querySelectorAll('[data-copy-text]').forEach(button=>button.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(button.dataset.copyText);button.textContent='Copied'}
+  catch(_e){button.textContent='Select citation above'}
+}));
+document.querySelectorAll('[data-copy-link]').forEach(button=>button.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(location.href);button.textContent='Link copied'}
+  catch(_e){button.textContent='Copy the address bar'}
+}));
 """
     body.append(quote_script(issue_js))
 
@@ -871,7 +1084,7 @@ def health_page(rows, weeks, silent, prompt_versions, link_summary, out_dir):
     a snapshot; this is the series, which is what distinguishes a party that
     went quiet from a feed that died."""
     bad = [r for r in rows if r["state"] in ("regressed", "intermittent")]
-    body = ['<h1>Source health</h1>',
+    body = ['<h1>Collection status</h1>',
             '<p class="lede">Every collection attempt, successful or not, across the '
             'weeks on file. A source that stopped working is new information; one that '
             'never worked is a configuration error you already know about. They are '
@@ -934,7 +1147,7 @@ def health_page(rows, weeks, silent, prompt_versions, link_summary, out_dir):
 
     path = os.path.join(out_dir, "health.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Source health", "".join(body),
+        f.write(layout("Collection status", "".join(body),
                        subtitle=f"{len(bad)} degraded"))
     return path
 
@@ -1030,14 +1243,103 @@ def reliability_page(reports, out_dir):
     return path
 
 
-def party_page(party, series, items, out_dir):
-    camp = party.get("camp", "right")
-    site = (f'<a href="{e(party["site"])}" rel="noreferrer">official website</a>'
-            if party.get("site") else "no official website configured")
+def _seat_card(label, row, fallback_source=None):
+    row = row or {}
+    if row.get("seats") is None or not row.get("total"):
+        source = fallback_source or {}
+        link = (f' <a href="{e(source.get("url"))}" rel="noreferrer">Check official source</a>.'
+                if source.get("url") else "")
+        return (f'<section class="seat-card"><h3>{e(label)}</h3>'
+                '<p class="seat-pending">A verified seat total has not yet been published '
+                f'in RAPPORT.{link}</p></section>')
+    seats, total = int(row.get("seats", 0)), int(row.get("total", 0))
+    width = min(100, max(0, 100 * seats / total)) if total else 0
+    source = row.get("source") or (fallback_source or {}).get("url")
+    source_link = (f'<a href="{e(source)}" rel="noreferrer">source</a>' if source else "")
+    return (f'<section class="seat-card"><h3>{e(label)}</h3>'
+            f'<div class="seat-value">{seats} <span class="meta">/ {total}</span></div>'
+            f'<div class="seat-bar" aria-label="{seats} of {total} seats"><i style="width:{width:.2f}%"></i></div>'
+            f'<p class="meta">{e(row.get("as_of") or "current verified total")} '
+            f'{source_link}</p></section>')
+
+
+def representation_html(party, representation):
+    representation = representation or {}
+    country = (representation.get("country_sources") or {}).get(party.get("country"), {})
+    profile = (representation.get("parties") or {}).get(party.get("id"), {})
+    links = []
+    if party.get("site"):
+        links.append(("Official party website", party["site"]))
+    custom_links = profile.get("links") or {}
+    domestic = custom_links.get("domestic") or country.get("parliament")
+    if domestic and domestic.get("url"):
+        label = domestic.get("label") or "Domestic parliament"
+        if not custom_links.get("domestic"):
+            label += " · institutional directory"
+        links.append((label, domestic["url"]))
+    european = custom_links.get("european")
+    if not european and country.get("eu_member"):
+        european = representation.get("european_parliament")
+    if european and european.get("url"):
+        label = european.get("label") or "European Parliament"
+        if not custom_links.get("european"):
+            label += " · member directory"
+        links.append((label, european["url"]))
+    election_source = country.get("elections") or {}
+    if election_source.get("url"):
+        links.append((election_source.get("label") or "Official election results",
+                      election_source["url"]))
+
+    parts = ['<section aria-labelledby="representation-heading"><h2 id="representation-heading">'
+             'Representation</h2><p class="meta">Current representation is kept separate '
+             'from election-result seats. Figures appear only after source verification.</p>',
+             '<div class="profile-links">']
+    parts.extend(f'<a href="{e(url)}" rel="noreferrer">{e(label)}</a>'
+                 for label, url in links)
+    parts.append('</div><div class="representation-grid">')
+    current = profile.get("current") or {}
+    parts.append(_seat_card("National parliament", current.get("national"),
+                            country.get("parliament")))
+    if country.get("eu_member") or current.get("european"):
+        parts.append(_seat_card("European Parliament", current.get("european"),
+                                representation.get("european_parliament")))
+    for row in current.get("regional") or []:
+        parts.append(_seat_card(row.get("name") or "State or regional parliament", row))
+    parts.append('</div>')
+
+    elections = (profile.get("elections") or {}).get("national") or []
+    parts.append('<h3>Last three concluded national elections</h3>')
+    if elections:
+        scale = max((int(row.get("seats") or 0) for row in elections[-3:]), default=1) or 1
+        parts.append('<div class="election-comparison">')
+        for row in elections[-3:]:
+            seats = int(row.get("seats") or 0)
+            height = max(2, 90 * seats / scale)
+            source = (f'<a href="{e(row.get("source"))}" rel="noreferrer">source</a>'
+                      if row.get("source") else "")
+            vote = (f'{row.get("vote_share")}% vote' if row.get("vote_share") is not None
+                    else "vote share unavailable")
+            parts.append(f'<div class="election-result"><span class="column" style="height:{height:.1f}px"></span>'
+                         f'<strong>{seats} seats</strong><small>{e(row.get("date"))}</small>'
+                         f'<small>{e(vote)} · {source}</small></div>')
+        parts.append('</div>')
+    else:
+        link = (f'<a href="{e(election_source.get("url"))}" rel="noreferrer">official election source</a>'
+                if election_source.get("url") else "the official election source")
+        parts.append('<div class="box dashed"><p>Election comparison awaiting verification.</p>'
+                     f'<p class="meta">RAPPORT will not infer historical seats. Use the {link} '
+                     'until three sourced results are entered.</p></div>')
+    checked = profile.get("checked_on") or representation.get("checked_on")
+    if checked:
+        parts.append(f'<p class="meta">Institutional links checked {e(checked)}.</p>')
+    parts.append('</section>')
+    return "".join(parts)
+
+
+def party_page(party, series, items, out_dir, representation=None):
     body = [f'<h1>{e(party.get("name"))}</h1>',
-            f'<p class="meta">{e(party.get("country",""))} · '
-            f'{"radical left" if camp == "left" else "far right"}'
-            f' · {site}</p>']
+            f'<p class="meta">{e(party.get("country",""))}</p>',
+            representation_html(party, representation)]
 
     total_all = len(items)
     direct = [i for i in items if is_party_document(i)]
@@ -1095,7 +1397,7 @@ def party_page(party, series, items, out_dir):
     if not direct and items:
         body.append('<div class="box dashed"><p>No direct records captured yet.</p>'
                     '<p class="meta">The timeline contains outside reporting only. Check '
-                    'Source health to distinguish a quiet period from a blocked source.</p></div>')
+                    'Collection status to distinguish a quiet period from a blocked source.</p></div>')
     if not items:
         body.append('<div class="box dashed"><p>Nothing collected yet.</p>'
                     '<p class="meta">A persistent blank here means the source '
@@ -1191,7 +1493,8 @@ loadSearch();
 def methodology_page(parties, prompt_versions, revisions, out_dir):
     """Plain-language method, limitations, and a visible revision history."""
     body = ['<h1>Methodology and revision log</h1>',
-            '<p class="lede">This is an evidence-led monitoring archive. It records what '
+            f'<p class="lede">{SITE_NAME} is an evidence-led, automated AI monitoring '
+            'archive powered by the Claude API. It records what '
             'the listed parties did and published; it does not infer that absence from the '
             'archive means political inactivity.</p>',
             '<h2>How one weekly report is made</h2>']
@@ -1212,7 +1515,9 @@ def methodology_page(parties, prompt_versions, revisions, out_dir):
         'direct channel, or an official parliamentary record. <strong>Outside reporting</strong> '
         'means journalism or another contextual source. Action labels describe the form of an '
         'observable act, such as a parliamentary intervention or mobilisation; they are not '
-        'ideological topic labels.</p>',
+        'ideological topic labels. <strong>far-left</strong> and <strong>far-right</strong> '
+        'are the two operational roster buckets used throughout this project. They are not '
+        'claims of academic consensus or party self-identification.</p>',
         '<h2>Coverage and limits</h2>',
         '<p>Collection coverage is reported party by party. “No dated activity retained” means '
         'the configured source was checked but produced no qualifying dated record. “Official '
@@ -1232,7 +1537,7 @@ def methodology_page(parties, prompt_versions, revisions, out_dir):
         body.append(f'<li><a class="link-title" href="parties/{e(party["id"])}.html">'
                     f'{e(party.get("short") or party.get("name"))}</a>'
                     f'<span class="link-meta">{e(party.get("country"))} · '
-                    f'{e(party.get("name"))}</span></li>')
+                    f'{camp_label(party.get("camp"))} · {e(party.get("name"))}</span></li>')
     body.append('</ul><h2>Analysis versions in this archive</h2>'
                 '<table class="rev"><thead><tr><th>Stage</th><th>Model</th><th>Prompt</th>'
                 '<th>Records</th><th>First run</th><th>Latest run</th></tr></thead><tbody>')
@@ -1252,6 +1557,95 @@ def methodology_page(parties, prompt_versions, revisions, out_dir):
     path = os.path.join(out_dir, "methodology.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout("Methodology", "".join(body), subtitle="method and changes"))
+    return path
+
+
+def dataset_page(index, parties, years, out_dir):
+    """Human-readable dataset landing page and compact codebook."""
+    total = sum(int(row.get("items") or 0) for row in index)
+    year_links = "".join(
+        f'<li><a class="link-title" href="corpus/{e(year)}.json" download>'
+        f'{e(year)} corpus (JSON)</a><span class="link-meta">Retained evidence records '
+        f'for {e(year)}</span></li>' for year in years)
+    week_links = "".join(
+        f'<li><a class="link-title" href="data/{e(row.get("week"))}.csv" download>'
+        f'{e(row.get("week"))} coding rows (CSV)</a><span class="link-meta">'
+        f'{e(row.get("range"))} · {row.get("items", 0)} retained items</span></li>'
+        for row in index)
+    body = f'''<h1>Dataset and exports</h1>
+<p class="lede">Download the public evidence index behind RAPPORT. Each record retains its
+source URL, date, party, country, evidence class, observable action type, factual summary,
+and stable weekly-report identifier.</p>
+<div class="statline"><div class="stat"><div class="v">{total}</div><div class="k">retained records</div></div>
+<div class="stat"><div class="v">{len(parties)}</div><div class="k">monitored parties</div></div>
+<div class="stat"><div class="v">{len(index)}</div><div class="k">weekly issues</div></div></div>
+<div class="research-pages"><section class="box"><h4>Machine-readable corpus</h4>
+<p>Use the <a href="corpus/index.json">corpus index (JSON)</a> to discover annual shards.</p>
+<ul class="link-list">{year_links or '<li class="meta">No corpus shards yet.</li>'}</ul></section>
+<section class="box"><h4>Weekly coding exports</h4><ul class="link-list">
+{week_links or '<li class="meta">No weekly exports yet.</li>'}</ul></section></div>
+<h2>Compact codebook</h2>
+<table class="rev"><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody>
+<tr><td class="n">id / w / d</td><td>Stable record identifier, ISO reporting week, and publication date.</td></tr>
+<tr><td class="n">p / pn / c</td><td>Party identifier, display name, and country code.</td></tr>
+<tr><td class="n">cm</td><td>Operational roster bucket: far-left or far-right, stored compactly as left/right.</td></tr>
+<tr><td class="n">pr / di</td><td>Evidence provenance and whether the record is a direct party or parliamentary document.</td></tr>
+<tr><td class="n">ti / s / at</td><td>Source title, factual summary, and observable action type.</td></tr>
+<tr><td class="n">u / au</td><td>Original source URL and archived URL, where capture succeeded.</td></tr>
+<tr><td class="n">ac / q</td><td>Named actors and captured quotations.</td></tr>
+</tbody></table>
+<h2>Use and limitations</h2><p>These are records retained by an automated collection and
+screening system, not a complete census of political activity. Dynamic, blocked, deleted,
+or unconfigured sources may be missed. Verify analytical claims against the linked primary
+source and cite the specific weekly issue and record. See the <a href="methodology.html">full methodology</a>
+and <a href="citation.html">suggested citation</a>.</p>
+<h2>Stable links</h2><p>Weekly reports use <code>issues/YYYY-Www.html</code>; individual
+records add <code>#item-ID</code>; party pages use <code>parties/PARTY-ID.html</code>.
+These identifiers do not change when the site is rebuilt.</p>'''
+    path = os.path.join(out_dir, "dataset.html")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(layout("Dataset and exports", body, subtitle="public research data"))
+    return path
+
+
+def citation_page(out_dir):
+    """Citable descriptions for the project, dataset, and individual issues."""
+    site_citation = ("Bar, Neil. RAPPORT: Radicalism and Party Politics: Observation, "
+                     "Reporting and Tracking. Automated research monitoring platform. "
+                     "https://www.neilbar.com.")
+    dataset_citation = ("Bar, Neil. RAPPORT public evidence dataset [data set]. "
+                        "Radicalism and Party Politics: Observation, Reporting and Tracking.")
+    bib = """@misc{bar_rapport,
+  author = {Neil Bar},
+  title = {RAPPORT: Radicalism and Party Politics: Observation, Reporting and Tracking},
+  howpublished = {Automated research monitoring platform},
+  url = {https://www.neilbar.com},
+  note = {Accessed: YYYY-MM-DD}
+}"""
+    body = f'''<h1>Suggested citation</h1>
+<p class="lede">Cite the narrowest stable object that supports the claim: an individual
+evidence record where possible, otherwise its weekly report, dataset version, or the platform.</p>
+<section class="box"><h4>Platform</h4><p>{e(site_citation)}</p>
+<button type="button" data-copy-text="{e(site_citation)}">Copy citation</button></section>
+<section class="box"><h4>Weekly report</h4><p>Bar, Neil. “RAPPORT: Week YYYY-Www
+(date range).” <em>Radicalism and Party Politics: Observation, Reporting and Tracking</em>.
+Permanent weekly-report URL.</p></section>
+<section class="box"><h4>Dataset</h4><p>{e(dataset_citation)} Add the download date and
+the corpus or weekly-export URL used.</p></section>
+<h2>BibTeX</h2><pre class="bib">{e(bib)}</pre>
+<h2>Stable-link hierarchy</h2><ul>
+<li>Report: <code>issues/YYYY-Www.html</code></li>
+<li>Evidence record: <code>issues/YYYY-Www.html#item-ID</code></li>
+<li>Party archive: <code>parties/PARTY-ID.html</code></li>
+</ul><p class="meta">Replace the example access date and use the public RAPPORT URL once
+the project domain is finalised.</p>
+<script>document.querySelectorAll('[data-copy-text]').forEach(button=>button.addEventListener('click',async()=>{{
+try{{await navigator.clipboard.writeText(button.dataset.copyText);button.textContent='Copied'}}
+catch(_e){{button.textContent='Select the citation above'}}
+}}));</script>'''
+    path = os.path.join(out_dir, "citation.html")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(layout("Suggested citation", body, subtitle="how to cite RAPPORT"))
     return path
 
 
@@ -1320,7 +1714,7 @@ def roster_page(candidates, out_dir):
         body.append(
             f'<div class="box"><h4>{e(c.get("name"))} '
             f'<span class="meta">{e(c.get("country",""))} · '
-            f'{"radical left" if c.get("camp")=="left" else "far right"}</span></h4>'
+            f'{camp_label(c.get("camp"))}</span></h4>'
             f'<p>{e(c.get("why",""))}</p>'
             f'<p class="meta">{e(c.get("origin",""))} · founded {e(c.get("founded","?"))} · '
             f'{e(c.get("polling",""))} · seats: {e(c.get("seats",""))}'
@@ -1375,29 +1769,248 @@ def parties_page(parties, totals, out_dir):
     body = (f'<h1>Parties</h1><p class="lede">{len(parties)} parties across '
             f'{len({p.get("country") for p in parties if p.get("country")})} countries. '
             'The figure is everything collected to date.</p>'
-            + block("right", "Far right and radical right")
-            + block("left", "Radical left"))
+            + block("right", "far-right")
+            + block("left", "far-left"))
     path = os.path.join(out_dir, "parties.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout("Parties", body, subtitle=f"{len(parties)} monitored"))
     return path
 
 
-def home_page(latest, index, out_dir):
+MAP_ISO3 = {
+    "GR": ("GRC",), "DE": ("DEU",), "FR": ("FRA",), "AT": ("AUT",),
+    "NL": ("NLD",), "BE": ("BEL",), "SE": ("SWE",), "FI": ("FIN",),
+    "IT": ("ITA",), "ES": ("ESP",), "GB": ("GBR",), "IL": ("ISR",),
+    # Natural Earth keeps the island's internationally recognised government
+    # and the de-facto northern administration as separate geometries.  Both
+    # shapes open the single Cyprus entry in this research roster.
+    "CY": ("CYP", "CYN"),
+    "PT": ("PRT",), "NO": ("NOR",), "DK": ("DNK",), "IE": ("IRL",),
+    "LU": ("LUX",), "CH": ("CHE",), "IS": ("ISL",),
+}
+
+# Enlarged pointer targets for the two smallest/easternmost monitored shapes.
+# The visible country outline remains the geographic source of truth.
+MAP_MARKERS = {"CY": (33.1, 35.0), "IL": (35.0, 31.5), "MT": (14.4, 35.9)}
+
+
+def _map_geometry():
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                        "config", "map_geometry.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {"viewBox": "0 0 900 560", "extent": [-25, 28, 45, 72],
+                "features": [], "source": "Natural Earth",
+                "source_url": "https://www.naturalearthdata.com/"}
+
+
+def _home_map(parties, country_names):
+    """Build a no-dependency SVG map from the roster and bundled geometry."""
+    by_country = {}
+    for party in parties:
+        code = party.get("country")
+        if code:
+            by_country.setdefault(code, []).append(party)
+    for plist in by_country.values():
+        plist.sort(key=lambda p: (p.get("camp") != "right",
+                                  p.get("short") or p.get("name") or p["id"]))
+
+    geometry = _map_geometry()
+    features = {f.get("code"): f for f in geometry.get("features", [])}
+    tracked_shapes = {iso3 for code in by_country for iso3 in MAP_ISO3.get(code, ())}
+    background = "".join(
+        f'<path class="map-country" d="{e(feature.get("d"))}">'
+        f'<title>{e(feature.get("name"))}</title></path>'
+        for code, feature in features.items() if code not in tracked_shapes)
+
+    lon_min, lat_min, lon_max, lat_max = geometry.get("extent", [-25, 28, 45, 72])
+    view = [float(x) for x in str(geometry.get("viewBox", "0 0 900 560")).split()]
+    width, height = view[2], view[3]
+
+    def project(lon, lat):
+        return ((lon - lon_min) / (lon_max - lon_min) * width,
+                (lat_max - lat) / (lat_max - lat_min) * height)
+
+    records = {}
+    watched = []
+    directory = []
+    for code in sorted(by_country, key=lambda c: country_names.get(c, c)):
+        plist = by_country[code]
+        name = country_names.get(code, code)
+        party_records = [{"id": p["id"],
+                          "name": p.get("short") or p.get("name") or p["id"],
+                          "camp": p.get("camp", "right"),
+                          "label": camp_label(p.get("camp"))}
+                         for p in plist]
+        records[code] = {"name": name, "parties": party_records}
+        label = f'{name}: ' + ", ".join(p["name"] for p in party_records)
+        d = "".join(features.get(iso3, {}).get("d", "")
+                    for iso3 in MAP_ISO3.get(code, ()))
+        marker = ""
+        if code in MAP_MARKERS:
+            x, y = project(*MAP_MARKERS[code])
+            marker = (f'<circle class="map-hit" cx="{x:.1f}" cy="{y:.1f}" r="14"/>'
+                      f'<circle class="map-pin" cx="{x:.1f}" cy="{y:.1f}" r="4.5"/>')
+        if d or marker:
+            watched.append(
+                f'<a class="map-country-link" href="#map-detail" data-country="{e(code)}" '
+                f'aria-label="{e(label)}"><path class="map-country" d="{e(d)}">'
+                f'<title>{e(label)}</title></path>{marker}</a>')
+        links = ", ".join(
+            f'<a href="parties/{e(p["id"])}.html">{e(p["name"])}</a>'
+            for p in party_records)
+        directory.append(
+            f'<div class="country-directory-item"><strong>{e(name)} · {len(plist)}</strong>'
+            f'<span>{links}</span></div>')
+
+    israel_inset = ""
+    israel_path = features.get("ISR", {}).get("d", "")
+    if "IL" in by_country and israel_path:
+        label = "Israel: " + ", ".join(p["name"] for p in records["IL"]["parties"])
+        israel_inset = (
+            '<g class="map-inset"><rect class="map-inset-box" x="764" y="360" '
+            'width="92" height="150" rx="3"/><text class="map-inset-label" '
+            'x="810" y="380">Israel</text><text class="map-inset-note" x="810" '
+            'y="494">enlarged</text><a class="map-country-link" href="#map-detail" '
+            f'data-country="IL" aria-label="{e(label)}"><path class="map-country" '
+            f'd="{e(israel_path)}" transform="translate(810 435) scale(2.35) '
+            'translate(-772 -517)"><title>' + e(label) + '</title></path></a></g>')
+
+    data = json.dumps(records, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    script = """<script>
+(() => {
+  const records = __MAP_DATA__;
+  const map = document.getElementById('party-map');
+  const tip = document.getElementById('map-tooltip');
+  const tipCountry = document.getElementById('map-tooltip-country');
+  const tipParties = document.getElementById('map-tooltip-parties');
+  const detail = document.getElementById('map-detail');
+  const detailCountry = document.getElementById('map-detail-country');
+  const detailIntro = document.getElementById('map-detail-intro');
+  const detailParties = document.getElementById('map-detail-parties');
+  const targets = [...document.querySelectorAll('.map-country-link')];
+
+  function showCountry(code) {
+    const record = records[code];
+    if (!record) return;
+    detailCountry.textContent = record.name;
+    detailIntro.textContent = `${record.parties.length} ${record.parties.length === 1 ? 'party' : 'parties'} monitored`;
+    detailParties.replaceChildren();
+    for (const party of record.parties) {
+      const link = document.createElement('a');
+      link.className = `map-party ${party.camp === 'left' ? 'left' : 'right'}`;
+      link.href = `parties/${encodeURIComponent(party.id)}.html`;
+      const dot = document.createElement('span');
+      dot.className = 'camp-dot';
+      dot.setAttribute('aria-hidden', 'true');
+      const name = document.createElement('span');
+      name.textContent = party.name;
+      const label = document.createElement('small');
+      label.textContent = party.label;
+      link.append(dot, name, label);
+      detailParties.append(link);
+    }
+    for (const target of targets) {
+      const active = target.dataset.country === code;
+      target.classList.toggle('selected', active);
+      if (active) target.setAttribute('aria-current', 'true');
+      else target.removeAttribute('aria-current');
+    }
+  }
+
+  function positionTip(event) {
+    const box = map.getBoundingClientRect();
+    let left = event.clientX - box.left + 14;
+    let top = event.clientY - box.top + 14;
+    if (left + tip.offsetWidth > box.width - 8) left = Math.max(8, left - tip.offsetWidth - 28);
+    if (top + tip.offsetHeight > box.height - 8) top = Math.max(8, top - tip.offsetHeight - 28);
+    tip.style.left = `${left}px`;
+    tip.style.top = `${top}px`;
+  }
+
+  for (const target of targets) {
+    target.addEventListener('pointerenter', event => {
+      const record = records[target.dataset.country];
+      showCountry(target.dataset.country);
+      tipCountry.textContent = record.name;
+      tipParties.textContent = record.parties.map(party => party.name).join(' · ');
+      tip.hidden = false;
+      positionTip(event);
+    });
+    target.addEventListener('pointermove', positionTip);
+    target.addEventListener('pointerleave', () => { tip.hidden = true; });
+    target.addEventListener('focus', () => {
+      tip.hidden = true;
+      showCountry(target.dataset.country);
+    });
+    target.addEventListener('click', event => {
+      event.preventDefault();
+      showCountry(target.dataset.country);
+      if (window.matchMedia('(max-width: 850px)').matches) {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        detail.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'nearest'});
+      }
+    });
+  }
+})();
+</script>""".replace("__MAP_DATA__", data)
+
+    source = geometry.get("source") or "Natural Earth"
+    source_url = geometry.get("source_url") or "https://www.naturalearthdata.com/"
+    return f"""<section class="map-section" aria-labelledby="map-heading">
+<div class="map-section-head"><h2 id="map-heading">Where we are watching</h2>
+<div class="map-legend" aria-label="Map legend"><span><i class="watched"></i>Monitored</span>
+<span><i></i>Other country</span></div></div>
+<div class="map-shell">
+<div class="map-visual" id="party-map">
+<svg class="map-svg" viewBox="{e(geometry.get('viewBox', '0 0 900 560'))}" role="img"
+ aria-labelledby="map-title map-description">
+ <title id="map-title">Countries monitored by {SITE_NAME}</title>
+ <desc id="map-description">A map focused on Europe and Israel. Highlighted countries
+ show the monitored parties when selected or pointed to.</desc>
+ <rect class="map-sea" width="100%" height="100%"/>
+ <g aria-hidden="true">{background}</g>
+ <g>{''.join(watched)}</g>{israel_inset}
+</svg>
+<div class="map-tooltip" id="map-tooltip" role="tooltip" hidden>
+ <strong id="map-tooltip-country"></strong><span id="map-tooltip-parties"></span>
+</div></div>
+<aside class="map-detail" id="map-detail" aria-live="polite">
+ <span class="eyebrow">Monitored country</span>
+ <h3 id="map-detail-country">Explore the map</h3>
+ <p id="map-detail-intro">Move over a highlighted country, or select it, to see the parties tracked there.</p>
+ <div class="map-party-list" id="map-detail-parties"></div>
+</aside></div>
+<p class="map-credit">Map geometry: <a href="{e(source_url)}">{e(source)}</a>.</p>
+<details class="country-directory"><summary>Browse all monitored countries and parties</summary>
+<div class="country-directory-grid">{''.join(directory)}</div></details>
+</section>{script}"""
+
+
+def home_page(latest, index, parties, country_names, out_dir):
+    country_count = len({p.get("country") for p in parties if p.get("country")})
+    intro = f"""<p class="meta">{e(SITE_EXPANSION)}</p><h1>{SITE_NAME}</h1>
+<p class="lede">{e(SITE_DESCRIPTION)}</p>
+<p class="research-note">This is an automated AI system powered by the Claude API,
+created by <strong>Dr. Neil Bar</strong> solely for academic research into contemporary
+far-right and far-left parties. Project information and contact:
+<a class="email" href="https://www.neilbar.com" rel="me">www.neilbar.com</a>.
+AI-generated material may contain errors; consult the cited primary sources.</p>
+<div class="front-stats" aria-label="Monitoring overview">
+ <div class="front-stat"><span class="v">{country_count}</span><span class="k">countries tracked</span></div>
+ <div class="front-stat"><span class="v">{len(parties)}</span><span class="k">parties tracked</span></div>
+</div>{_home_map(parties, country_names)}"""
     if not latest:
-        body = ("<h1>Neil's Parties Report</h1>"
-                '<div class="box dashed"><p>No issues yet.</p>'
+        body = (intro + '<div class="box dashed"><p>No issues yet.</p>'
                 '<p class="meta">Run <code>python run.py weekly</code> to build the first one.</p></div>')
     else:
         recent = "".join(
             f'<div class="grow"><span><a href="issues/{e(r["week"])}.html">{e(r["week"])}</a> '
             f'<span class="meta">{e(r["range"])}</span></span>'
             f'<span class="meta">{r["items"]}</span></div>' for r in index[:8])
-        body = f"""<h1>Neil's Parties Report</h1>
-<p class="lede">A weekly record of what monitored European and Israeli radical-left and
-far/right radical-right parties did and said. Direct party documents are shown first;
-reporting and broader context stay as short, clearly attributed links.</p>
-<div class="box"><h4>Latest issue · week {e(latest['week'])}</h4>
+        body = intro + f"""<div class="box" id="latest"><h4>Latest issue · week {e(latest['week'])}</h4>
 <p>{e(latest['headline'])}</p>
 <p><a href="issues/{e(latest['week'])}.html">Read week {e(latest['week'])}</a>
  · <a href="data/{e(latest['week'])}.csv">coding rows (CSV)</a></p></div>
@@ -1406,7 +2019,7 @@ reporting and broader context stay as short, clearly attributed links.</p>
  · <a href="parties.html">Party pages</a></p>"""
     path = os.path.join(out_dir, "index.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Neil's Parties Report", body,
+        f.write(layout(SITE_NAME, body,
                        subtitle=f"{len(index)} issues"))
     return path
 

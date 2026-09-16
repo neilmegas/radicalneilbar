@@ -5,7 +5,7 @@ reports. You do not need to run Python on your computer.
 
 ## 1. Unzip the download
 
-Double-click the downloaded Neil's Parties Report update ZIP.
+Double-click the downloaded RAPPORT update ZIP.
 
 Do **not** upload the ZIP itself: GitHub stores ZIP files but does not unpack
 them.
@@ -19,7 +19,7 @@ them.
 5. Drag **everything inside the folder** into GitHub's upload box. Upload the
    contents, not the enclosing update folder.
 6. Wait until GitHub lists the files.
-7. In the commit box, type `Update Neil's Parties Report`.
+7. In the commit box, type `Update RAPPORT`.
 8. Click **Commit changes**.
 
 The important folders are `src`, `config`, and `data`, plus `run.py`. The
@@ -41,9 +41,23 @@ If it does not start:
 When the run is green, refresh your existing public website. Open weeks
 `2026-W38` and `2026-W37` to see the revised reports.
 
+The new party pages appear immediately after publishing. They correctly show
+zero archived items at first. The next **2 · Weekly issue** run will start
+collecting them automatically; old material is only added if you run
+**5 · Historical collection** for the dates you want.
+
 ## What changed
 
-- The name is now **Neil's Parties Report**.
+- The front page now opens with live totals for **20 countries** and **65
+  parties**, followed by an interactive map focused on Europe and Israel.
+- Point to, tab to, or select a highlighted country to see every party tracked
+  there. A collapsible text directory provides the same information without
+  relying on the map.
+- The introduction now identifies the Claude-powered automated system, states
+  its academic-research purpose, credits **Dr. Neil Bar**, and links to
+  **www.neilbar.com**.
+- The name is now **RAPPORT** (Radicalism and Party Politics: Observation,
+  Reporting and Tracking).
 - Direct party documents and records are the full, central entries.
 - Other reporting is shown as a linked title, publication/date, and short
   description.
@@ -51,9 +65,13 @@ When the run is green, refresh your existing public website. Open weeks
   contain at least two entries when verified sources are available.
 - Countries, parties, and Everything reviewed are collapsible.
 - The former topic tags/filters and survey-baseline blocks are gone.
-- דע״ם / Da'am is included as the 27th monitored party.
+- The watch list now contains **65 parties**. Requested and suggested parties were
+  added; Greek Solution and Podemos were already present and were not duplicated.
+- Every party is displayed using only **far-left** or **far-right**. These are
+  the report's two monitoring buckets, not a claim that every external source
+  classifies every party identically.
 - A blocked official site now triggers official-domain web search and then a
-  wider web/news-search fallback. Source health still records failed attempts;
+  wider web/news-search fallback. Collection status still records failed attempts;
   a private or non-indexed page cannot be recovered automatically.
 - Each issue now opens with **The week in one minute**, then shows what changed
   since the previous archived week, collection coverage, and evidence-linked
@@ -65,5 +83,12 @@ When the run is green, refresh your existing public website. Open weeks
   report builder can compare any two archived weeks.
 - Original quotations can be shown with English, in English only, or in their
   original language only.
-- The new **Method** page explains the evidence hierarchy, limitations, prompt
-  versions, and every report-design revision.
+- The new **Research** menu contains Methodology, Dataset and exports,
+  Suggested citation, and Collection status.
+- Party pages include official and institutional links plus source-gated
+  representation and election-comparison panels. Empty panels mean the figure
+  still needs verification; RAPPORT does not invent or carry stale seat totals.
+- Every weekly report now has representation changes, a four-week timeline,
+  compact citation, stable-link copy, CSV, and print/PDF controls.
+- The public custom-report builder only filters the published archive in the
+  visitor's browser. It cannot call Claude or spend your API tokens.
