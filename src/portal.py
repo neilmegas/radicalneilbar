@@ -16,13 +16,7 @@ import os
 import shutil
 
 from evidence import PROVENANCE
-from trends import THEMES
-
-THEME_LABEL = {
-    "israel_palestine": "Israel and Palestine",
-    "jews_antisemitism": "Jews and antisemitism",
-    "immigration": "Immigration",
-}
+import trends as trend_utils
 
 CSS = """
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap&subset=latin,latin-ext,greek,hebrew');
@@ -38,7 +32,7 @@ CSS = """
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
   font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:880px;margin:0 auto;padding:0 1.25rem 5rem}
+.wrap{max-width:1180px;margin:0 auto;padding:0 1.25rem 5rem}
 .meta{font-size:12.5px;line-height:1.45;color:var(--muted)}
 .num{font-family:'Source Serif 4',Georgia,serif;font-variant-numeric:tabular-nums}
 a{color:var(--accent-dk)} a:hover{color:var(--ink)}
@@ -83,9 +77,8 @@ hr.thin{border:0;border-top:1px solid var(--rule);margin:1.6rem 0}
   cursor:help;border-radius:2px}
 .ptag.p1,.ptag.p2{border-color:var(--accent);color:var(--accent-dk);font-weight:500}
 .ptag.p5{border-style:dashed}
-.themes{margin:.2rem 0 .1rem}
-.themes .tt{display:inline-block;font-size:11.5px;color:var(--accent-dk);
-  border-bottom:2px solid var(--accent);margin-right:.6rem}
+.item-title{font-size:1.05rem;line-height:1.3;margin:.35rem 0 .2rem}
+.item-title a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
 
 blockquote{margin:.7rem 0 0;padding-left:.9rem;border-left:3px solid var(--accent)}
 blockquote[dir="rtl"]{padding:0 .9rem 0 0;border-left:0;border-right:3px solid var(--accent)}
@@ -113,12 +106,6 @@ blockquote .tr{color:var(--muted);font-style:italic;margin-top:.2rem;font-size:.
 .spark12{display:inline-flex;gap:2px;align-items:center;vertical-align:middle}
 .spark12 i{width:7px;height:13px;background:var(--track);display:block}
 .spark12 i.ok{background:var(--accent)}
-.baseline{display:flex;flex-wrap:wrap;gap:1.4rem;margin:.5rem 0 1rem;
-  padding:.7rem .9rem;background:var(--surface);border-left:4px solid var(--accent)}
-.baseline .b{min-width:130px}
-.baseline .bv{font-family:'Source Serif 4',Georgia,serif;font-size:1.7rem;
-  line-height:1;color:var(--accent)}
-.baseline .bk{font-size:11.5px;color:var(--muted);margin-top:.2rem}
 .edge{display:grid;grid-template-columns:1fr auto;gap:.5rem;padding:.3rem 0;
   border-bottom:1px solid var(--hair);font-size:.93rem}
 .kap{font-variant-numeric:tabular-nums}
@@ -165,7 +152,94 @@ pre.bib{background:var(--surface);border:1px solid var(--hair);padding:.5rem .6r
 .cut ol{margin:.4rem 0 0;padding-left:1.2rem}
 .cut li{margin:.5rem 0}
 
-/* highlights */
+/* weekly overview and collapsible report structure */
+.weekly-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem;
+  margin:1.5rem 0 2.2rem}
+.weekly-card{border:1px solid var(--hair);border-top:4px solid var(--accent);
+  padding:.85rem;background:var(--surface);min-width:0}
+.weekly-card h2{font-size:1.05rem;margin:0 0 .55rem;padding:0;border:0}
+.weekly-card ul{margin:.2rem 0 0;padding-left:1.1rem}
+.weekly-card li{margin:.6rem 0;line-height:1.35}
+.weekly-card .desc{display:block;color:#2B3947;font-size:.88rem;margin-top:.15rem}
+.weekly-card .pub{display:block;color:var(--muted);font-size:.75rem;margin-top:.12rem}
+
+.action-tag{display:inline-block;font-size:10.5px;line-height:1.25;padding:.12rem .42rem;
+  border:1px solid var(--rule);color:var(--accent-dk);background:#F2FAFC;
+  border-radius:2px;margin:.1rem .35rem .1rem 0;vertical-align:.08em}
+.minute{border:2px solid var(--ink);padding:.9rem 1.05rem;margin:1.25rem 0}
+.minute h2,.change-box h2,.watch-box h2{border:0;margin:0 0 .45rem;padding:0;font-size:1.12rem}
+.minute ul,.change-list,.watch-list{margin:.3rem 0 0;padding-left:1.2rem}
+.minute li,.change-list li,.watch-list li{margin:.55rem 0}
+.change-box,.watch-box{background:var(--surface);border-left:4px solid var(--accent);
+  padding:.8rem 1rem;margin:1.25rem 0}
+.change-kind{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--muted);font-weight:600;margin-right:.35rem}
+.coverage-strip{display:flex;flex-wrap:wrap;gap:.55rem 1rem;margin:.55rem 0}
+.coverage-strip span{font-size:.8rem;color:var(--muted)}
+.coverage-strip strong{font-family:'Source Serif 4',Georgia,serif;font-size:1.22rem;
+  color:var(--accent-dk);margin-right:.18rem}
+.coverage-table{margin-top:.55rem;overflow-x:auto}
+.coverage-status{font-weight:600}
+.coverage-error{display:block;max-width:38rem;white-space:normal}
+.quote-tools,.timeline-tools,.search-tools,.compare-box{display:flex;flex-wrap:wrap;
+  align-items:end;gap:.55rem 1rem;padding:.7rem .8rem;background:var(--surface);
+  border:1px solid var(--hair);margin:1rem 0}
+.quote-tools{justify-content:space-between;align-items:center;padding:.45rem .7rem}
+.quote-tools button{border:1px solid var(--hair);background:white;color:var(--ink);
+  font:inherit;font-size:.77rem;padding:.25rem .5rem;cursor:pointer}
+.quote-tools button.active{border-color:var(--accent);color:var(--accent-dk);font-weight:600}
+.quotes-original blockquote .tr{display:none}
+.quotes-english blockquote.has-translation .orig{display:none}
+.timeline-tools label,.search-tools label,.compare-box label{font-size:.72rem;color:var(--muted)}
+.timeline-tools input,.timeline-tools select,.search-tools input,.search-tools select,
+.compare-box select{display:block;margin-top:.15rem;padding:.42rem .5rem;border:1px solid var(--hair);
+  background:white;color:var(--ink);font:inherit;font-size:.86rem}
+.timeline-tools input,.search-tools input{min-width:260px}
+details.timeline-period{border-top:2px solid var(--ink);margin:.75rem 0}
+details.timeline-period>summary{cursor:pointer;list-style:none;display:flex;
+  justify-content:space-between;gap:1rem;padding:.65rem .1rem;font-weight:700}
+details.timeline-period>summary::-webkit-details-marker{display:none}
+details.timeline-period>summary::before{content:'+';color:var(--accent-dk);width:1rem}
+details[open].timeline-period>summary::before{content:'−'}
+.timeline-content{padding:0 .2rem .8rem}
+.search-result{padding:.8rem 0;border-bottom:1px solid var(--hair)}
+.search-result h3{font-size:1rem;margin:0 0 .15rem}
+.search-result p{margin:.2rem 0}
+.compare-table .pos{color:var(--accent-dk);font-weight:600}
+.compare-table .neg{color:#8A4A3A;font-weight:600}
+.comparison{overflow-x:auto}
+.method-step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;padding:.65rem 0;
+  border-bottom:1px solid var(--hair)}
+.method-step .step{font-family:'Source Serif 4',Georgia,serif;font-size:1.35rem;
+  color:var(--accent-dk)}
+
+details.country-section{border-top:2px solid var(--ink);margin:1rem 0;background:var(--paper)}
+details.country-section>summary,details.party-section>summary,details.reviewed>summary{
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem;
+  align-items:baseline}
+details.country-section>summary::-webkit-details-marker,
+details.party-section>summary::-webkit-details-marker,
+details.reviewed>summary::-webkit-details-marker{display:none}
+details.country-section>summary{font-size:1.12rem;font-weight:700;padding:.8rem .2rem}
+details.country-section>summary::before,details.party-section>summary::before,
+details.reviewed>summary::before{content:'+';color:var(--accent-dk);font-weight:700;
+  width:1rem;flex:0 0 1rem}
+details[open].country-section>summary::before,details[open].party-section>summary::before,
+details[open].reviewed>summary::before{content:'−'}
+.country-content{padding:0 .2rem 1rem}
+details.party-section{border:1px solid var(--hair);margin:.65rem 0;background:var(--surface)}
+details.party-section>summary{padding:.65rem .75rem;font-weight:600}
+.party-content{padding:.1rem .85rem .9rem;background:var(--paper)}
+.party-content h4{margin:1rem 0 .1rem;font-size:.93rem}
+.summary-count{margin-left:auto;font-weight:400;color:var(--muted);font-size:.78rem}
+ul.link-list{list-style:none;padding:0;margin:.25rem 0}
+ul.link-list li{padding:.65rem 0;border-bottom:1px solid var(--hair)}
+ul.link-list .link-title{font-weight:600}
+ul.link-list .link-meta{display:block;font-size:.76rem;color:var(--muted)}
+ul.link-list .link-desc{display:block;font-size:.9rem;color:#2B3947;margin-top:.12rem}
+details.reviewed{margin-top:2.4rem;border-top:2px solid var(--ink)}
+details.reviewed>summary{font-size:1.25rem;font-weight:700;padding:.8rem .1rem}
+
 .partyblock{margin-top:1.7rem}
 .partyblock .ph{font-weight:600;font-size:1.03rem;border-bottom:1px solid var(--hair);
   padding-bottom:.25rem}
@@ -223,6 +297,8 @@ input.q{font-size:14px;padding:.5rem .6rem;border:1px solid var(--hair);
   background:var(--surface);width:100%;max-width:340px;color:var(--ink);
   font-family:inherit}
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule)}
+@media(max-width:850px){.weekly-panels{grid-template-columns:1fr}.wrap{max-width:880px}}
+@media(max-width:650px){.timeline-tools input,.search-tools input{min-width:0;width:100%}}
 """
 
 from reportbuilder import REPORT_CSS  # noqa: E402
@@ -236,22 +312,26 @@ def e(s):
 
 def layout(title, body, depth=0, subtitle=""):
     up = "../" * depth
+    page_title = (title if title == "Neil's Parties Report"
+                  else f"{title} · Neil's Parties Report")
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>{e(title)}</title>
+<title>{e(page_title)}</title>
 <link rel="stylesheet" href="{up}assets/style.css">
 </head><body><div class="wrap">
 <nav class="top">
-  <a class="brand" href="{up}index.html">Radical Party Watch</a>
+  <a class="brand" href="{up}index.html">Neil's Parties Report</a>
   <a href="{up}archive.html">Archive</a>
+  <a href="{up}search.html">Search</a>
   <a href="{up}parties.html">Parties</a>
   <a href="{up}speakers.html">Speakers</a>
   <a href="{up}report.html">Report</a>
   <a href="{up}network.html">Network</a>
   <a href="{up}health.html">Health</a>
+  <a href="{up}methodology.html">Method</a>
   <span class="spacer"></span>
   <span class="meta">{e(subtitle)}</span>
 </nav>
@@ -310,10 +390,31 @@ def prov_tag(item):
     return f'<span class="prov-tag p{rank}" title="{e(PROVENANCE.get(p,("","",""))[2])}">{e(label)}</span>'
 
 
+def action_tag(item):
+    return f'<span class="action-tag">{e(trend_utils.action_type(item))}</span>'
+
+
+def quote_toolbar():
+    return ('<div class="quote-tools"><span class="meta">Quoted text</span>'
+            '<span><button type="button" data-quote-mode="both" class="active">Original + English</button> '
+            '<button type="button" data-quote-mode="english">English</button> '
+            '<button type="button" data-quote-mode="original">Original</button></span></div>')
+
+
 def item_html(it, show_party=True, cluster_sizes=None):
     a = it.get("analysis") or {}
     cluster_sizes = cluster_sizes or {}
-    parts = [f'<article class="item" id="item-{e(it["id"])}">'
+    action = trend_utils.action_type(it)
+    direct = "1" if is_party_document(it) else "0"
+    search_text = " ".join([
+        str(it.get("title") or ""),
+        str((it.get("analysis") or {}).get("summary") or ""),
+        str(it.get("party_name") or ""),
+        action,
+    ])
+    parts = [f'<article class="item timeline-entry" id="item-{e(it["id"])}" '
+             f'data-action="{e(action)}" data-direct="{direct}" '
+             f'data-search="{e(search_text.lower())}">'
              f'<div class="rail {e(it.get("camp","right"))}">'
              f'<span class="cc">{e(it.get("country",""))}</span>'
              f'<span>{e((it.get("published") or "")[:10])}</span>'
@@ -322,23 +423,28 @@ def item_html(it, show_party=True, cluster_sizes=None):
     if show_party:
         parts.append(f'<div class="pname">{e(it.get("party_name",""))}'
                      f'<span class="full">{e(it.get("party_full",""))}</span>'
-                     f'{prov_tag(it)}</div>')
+                     f'{prov_tag(it)} {action_tag(it)}</div>')
     else:
-        parts.append(f'<div class="meta">{prov_tag(it)}</div>')
-    topics = [THEME_LABEL[t] for t in (a.get("topics") or []) if t in THEME_LABEL]
-    if topics:
-        parts.append('<div class="themes meta">'
-                     + "".join(f'<span class="tt">{e(t)}</span>' for t in topics)
-                     + '</div>')
-    parts.append(f'<p>{e(a.get("summary",""))}</p>')
+        parts.append(f'<div class="meta">{prov_tag(it)} {action_tag(it)}</div>')
+    title = it.get("title") or a.get("summary") or "Untitled source"
+    if it.get("url"):
+        parts.append(f'<h4 class="item-title"><a href="{e(it["url"])}" '
+                     f'rel="noreferrer">{e(title)}</a></h4>')
+    else:
+        parts.append(f'<h4 class="item-title">{e(title)}</h4>')
+    summary = a.get("summary") or ""
+    if summary and summary.casefold() != str(title).casefold():
+        parts.append(f'<p>{e(summary)}</p>')
 
     for q in (a.get("quotes") or [])[:2]:
         if not q.get("original"):
             continue
         rtl = ' dir="rtl"' if it.get("rtl") else ''
-        parts.append(f'<blockquote{rtl}>')
+        has_translation = bool(q.get("translation") and q["translation"] != q["original"])
+        quote_class = ' class="has-translation"' if has_translation else ''
+        parts.append(f'<blockquote{quote_class}{rtl}>')
         parts.append(f'<div class="orig">{e(q["original"])}</div>')
-        if q.get("translation") and q["translation"] != q["original"]:
+        if has_translation:
             parts.append(f'<div class="tr">{e(q["translation"])}</div>')
         if q.get("speaker"):
             parts.append(f'<div class="meta">{e(q["speaker"])}</div>')
@@ -426,23 +532,168 @@ def item_html(it, show_party=True, cluster_sizes=None):
     return "".join(parts)
 
 
-def bars(series, theme, camp):
-    vals = [w[theme] for w in series]
-    top = max(vals + [1])
-    cells = "".join(
-        f'<i class="{"on" if v else ""}" style="height:{max(2, int(34*v/top))}px"></i>'
-        for v in vals
-    )
-    return f'<div class="bars {camp}">{cells}</div>'
+def is_party_document(item):
+    """Direct records get full cards; secondary coverage gets compact links."""
+    return trend_utils.is_direct(item)
+
+
+def compact_link_html(it, show_party=False):
+    """One linked title, publication/date line, and brief factual description."""
+    a = it.get("analysis") or {}
+    title = it.get("title") or a.get("summary") or "Untitled item"
+    link = (f'<a class="link-title" href="{e(it["url"])}" rel="noreferrer">{e(title)}</a>'
+            if it.get("url") else f'<span class="link-title">{e(title)}</span>')
+    source = it.get("outlet") or it.get("source") or it.get("source_type") or "Source"
+    party = it.get("party_name") or it.get("party_id") or ""
+    meta = " · ".join(x for x in [party if show_party else "", source,
+                                   (it.get("published") or "")[:10]] if x)
+    desc = str(a.get("summary") or it.get("description") or it.get("why") or "")
+    action = trend_utils.action_type(it)
+    direct = "1" if is_party_document(it) else "0"
+    search_text = " ".join([str(title), str(desc), str(party), action]).lower()
+    return (f'<li class="timeline-entry" id="item-{e(it.get("id",""))}" '
+            f'data-action="{e(action)}" data-direct="{direct}" '
+            f'data-search="{e(search_text)}">{link}'
+            f'<span class="link-meta">{action_tag(it)} {e(meta)}</span>'
+            + (f'<span class="link-desc">{e(desc)}</span>' if desc and
+               desc.casefold() != str(title).casefold() else "")
+            + '</li>')
+
+
+def panel_html(title, rows, item_by_id):
+    entries = []
+    for row in (rows or [])[:6]:
+        item = item_by_id.get(row.get("item_id")) if isinstance(row, dict) else None
+        src = item or row
+        if not isinstance(src, dict):
+            continue
+        item_title = src.get("title") or row.get("title") or row.get("line") or "Weekly item"
+        url = src.get("url") or row.get("url") or ""
+        linked = (f'<a href="{e(url)}" rel="noreferrer">{e(item_title)}</a>'
+                  if url else e(item_title))
+        source = (src.get("party_name") or src.get("source") or src.get("outlet")
+                  or src.get("party_id") or "Source")
+        published = (src.get("published") or row.get("published") or "")[:10]
+        description = str(row.get("description") or row.get("line")
+                          or (src.get("analysis") or {}).get("summary") or "")
+        jump = (f' · <a href="#item-{e(item["id"])}">full record</a>' if item else "")
+        entries.append(
+            f'<li>{linked}<span class="pub">{e(source)}'
+            + (f' · {e(published)}' if published else "") + jump + '</span>'
+            + (f'<span class="desc">{e(description)}</span>' if description and
+               description.casefold() != str(item_title).casefold() else "")
+            + '</li>'
+        )
+    if not entries:
+        entries.append('<li><span class="meta">No verified result was retrieved. '
+                       'Check Source health before treating this as a quiet week.</span></li>')
+    return f'<section class="weekly-card"><h2>{e(title)}</h2><ul>{"".join(entries)}</ul></section>'
+
+
+def minute_html(rows):
+    """Render the deliberately short, evidence-linked issue entry point."""
+    entries = []
+    for row in (rows or [])[:5]:
+        jump = (f'<a href="#item-{e(row.get("item_id"))}">{e(row.get("party"))}</a>'
+                if row.get("item_id") else f'<strong>{e(row.get("party"))}</strong>')
+        entries.append(f'<li>{jump} {e(row.get("text"))} '
+                       f'<span class="action-tag">{e(row.get("action"))}</span></li>')
+    if not entries:
+        entries.append('<li class="meta">No retained activity was available for a summary.</li>')
+    return ('<section class="minute"><h2>The week in one minute</h2>'
+            '<p class="meta">The shortest route through the most consequential retained '
+            'party activity. Every point opens its supporting record.</p>'
+            f'<ul>{"".join(entries)}</ul></section>')
+
+
+def changes_html(rows, previous_week):
+    entries = []
+    for row in rows or []:
+        party = (f'<a href="#item-{e(row.get("item_id"))}">{e(row.get("party"))}</a>'
+                 if row.get("item_id") else f'<strong>{e(row.get("party"))}</strong>')
+        entries.append(f'<li><span class="change-kind">{e(row.get("kind"))}</span>'
+                       f'{party}: {e(row.get("text"))}</li>')
+    if not entries:
+        entries.append('<li class="meta">No material change was detected in the retained '
+                       'records. Coverage may still have changed.</li>')
+    label = f' since {previous_week}' if previous_week else ''
+    return (f'<section class="change-box"><h2>What changed{e(label)}</h2>'
+            '<p class="meta">A comparison of action types and direct-document volume, not '
+            'a claim about ideological movement.</p>'
+            f'<ul class="change-list">{"".join(entries)}</ul></section>')
+
+
+def coverage_html(report):
+    report = report or {}
+    counts = report.get("counts") or {}
+    status_order = [
+        "Direct material found", "Outside reporting only", "No dated activity retained",
+        "Official source inaccessible", "No archived check", "Search fallback used",
+    ]
+    figures = [f'<span><strong>{report.get("checked", 0)}/{report.get("total", 0)}</strong> '
+               'parties checked</span>']
+    figures += [f'<span><strong>{counts.get(status, 0)}</strong> {e(status.lower())}</span>'
+                for status in status_order if counts.get(status)]
+    rows = []
+    for row in report.get("entries") or []:
+        fallback = ' · search fallback' if row.get("fallback") else ''
+        error = (f'<span class="coverage-error meta">{e(row.get("error"))}</span>'
+                 if row.get("error") else '')
+        rows.append('<tr>'
+                    f'<td><a href="../parties/{e(row.get("party_id"))}.html">'
+                    f'{e(row.get("party"))}</a> <span class="meta">{e(row.get("country"))}</span></td>'
+                    f'<td class="coverage-status">{e(row.get("status"))}{e(fallback)}</td>'
+                    f'<td class="n">{row.get("direct", 0)}</td>'
+                    f'<td class="n">{row.get("coverage", 0)}{error}</td></tr>')
+    return ('<section><h2>Collection coverage</h2>'
+            '<p class="meta">What the collector checked, what it found, and where access '
+            'failed. “No activity” is only used when a source was actually checked.</p>'
+            f'<div class="coverage-strip">{"".join(figures)}</div>'
+            '<details class="coverage-table"><summary>Party-by-party collection record</summary>'
+            '<table class="rev"><thead><tr><th>Party</th><th>Result</th>'
+            f'<th>Direct</th><th>Coverage</th></tr></thead><tbody>{"".join(rows)}'
+            '</tbody></table></details></section>')
+
+
+def watch_html(rows):
+    entries = []
+    for row in (rows or [])[:5]:
+        evidence = (f'<a href="#item-{e(row.get("item_id"))}">{e(row.get("party"))}</a>'
+                    if row.get("item_id") else f'<strong>{e(row.get("party"))}</strong>')
+        entries.append(f'<li>{evidence}: {e(row.get("text"))} '
+                       f'<span class="action-tag">{e(row.get("action"))}</span></li>')
+    if not entries:
+        entries.append('<li class="meta">No evidence-linked watchpoint was generated.</li>')
+    return ('<section class="watch-box"><h2>Watch next week</h2>'
+            '<p class="meta">Evidence-linked follow-ups, not a calendar prediction unless '
+            'the source itself supplied a date.</p>'
+            f'<ul class="watch-list">{"".join(entries)}</ul></section>')
+
+
+def quote_script(extra=""):
+    """Shared original/translation preference, kept locally in the browser."""
+    return f"""<script>
+function setQuoteMode(mode){{
+  document.body.classList.remove('quotes-both','quotes-english','quotes-original');
+  document.body.classList.add('quotes-'+mode);
+  document.querySelectorAll('[data-quote-mode]').forEach(b=>b.classList.toggle('active',b.dataset.quoteMode===mode));
+  try{{localStorage.setItem('npr-quote-mode',mode)}}catch(_e){{}}
+}}
+document.querySelectorAll('[data-quote-mode]').forEach(b=>b.addEventListener('click',()=>setQuoteMode(b.dataset.quoteMode)));
+let savedMode='both';try{{savedMode=localStorage.getItem('npr-quote-mode')||'both'}}catch(_e){{}}
+setQuoteMode(['both','english','original'].includes(savedMode)?savedMode:'both');
+{extra}
+</script>"""
 
 
 # ------------------------------------------------------------- pages
 
 def issue_page(week, items, overview, briefings, country_names, parties,
-               absences, shifts_by_party, cluster_sizes, out_dir,
-               all_items=None, convergence=None, page_changes=None,
+               absences, cluster_sizes, out_dir,
+               all_items=None, page_changes=None,
                editors_cut=None, world=None, highlights=None, reading=None,
-               week_range="", retractions=None, baselines=None, reference=None):
+               week_range="", retractions=None, minute=None, changes=None,
+               coverage=None, watch=None, previous_week=""):
     """Order follows how the issue is read: the world, then the headlines,
     then country by country and party by party, then what to read."""
     relevant = [i for i in items if (i.get("analysis") or {}).get("relevant")]
@@ -456,58 +707,23 @@ def issue_page(week, items, overview, briefings, country_names, parties,
             f'{len({i["party_id"] for i in relevant})} of {len(parties)} parties · '
             f'{flagged} flagged · {len(all_items)} reviewed · '
             f'<a href="../data/{e(week)}.csv">coding rows (CSV)</a></p>']
+    body.append(quote_toolbar())
+    body.append(minute_html(minute))
 
-    # 1 — the world
-    body.append('<h2>This week in the world</h2>')
-    body.append(f'<p class="lede">{e(world or overview or "")}</p>')
-    if world and overview:
-        body.append(f'<p class="brief">{e(overview)}</p>')
-
-    # 2 — highlights
-    body.append('<h2>Highlights</h2>')
-    if highlights:
-        item_by_id = {i["id"]: i for i in relevant}
-        body.append('<ul class="hl">')
-        for h in highlights:
-            it = item_by_id.get(h.get("item_id"))
-            if not it:
-                continue
-            sig = (it.get("interpretation") or {}).get("significance", "")
-            body.append(
-                f'<li class="{e(it.get("camp","right"))}">'
-                f'<strong>{e(it.get("party_name"))}</strong> '
-                f'<span class="meta">{e(it.get("country",""))} · '
-                f'{e((it.get("published") or "")[:10])}</span> — {e(h.get("line",""))} '
-                f'<a href="#item-{e(it["id"])}">in issue</a>'
-                + (f' · <a href="{e(it["url"])}" rel="noreferrer">source</a>' if it.get("url") else "")
-                + (f' · <a href="{e(it["archive_url"])}" rel="noreferrer">archived</a>' if it.get("archive_url") else "")
-                + f'<span class="tagline">{e(h.get("tag",""))}'
-                + (f' · {e(sig)}' if sig and sig != "routine" else "")
-                + f' · {e(PROVENANCE.get(it.get("provenance"),("",0,""))[0])}</span></li>')
-        body.append('</ul>')
-    else:
-        body.append('<div class="box dashed"><p>No highlights this week.</p></div>')
-
-    body.append('<div class="glance" style="margin-top:1.2rem">')
-    for t in THEMES:
-        hits = [i for i in relevant if t in (i["analysis"].get("topics") or [])]
-        if hits:
-            links = ", ".join(f'<a href="#item-{e(i["id"])}">{e(i["party_name"])}</a>'
-                              for i in sorted(hits, key=lambda x: (x.get("provenance_rank") or 9)))
-            body.append(f'<div><span class="th">{THEME_LABEL[t]}</span> — {links}</div>')
-        else:
-            body.append(f'<div><span class="th">{THEME_LABEL[t]}</span> '
-                        f'<span class="meta">— nothing this week</span></div>')
+    # Three short lists share one row. Highlights are drawn from monitored
+    # party activity; the other two are linked external context.
+    item_by_id = {i["id"]: i for i in relevant}
+    body.append('<div class="weekly-panels">')
+    body.append(panel_html("Highlights", highlights, item_by_id))
+    body.append(panel_html("This week in the world", world, item_by_id))
+    body.append(panel_html("Worth reading", reading, item_by_id))
     body.append('</div>')
+    if overview:
+        body.append(f'<p class="brief"><strong>The monitored week:</strong> {e(overview)}</p>')
 
-    if shifts_by_party:
-        body.append('<div class="box flag"><h4>Changes against the record</h4>')
-        for pname, sh in shifts_by_party.items():
-            for sft in sh:
-                verb = "took up" if sft["kind"] == "new" else "dropped"
-                body.append(f'<p>{e(pname)} {verb} <strong>{e(THEME_LABEL[sft["theme"]])}</strong> '
-                            f'<span class="meta">({e(sft["detail"])})</span></p>')
-        body.append('</div>')
+    body.append(changes_html(changes, previous_week))
+    body.append(coverage_html(coverage))
+    body.append(watch_html(watch))
 
     if retractions:
         body.append('<div class="box flag"><h4>Source pages gone or rewritten</h4>'
@@ -538,23 +754,19 @@ def issue_page(week, items, overview, briefings, country_names, parties,
                 body.append(f'<p class="ad">+ {e(line[:220])}</p>')
         body.append('</div>')
 
-    if convergence:
-        body.append('<div class="box"><h4>Language appearing on both flanks</h4>'
-                    '<p class="meta">Terms used this week by parties in both camps, in the '
-                    'same language, taken from verbatim quotes only. A candidate, not a '
-                    'finding — shared vocabulary is not a shared position.</p>')
-        for c in convergence:
-            body.append(f'<p><strong>{e(c["term"])}</strong> <span class="meta">[{e(c["lang"])}] — '
-                        f'left: {e(", ".join(c["left"]))} · right: {e(", ".join(c["right"]))}</span></p>')
-        body.append('</div>')
-
-    # 3 — country by country, party by party
+    # Country and party sections are collapsed by default so the direct
+    # documents remain readable even in a high-volume week.
     body.append('<h2>By country</h2>')
-    used = set()
-    codes = sorted({i["country"] for i in relevant} | set(briefings.keys()))
+    codes = sorted({p.get("country") for p in parties if p.get("country")}
+                   | {i.get("country") for i in relevant if i.get("country")})
     for code in codes:
-        body.append(f'<h3><span class="cc">{e(code)}</span> {e(country_names.get(code, code))}</h3>')
-        body.append(baseline_block(code, baselines, reference))
+        here = [i for i in relevant if i.get("country") == code]
+        direct_here = [i for i in here if is_party_document(i)]
+        body.append('<details class="country-section"><summary>'
+                    f'<span><span class="cc">{e(code)}</span> '
+                    f'{e(country_names.get(code, code))}</span>'
+                    f'<span class="summary-count">{len(direct_here)} direct records · '
+                    f'{len(here)} total items</span></summary><div class="country-content">')
         if briefings.get(code):
             body.append(f'<p class="brief">{e(briefings[code])}</p>')
         for ab in [a for a in absences if a.get("country") == code]:
@@ -562,62 +774,47 @@ def issue_page(week, items, overview, briefings, country_names, parties,
                         f'<p class="meta">Engaged: {e(", ".join(ab["spoke"]) or "none")}. '
                         f'Silent: {e(", ".join(ab["silent_names"]) or "none")}.</p></div>')
 
-        here = [i for i in relevant if i["country"] == code]
-        for pid in sorted({i["party_id"] for i in here},
-                          key=lambda x: (by_id.get(x, {}).get("short") or x)):
+        country_parties = sorted([p for p in parties if p.get("country") == code],
+                                 key=lambda p: p.get("short") or p["id"])
+        for p in country_parties:
+            pid = p["id"]
             mine = [i for i in here if i["party_id"] == pid]
-            p = by_id.get(pid, {})
-            body.append(f'<div class="partyblock"><div class="ph">'
-                        f'<span class="camp {e(p.get("camp","right"))}"></span>'
-                        f'<a href="../parties/{e(pid)}.html">{e(p.get("short") or pid)}</a>'
-                        f'<span class="full"> {e(p.get("name",""))}</span></div>')
-            shown = set()
-            for t in THEMES:
-                for i in sorted([x for x in mine if t in (x["analysis"].get("topics") or [])],
-                                key=lambda x: (x.get("provenance_rank") or 9)):
-                    if i["id"] in shown:
-                        continue
-                    shown.add(i["id"]); used.add(i["id"])
-                    body.append(item_html(i, show_party=False, cluster_sizes=cluster_sizes))
-            for i in sorted([x for x in mine if x["id"] not in shown],
-                            key=lambda x: (x.get("provenance_rank") or 9))[:8]:
-                body.append(item_html(i, show_party=False, cluster_sizes=cluster_sizes))
-            body.append('</div>')
+            direct = sorted([i for i in mine if is_party_document(i)],
+                            key=lambda x: x.get("published") or "", reverse=True)
+            coverage = sorted([i for i in mine if not is_party_document(i)],
+                              key=lambda x: x.get("published") or "", reverse=True)
+            body.append('<details class="party-section"><summary>'
+                        f'<span><a href="../parties/{e(pid)}.html">'
+                        f'{e(p.get("short") or pid)}</a> '
+                        f'<span class="meta">{e(p.get("name", ""))}</span></span>'
+                        f'<span class="summary-count">{len(direct)} direct · '
+                        f'{len(coverage)} coverage</span></summary><div class="party-content">')
+            if direct:
+                body.append('<h4>Party documents and direct records</h4>')
+                for item in direct:
+                    body.append(item_html(item, show_party=False,
+                                          cluster_sizes=cluster_sizes))
+            if coverage:
+                body.append('<h4>Other reporting and context</h4><ul class="link-list">')
+                for item in coverage:
+                    body.append(compact_link_html(item))
+                body.append('</ul>')
+            if not mine:
+                site = (f' <a href="{e(p["site"])}" rel="noreferrer">Check official site</a>.'
+                        if p.get("site") else "")
+                body.append('<p class="meta">No substantive activity was retained for this '
+                            f'week.{site} Collection attempts remain visible on Source health.</p>')
+            elif not direct:
+                body.append('<p class="meta">No direct party document was captured; the linked '
+                            'items above are secondary coverage.</p>')
+            body.append('</div></details>')
+        body.append('</div></details>')
 
-    active = {i["party_id"] for i in relevant}
-    collected = {i["party_id"] for i in all_items}
-    quiet = [p for p in parties if p["id"] not in active]
-    if quiet:
-        body.append('<h2>No substantive items</h2><div class="grid">')
-        for p in sorted(quiet, key=lambda x: x.get("short") or x["id"]):
-            bad = ("" if p["id"] in collected
-                   else '<span class="meta bad">unreachable</span>')
-            body.append(f'<div class="grow"><span>'
-                        f'<a href="../parties/{e(p["id"])}.html">{e(p.get("short") or p["id"])}</a> '
-                        f'<span class="meta">{e(p.get("country",""))}</span></span>{bad}</div>')
-        body.append('</div>')
-
-    # 4 — what to read
-    body.append('<h2>Worth reading</h2>')
-    if reading:
-        body.append('<p class="meta">Commentary, analysis, surveys and reporting from this '
-                    'week — secondary literature rather than party output.</p>')
-        for r in reading:
-            body.append(
-                f'<div class="read"><span class="kind">{e(r.get("kind",""))}</span>'
-                f'<a href="{e(r.get("url",""))}" rel="noreferrer">{e(r.get("title",""))}</a>'
-                f'<span class="src"> · {e(r.get("source",""))}</span>'
-                + (f'<p class="meta">{e(r["why"])}</p>' if r.get("why") else "")
-                + '</div>')
-    else:
-        body.append('<div class="box dashed"><p>Nothing collected for the reading list.</p>'
-                    '<p class="meta">Check the feeds in config/reading.yaml — a persistent '
-                    'blank here is a broken feed list, not a quiet week in the literature.</p></div>')
-
-    # 5 — audit trail
-    body.append('<h2>Everything reviewed</h2>'
-                f'<p class="meta">{len(all_items)} items reached analysis; {len(relevant)} were '
-                'carried. Check what was dropped rather than trusting the filter.</p>'
+    # Audit trail is present, but no longer overwhelms the weekly findings.
+    body.append('<details class="reviewed"><summary><span>Everything reviewed</span>'
+                f'<span class="summary-count">{len(all_items)} checked · '
+                f'{len(relevant)} retained</span></summary>'
+                '<p class="meta">Open this audit trail to inspect what was retained or dropped.</p>'
                 '<table class="rev"><thead><tr><th>Party</th><th>Date</th><th>Source</th>'
                 '<th>Item</th><th>Status</th></tr></thead><tbody>')
     for it in sorted(all_items, key=lambda x: (x.get("party_id") or "", x.get("published") or "")):
@@ -626,7 +823,10 @@ def issue_page(week, items, overview, briefings, country_names, parties,
         if keep:
             status = f'<a href="#item-{e(it["id"])}">in issue</a>'
         elif a.get("triaged_out"):
-            status = e(a["triaged_out"])
+            # Older analyses described rejection against the retired topic
+            # scheme. Keep the audit decision without leaking those obsolete
+            # labels back into a newly generated report.
+            status = "not retained"
         elif a.get("skipped"):
             status = "too short"
         elif a.get("error"):
@@ -644,29 +844,26 @@ def issue_page(week, items, overview, briefings, country_names, parties,
                     f'<td class="n">{e((it.get("published") or "")[:10])}</td>'
                     f'<td class="n">{e(it.get("outlet") or it.get("source_type") or "")}</td>'
                     f'<td>{link}</td><td class="n">{status}</td></tr>')
-    body.append('</tbody></table>')
+    body.append('</tbody></table></details>')
+    issue_js = """
+function revealLinkedItem(){
+  if(!location.hash)return;
+  const target=document.querySelector(location.hash);
+  if(!target)return;
+  for(const section of target.closest('.country-section')?[target.closest('.country-section'),target.closest('.party-section')]:[]){
+    if(section)section.open=true;
+  }
+}
+window.addEventListener('hashchange',revealLinkedItem);
+revealLinkedItem();
+"""
+    body.append(quote_script(issue_js))
 
     os.makedirs(os.path.join(out_dir, "issues"), exist_ok=True)
     path = os.path.join(out_dir, "issues", f"{week}.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout(f"Week {week}", "".join(body), depth=1, subtitle=week))
     return path
-
-
-def baseline_block(code, baselines, reference=None):
-    rows = (baselines or {}).get(code) or []
-    if not rows:
-        return ""
-    cells = "".join(
-        f'<div class="b"><div class="bv">{e(r["value"])}{e(r.get("unit",""))}</div>'
-        f'<div class="bk">{e(r["label"])}'
-        + (f'<br>{e(r["note"])}' if r.get("note") else "")
-        + '</div></div>' for r in rows)
-    if reference:
-        cells += (f'<div class="b"><div class="bv" style="color:var(--grey)">'
-                  f'{e(reference["value"])}{e(reference.get("unit",""))}</div>'
-                  f'<div class="bk">{e(reference["label"])}</div></div>')
-    return f'<div class="baseline">{cells}</div>'
 
 
 def health_page(rows, weeks, silent, prompt_versions, link_summary, out_dir):
@@ -811,7 +1008,7 @@ def reliability_page(reports, out_dir):
                         '<th>You only</th><th>Note</th></tr></thead><tbody>')
             for lab, v in res.items():
                 body.append(
-                    f'<tr><td>{e(THEME_LABEL.get(lab, lab))}</td>'
+                    f'<tr><td>{e(lab)}</td>'
                     f'<td class="n kap">{v["raw_agreement"]:.0%}</td>'
                     f'<td class="n kap">{_kap(v["kappa"])}</td>'
                     f'<td class="n kap">{v["prevalence"]:.0%}</td>'
@@ -823,7 +1020,7 @@ def reliability_page(reports, out_dir):
             body.append('<h3>Between coders</h3><table class="rev"><thead><tr><th>Theme</th>'
                         '<th>Raw agreement</th><th>Kappa</th></tr></thead><tbody>')
             for lab, v in rep["inter_coder"].items():
-                body.append(f'<tr><td>{e(THEME_LABEL.get(lab, lab))}</td>'
+                body.append(f'<tr><td>{e(lab)}</td>'
                             f'<td class="n kap">{v["raw_agreement"]:.0%}</td>'
                             f'<td class="n kap">{_kap(v["kappa"])}</td></tr>')
             body.append('</tbody></table>')
@@ -835,49 +1032,226 @@ def reliability_page(reports, out_dir):
 
 def party_page(party, series, items, out_dir):
     camp = party.get("camp", "right")
+    site = (f'<a href="{e(party["site"])}" rel="noreferrer">official website</a>'
+            if party.get("site") else "no official website configured")
     body = [f'<h1>{e(party.get("name"))}</h1>',
             f'<p class="meta">{e(party.get("country",""))} · '
             f'{"radical left" if camp == "left" else "far right"}'
-            f'{" · " + e(party["site"]) if party.get("site") else ""}</p>']
+            f' · {site}</p>']
 
     total_all = len(items)
-    themed = sum(1 for i in items
-                 if (i.get("analysis") or {}).get("topics"))
+    direct = [i for i in items if is_party_document(i)]
+    coverage = [i for i in items if not is_party_document(i)]
     quoted = sum(1 for i in items
                  if ((i.get("analysis") or {}).get("quotes") or []))
     body.append('<div class="statline">'
                 f'<div class="stat"><div class="v">{total_all}</div>'
                 f'<div class="k">items on file</div></div>'
-                f'<div class="stat"><div class="v">{themed}</div>'
-                f'<div class="k">on your themes</div></div>'
+                f'<div class="stat"><div class="v">{len(direct)}</div>'
+                f'<div class="k">direct records</div></div>'
                 f'<div class="stat"><div class="v">{quoted}</div>'
                 f'<div class="k">with a captured quote</div></div></div>')
+    body.append(quote_toolbar())
+    actions = sorted({trend_utils.action_type(it) for it in items})
+    body.append('<div class="timeline-tools">'
+                '<label>Search this party<input id="timeline-query" type="search" '
+                'placeholder="words in titles and summaries"></label>'
+                '<label>Action type<select id="timeline-action"><option value="">All actions</option>'
+                + ''.join(f'<option>{e(action)}</option>' for action in actions)
+                + '</select></label><label>Evidence<select id="timeline-source">'
+                  '<option value="">All retained items</option>'
+                  '<option value="direct">Direct records only</option>'
+                  '<option value="coverage">Outside reporting only</option>'
+                  '</select></label></div>')
 
-    body.append('<h2>Themes over time</h2>')
-    body.append(f'<p class="meta">{len(series)} weeks, oldest first.</p>')
-    for t in THEMES:
-        vals = [w[t] for w in series]
-        top = max(vals + [1])
-        cells = "".join(f'<i class="{"on" if v else ""}" '
-                        f'style="height:{max(2, int(36*v/top))}px" '
-                        f'title="{e(series[n]["week"])}: {v}"></i>'
-                        for n, v in enumerate(vals))
-        body.append(f'<div class="meta">{THEME_LABEL[t]} · {sum(vals)} items</div>'
-                    f'<div class="bars {e(camp)}">{cells}</div>')
+    # A party's archive is a week-by-week timeline. Direct documents remain the
+    # full cards; contextual coverage remains a compact linked index.
+    by_week = {}
+    for it in items:
+        period = it.get("week") or (it.get("published") or "Undated")[:7]
+        by_week.setdefault(period, []).append(it)
+    body.append('<h2>Activity timeline</h2>')
+    for n, period in enumerate(sorted(by_week, reverse=True)):
+        rows = by_week[period]
+        period_direct = sorted([it for it in rows if is_party_document(it)],
+                               key=lambda x: x.get("published") or "", reverse=True)
+        period_coverage = sorted([it for it in rows if not is_party_document(it)],
+                                 key=lambda x: x.get("published") or "", reverse=True)
+        body.append(f'<details class="timeline-period" {"open" if n == 0 else ""}>'
+                    f'<summary><span>{e(period)}</span><span class="summary-count">'
+                    f'{len(period_direct)} direct · {len(period_coverage)} coverage</span></summary>'
+                    '<div class="timeline-content">')
+        if period_direct:
+            body.append('<h3>Party documents and direct records</h3>')
+            for it in period_direct:
+                body.append(item_html(it, show_party=False))
+        if period_coverage:
+            body.append('<h3>Other reporting and context</h3><ul class="link-list">')
+            for it in period_coverage:
+                body.append(compact_link_html(it))
+            body.append('</ul>')
+        body.append('</div></details>')
 
-    body.append('<h2>Everything collected</h2>')
-    for it in sorted(items, key=lambda x: (x.get("published") or ""), reverse=True)[:200]:
-        body.append(item_html(it, show_party=False))
+    if not direct and items:
+        body.append('<div class="box dashed"><p>No direct records captured yet.</p>'
+                    '<p class="meta">The timeline contains outside reporting only. Check '
+                    'Source health to distinguish a quiet period from a blocked source.</p></div>')
     if not items:
         body.append('<div class="box dashed"><p>Nothing collected yet.</p>'
                     '<p class="meta">A persistent blank here means the source '
                     'configuration needs attention rather than the party being quiet.</p></div>')
+
+    timeline_js = """
+const timelineQuery=document.getElementById('timeline-query');
+const timelineAction=document.getElementById('timeline-action');
+const timelineSource=document.getElementById('timeline-source');
+function filterTimeline(){
+  const q=(timelineQuery?.value||'').trim().toLocaleLowerCase();
+  const action=timelineAction?.value||'',source=timelineSource?.value||'';
+  document.querySelectorAll('.timeline-entry').forEach(row=>{
+    const direct=row.dataset.direct==='1';
+    const visible=(!q||(row.dataset.search||'').includes(q))&&
+      (!action||row.dataset.action===action)&&
+      (!source||(source==='direct'?direct:!direct));
+    row.hidden=!visible;
+  });
+  document.querySelectorAll('.timeline-period').forEach(period=>{
+    const any=[...period.querySelectorAll('.timeline-entry')].some(row=>!row.hidden);
+    period.hidden=!any;
+    if(any&&(q||action||source))period.open=true;
+  });
+}
+[timelineQuery,timelineAction,timelineSource].forEach(control=>control?.addEventListener('input',filterTimeline));
+"""
+    body.append(quote_script(timeline_js))
 
     os.makedirs(os.path.join(out_dir, "parties"), exist_ok=True)
     path = os.path.join(out_dir, "parties", f"{party['id']}.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout(party.get("name"), "".join(body), depth=1,
                        subtitle=party.get("country", "")))
+    return path
+
+
+def search_page(out_dir):
+    """Full-text search across the compact public corpus."""
+    body = r'''
+<h1>Search the archive</h1>
+<p class="lede">Search titles, summaries, parties, named actors, action types, and captured
+quotes across every report. Results link back to the complete evidence record.</p>
+<div class="search-tools">
+  <label>Words<input id="search-query" type="search" placeholder="e.g. coalition, protest, deportation"></label>
+  <label>Party<select id="search-party"><option value="">All parties</option></select></label>
+  <label>Action<select id="search-action"><option value="">All actions</option></select></label>
+  <label>Evidence<select id="search-source"><option value="">All evidence</option>
+    <option value="direct">Direct records</option><option value="coverage">Outside reporting</option></select></label>
+</div>
+<p id="search-status" class="meta">Loading archive…</p>
+<div id="search-results"></div>
+<script>
+const searchEl=id=>document.getElementById(id);
+const searchEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let searchCorpus=[];
+function searchable(x){return [x.ti,x.s,x.pn,x.p,x.c,x.at,x.o,...(x.ac||[]),...(x.q||[]).flatMap(q=>[q.o,q.t,q.sp])].join(' ').toLocaleLowerCase()}
+function renderSearch(){
+  const q=searchEl('search-query').value.trim().toLocaleLowerCase();
+  const party=searchEl('search-party').value,action=searchEl('search-action').value,source=searchEl('search-source').value;
+  const found=searchCorpus.filter(x=>(!q||searchable(x).includes(q))&&(!party||x.p===party)&&
+    (!action||x.at===action)&&(!source||(source==='direct'?x.di:!x.di)))
+    .sort((a,b)=>(b.d||'').localeCompare(a.d||'')).slice(0,100);
+  searchEl('search-status').textContent=`${found.length}${found.length===100?' shown':''} matching record${found.length===1?'':'s'}.`;
+  searchEl('search-results').innerHTML=found.length?found.map(x=>{
+    const issue=x.w?`issues/${encodeURIComponent(x.w)}.html#item-${encodeURIComponent(x.id)}`:'';
+    const title=x.ti||x.s||'Untitled item';
+    return `<article class="search-result"><h3>${issue?`<a href="${issue}">${searchEsc(title)}</a>`:searchEsc(title)}</h3>
+      <p class="meta"><span class="action-tag">${searchEsc(x.at||'Recorded development')}</span>
+      ${searchEsc(x.pn||x.p)} · ${searchEsc(x.c)} · ${searchEsc(x.d)} · ${x.di?'direct record':'outside reporting'}</p>
+      <p>${searchEsc(x.s||'')}</p>${x.u?`<p class="meta"><a href="${searchEsc(x.u)}" rel="noreferrer">original source</a></p>`:''}</article>`;
+  }).join(''):'<div class="box dashed">No records match. Try fewer words or clear a filter.</div>';
+}
+async function loadSearch(){
+  try{
+    const idx=await fetch('corpus/index.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json()});
+    searchCorpus=(await Promise.all(idx.years.map(y=>fetch(`corpus/${y}.json`).then(r=>r.json())))).flat();
+    const parties=[...new Map(searchCorpus.map(x=>[x.p,x.pn||x.p])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+    parties.forEach(([id,name])=>searchEl('search-party').insertAdjacentHTML('beforeend',`<option value="${searchEsc(id)}">${searchEsc(name)}</option>`));
+    [...new Set(searchCorpus.map(x=>x.at).filter(Boolean))].sort().forEach(action=>searchEl('search-action').insertAdjacentHTML('beforeend',`<option>${searchEsc(action)}</option>`));
+    renderSearch();
+  }catch(err){searchEl('search-status').textContent='The archive could not be loaded. Open this page through the GitHub Pages URL.'}
+}
+['search-query','search-party','search-action','search-source'].forEach(id=>searchEl(id).addEventListener('input',renderSearch));
+loadSearch();
+</script>'''
+    path = os.path.join(out_dir, "search.html")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(layout("Search", body, subtitle="full archive"))
+    return path
+
+
+def methodology_page(parties, prompt_versions, revisions, out_dir):
+    """Plain-language method, limitations, and a visible revision history."""
+    body = ['<h1>Methodology and revision log</h1>',
+            '<p class="lede">This is an evidence-led monitoring archive. It records what '
+            'the listed parties did and published; it does not infer that absence from the '
+            'archive means political inactivity.</p>',
+            '<h2>How one weekly report is made</h2>']
+    steps = [
+        ("Collect", "Check configured party sites and feeds, official parliamentary records, and configured discovery searches."),
+        ("Preserve", "Store the source URL and a local text snapshot so later deletion or editing does not erase the record."),
+        ("Screen", "Retain dated, substantive material about a monitored party; keep rejected rows visible in the review audit."),
+        ("Describe", "Extract a factual summary, named actors, verbatim quotations, and an observable action type."),
+        ("Present", "Give direct party documents full evidence cards; present outside reporting as linked context."),
+        ("Compare", "Compare retained action types and direct-document volume with the preceding archived week."),
+    ]
+    for n, (title, text) in enumerate(steps, 1):
+        body.append(f'<div class="method-step"><div class="step">{n}</div><div>'
+                    f'<strong>{e(title)}</strong><p>{e(text)}</p></div></div>')
+    body += [
+        '<h2>What the labels mean</h2>',
+        '<p><strong>Direct record</strong> means a party-controlled source, a named leader’s '
+        'direct channel, or an official parliamentary record. <strong>Outside reporting</strong> '
+        'means journalism or another contextual source. Action labels describe the form of an '
+        'observable act, such as a parliamentary intervention or mobilisation; they are not '
+        'ideological topic labels.</p>',
+        '<h2>Coverage and limits</h2>',
+        '<p>Collection coverage is reported party by party. “No dated activity retained” means '
+        'the configured source was checked but produced no qualifying dated record. “Official '
+        'source inaccessible” means the check failed. “No archived check” means this database '
+        'contains no collection log for that party and week. Search fallback use is shown '
+        'separately. Automated collection can still miss posts, dynamic pages, deleted content, '
+        'and material on unconfigured platforms.</p>',
+        '<p>Translations and model-written interpretations can contain errors. Original text, '
+        'source links, prompt-version records, confidence labels, and the audit trail exist so '
+        'a reader can verify the evidence. Week-over-week change describes the retained archive, '
+        'not the totality of a party’s behaviour.</p>',
+        '<h2>Monitored roster</h2>',
+        f'<p class="meta">{len(parties)} parties are configured. Inclusion is a research-roster '
+        'decision, not an endorsement or a claim that every party is equivalent.</p>',
+        '<ul class="link-list">']
+    for party in sorted(parties, key=lambda p: (p.get("country", ""), p.get("short", ""))):
+        body.append(f'<li><a class="link-title" href="parties/{e(party["id"])}.html">'
+                    f'{e(party.get("short") or party.get("name"))}</a>'
+                    f'<span class="link-meta">{e(party.get("country"))} · '
+                    f'{e(party.get("name"))}</span></li>')
+    body.append('</ul><h2>Analysis versions in this archive</h2>'
+                '<table class="rev"><thead><tr><th>Stage</th><th>Model</th><th>Prompt</th>'
+                '<th>Records</th><th>First run</th><th>Latest run</th></tr></thead><tbody>')
+    for row in prompt_versions:
+        body.append(f'<tr><td>{e(row.get("stage"))}</td><td>{e(row.get("model"))}</td>'
+                    f'<td>{e(row.get("prompt_ver"))}</td><td class="n">{row.get("n", 0)}</td>'
+                    f'<td class="n">{e((row.get("first") or "")[:10])}</td>'
+                    f'<td class="n">{e((row.get("last") or "")[:10])}</td></tr>')
+    body.append('</tbody></table><h2>Revision log</h2>')
+    if not revisions:
+        body.append('<p class="meta">No revisions have been recorded yet.</p>')
+    for revision in revisions:
+        body.append(f'<h3>{e(revision.get("date"))} · {e(revision.get("title"))}</h3><ul>')
+        for change in revision.get("changes") or []:
+            body.append(f'<li>{e(change)}</li>')
+        body.append('</ul>')
+    path = os.path.join(out_dir, "methodology.html")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(layout("Methodology", "".join(body), subtitle="method and changes"))
     return path
 
 
@@ -894,14 +1268,10 @@ def speakers_page(index, out_dir):
             '<p><input class="q" id="q" placeholder="Filter speakers" autocomplete="off"></p>',
             '<div id="rows">']
     for key, rec in rows:
-        themes = ", ".join(f"{THEME_LABEL.get(t,t)} ({n})"
-                           for t, n in sorted(rec["themes"].items(), key=lambda x: -x[1])
-                           if t in THEME_LABEL)
         body.append(
             f'<div class="spk"><span>'
             f'<a href="speakers/{e(slug(key))}.html">{e(rec["display"])}</a> '
-            f'<span class="meta">{e(", ".join(rec["parties"]))}'
-            f'{" · " + e(themes) if themes else ""}</span></span>'
+            f'<span class="meta">{e(", ".join(rec["parties"]))}</span></span>'
             f'<span class="meta">{len(rec["items"])} items · {rec["quoted"]} quoted</span></div>')
     body += ['</div>', """<script>
 const q=document.getElementById('q');
@@ -924,13 +1294,6 @@ def speaker_page(key, rec, items, out_dir):
     body = [f'<h1>{e(rec["display"])}</h1>',
             f'<p class="meta">{e(", ".join(rec["parties"]))} · '
             f'{len(rec["items"])} items · {rec["quoted"]} directly quoted</p>']
-    if rec["themes"]:
-        body.append('<h2>Themes</h2><div class="glance">')
-        for t, n in sorted(rec["themes"].items(), key=lambda x: -x[1]):
-            if t in THEME_LABEL:
-                body.append(f'<div><span class="th">{THEME_LABEL[t]}</span> '
-                            f'<span class="meta">— {n} items</span></div>')
-        body.append('</div>')
     body.append('<h2>Items</h2>')
     for it in sorted(items, key=lambda x: (x.get("published") or ""), reverse=True)[:120]:
         body.append(item_html(it))
@@ -979,9 +1342,9 @@ def archive_page(index, out_dir):
         for r in index
     )
     body = f"""<h1>Archive</h1>
-<p class="lede">Every issue built, oldest at the bottom. Issues are permanent —
-nothing is regenerated once published, so a quote you cited last March still
-reads as it did then.</p>
+<p class="lede">Every issue built, oldest at the bottom. The presentation can be
+rebuilt when the report format improves; captured source text and links remain
+in the research database.</p>
 <p><input class="q" id="q" placeholder="Filter issues" autocomplete="off"></p>
 <table class="idx"><thead><tr><th>Week</th><th>Dates</th><th>Lead</th><th>Volume</th><th>Data</th></tr></thead>
 <tbody id="rows">{rows}</tbody></table>
@@ -1022,7 +1385,7 @@ def parties_page(parties, totals, out_dir):
 
 def home_page(latest, index, out_dir):
     if not latest:
-        body = ('<h1>Radical Party Watch</h1>'
+        body = ("<h1>Neil's Parties Report</h1>"
                 '<div class="box dashed"><p>No issues yet.</p>'
                 '<p class="meta">Run <code>python run.py weekly</code> to build the first one.</p></div>')
     else:
@@ -1030,10 +1393,10 @@ def home_page(latest, index, out_dir):
             f'<div class="grow"><span><a href="issues/{e(r["week"])}.html">{e(r["week"])}</a> '
             f'<span class="meta">{e(r["range"])}</span></span>'
             f'<span class="meta">{r["items"]}</span></div>' for r in index[:8])
-        body = f"""<h1>Radical Party Watch</h1>
+        body = f"""<h1>Neil's Parties Report</h1>
 <p class="lede">A weekly record of what monitored European and Israeli radical-left and
-far/right radical-right parties said and did, with the original-language sentence and an
-archived source behind every claim.</p>
+far/right radical-right parties did and said. Direct party documents are shown first;
+reporting and broader context stay as short, clearly attributed links.</p>
 <div class="box"><h4>Latest issue · week {e(latest['week'])}</h4>
 <p>{e(latest['headline'])}</p>
 <p><a href="issues/{e(latest['week'])}.html">Read week {e(latest['week'])}</a>
@@ -1043,7 +1406,7 @@ archived source behind every claim.</p>
  · <a href="parties.html">Party pages</a></p>"""
     path = os.path.join(out_dir, "index.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Radical Party Watch", body,
+        f.write(layout("Neil's Parties Report", body,
                        subtitle=f"{len(index)} issues"))
     return path
 
@@ -1068,8 +1431,10 @@ def corpus_json(items, out_dir):
             "cm": it.get("camp"), "pr": it.get("provenance"),
             "prr": it.get("provenance_rank"), "o": it.get("outlet"),
             "u": it.get("url"), "au": it.get("archive_url"),
-            "t": a.get("topics") or [], "ac": a.get("actors") or [],
-            "s": a.get("summary", ""), "cf": a.get("confidence"),
+            "ti": it.get("title", ""), "di": is_party_document(it),
+            "ac": a.get("actors") or [], "s": a.get("summary", ""),
+            "at": trend_utils.action_type(it),
+            "cf": a.get("confidence"),
             "rtl": bool(it.get("rtl")),
             "q": [{"o": q.get("original", ""), "t": q.get("translation", ""),
                    "sp": q.get("speaker", "")}

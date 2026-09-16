@@ -17,9 +17,9 @@ hosting works before you add API keys or collect live material.
 
 ## Step 1 — unzip the download
 
-Double-click `radical-party-watch-upload.zip` on your computer.
+Double-click the downloaded update ZIP on your computer.
 
-Open the new `radical-party-watch` folder. You should see at least:
+Open the new project folder. You should see at least:
 
 ```text
 .github
@@ -123,6 +123,17 @@ https://neilmegas.github.io/radical-party-watch/
 
 You can always find the exact link again under **Settings → Pages**.
 
+Use the top menu after publication:
+
+- **Search** searches titles, summaries, actors, quotations, parties, and
+  action labels across the archive.
+- **Parties** opens the week-by-week timeline for each monitored party.
+- **Report** filters the archive, compares two weeks, downloads CSV, or prints
+  a PDF.
+- **Health** shows whether each configured source was actually reached.
+- **Method** explains the collection rules, evidence hierarchy, limitations,
+  prompt versions, and revision history.
+
 If the action has a red cross, click it, open the failed step, and read the
 last red message. The most common cause is that **Settings → Pages → Source**
 was not changed to **GitHub Actions**.
@@ -131,7 +142,7 @@ was not changed to **GitHub Actions**.
 
 ## Step 6 — check the project configuration
 
-The starter list contains 26 parties. Websites and leader names change, so do
+The starter list contains 27 parties. Websites and leader names change, so do
 not assume every address is correct.
 
 1. Go to **Actions**.

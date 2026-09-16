@@ -9,7 +9,7 @@ import os
 FIELDS = [
     "item_id", "week", "date", "country", "party_id", "party", "camp",
     "source_type", "provenance", "outlet", "title", "source_url", "archive_url",
-    "summary", "themes", "actors", "quote_index", "speaker", "original_quote",
+    "summary", "actors", "quote_index", "speaker", "original_quote",
     "translation", "cluster_id", "cluster_size", "confidence", "jda_category",
     "coder", "coded_date", "notes",
 ]
@@ -40,7 +40,6 @@ def rows_for(items: list[dict], cluster_sizes: dict | None = None) -> list[dict]
                 "source_url": item.get("url", ""),
                 "archive_url": item.get("archive_url", ""),
                 "summary": analysis.get("summary", ""),
-                "themes": "; ".join(analysis.get("topics") or []),
                 "actors": "; ".join(analysis.get("actors") or []),
                 "quote_index": index if quote else "",
                 "speaker": quote.get("speaker", ""),

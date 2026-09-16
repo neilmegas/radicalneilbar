@@ -17,13 +17,14 @@ REPORT_CSS = r"""
 .history-action{margin:1rem 0}.history-action a{font-weight:700}
 .report-group{margin:2rem 0}.report-card{padding:.8rem 0;border-bottom:1px solid var(--hair)}
 .report-card h4{margin:0}.report-card .summary{margin:.3rem 0}.report-empty{padding:1rem;border:1px dashed var(--hair)}
+.comparison{margin:1rem 0 2rem}.comparison table{width:100%}.comparison .new-actions{max-width:22rem}
 @media(max-width:600px){.builder{grid-template-columns:1fr}.builder .wide,.builder .actions{grid-column:1}}
 @media print{nav.top,.builder,.no-print,footer{display:none!important}.wrap{max-width:none;padding:0}}
 """
 
 
 BODY = r"""
-<h1>Build a report</h1>
+<h1>Build an archive report</h1>
 <p class="lede">Filter the archived items, choose how to group them, then print to PDF or
 download the matching rows as CSV. Everything runs in your browser.</p>
 <p class="meta">Corpus configured for __PARTIES__ parties in __COUNTRIES__ countries.</p>
@@ -39,19 +40,18 @@ download the matching rows as CSV. Everything runs in your browser.</p>
   <label>To<input type="date" id="to"></label>
   <label>Country<select id="country"><option value="">All countries</option></select></label>
   <label>Party<select id="party"><option value="">All parties</option></select></label>
-  <label>Theme<select id="theme"><option value="">All themes</option>
-    <option value="israel_palestine">Israel and Palestine</option>
-    <option value="jews_antisemitism">Jews and antisemitism</option>
-    <option value="immigration">Immigration</option></select></label>
   <label>Camp<select id="camp"><option value="">Both camps</option>
     <option value="left">Radical left</option><option value="right">Far/right radical right</option></select></label>
+  <label>Action type<select id="action"><option value="">All actions</option></select></label>
   <label>Group by<select id="group"><option value="country">Country</option>
-    <option value="party">Party</option><option value="theme">Theme</option>
+    <option value="party">Party</option>
     <option value="actor">Actor</option><option value="month">Month</option>
     <option value="camp">Camp</option><option value="source">Evidence class</option>
     <option value="none">No grouping</option></select></label>
   <label>Include interpretation<select id="interp"><option value="no">No</option>
     <option value="yes">Yes</option></select></label>
+  <label>Quoted text<select id="quote-display"><option value="both">Original + English</option>
+    <option value="english">English where available</option><option value="original">Original only</option></select></label>
   <label class="wide">Words anywhere<input id="query" type="search" placeholder="e.g. deportation, coalition, Gaza"></label>
   <div class="actions"><button type="submit">Build report</button>
     <button type="button" class="secondary" id="csv">Download CSV</button>
@@ -59,11 +59,18 @@ download the matching rows as CSV. Everything runs in your browser.</p>
 </form>
 <div id="status" class="meta">Loading corpus…</div>
 <div id="report"></div>
+<section class="comparison no-print">
+  <h2>Compare two weeks</h2>
+  <p class="meta">Compare retained records and direct-document volume. This measures the archive, not every act a party took.</p>
+  <div class="compare-box"><label>Earlier week<select id="compare-a"></select></label>
+    <label>Later week<select id="compare-b"></select></label>
+    <button type="button" id="compare">Compare weeks</button></div>
+  <div id="comparison"></div>
+</section>
 
 <script>
 const el=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const labels={israel_palestine:'Israel and Palestine',jews_antisemitism:'Jews and antisemitism',immigration:'Immigration'};
 let corpus=[], interps={}, shown=[];
 
 function setHistoryLink(){
@@ -84,12 +91,17 @@ async function loadCorpus(){
     corpus=chunks.flat();
     const countries=[...new Set(corpus.map(x=>x.c).filter(Boolean))].sort();
     const parties=[...new Map(corpus.map(x=>[x.p,x.pn||x.p])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+    const actions=[...new Set(corpus.map(x=>x.at).filter(Boolean))].sort();
     countries.forEach(x=>el('country').insertAdjacentHTML('beforeend',`<option>${esc(x)}</option>`));
     parties.forEach(([id,name])=>el('party').insertAdjacentHTML('beforeend',`<option value="${esc(id)}">${esc(name)}</option>`));
+    actions.forEach(x=>el('action').insertAdjacentHTML('beforeend',`<option>${esc(x)}</option>`));
     const dates=corpus.map(x=>x.d).filter(Boolean).sort();
     if(dates.length){el('from').value=dates[0];el('to').value=dates.at(-1)}
+    const weeks=[...new Set(corpus.map(x=>x.w).filter(Boolean))].sort();
+    weeks.forEach(w=>{el('compare-a').insertAdjacentHTML('beforeend',`<option>${esc(w)}</option>`);el('compare-b').insertAdjacentHTML('beforeend',`<option>${esc(w)}</option>`)});
+    if(weeks.length){el('compare-b').value=weeks.at(-1);el('compare-a').value=weeks.at(-2)||weeks.at(-1)}
     el('status').textContent=`${corpus.length} archived items loaded.`;
-    build();
+    build();compareWeeks();
   }catch(err){
     el('status').innerHTML='Could not load the corpus. This page works at the GitHub Pages URL; for local use start <code>python -m http.server</code> inside <code>site/</code>.';
   }
@@ -104,26 +116,47 @@ async function ensureInterps(){
 
 function selected(){
   const from=el('from').value,to=el('to').value,c=el('country').value,p=el('party').value;
-  const theme=el('theme').value,camp=el('camp').value,q=el('query').value.trim().toLowerCase();
+  const camp=el('camp').value,action=el('action').value,q=el('query').value.trim().toLowerCase();
   return corpus.filter(x=>(!from||x.d>=from)&&(!to||x.d<=to)&&(!c||x.c===c)&&(!p||x.p===p)&&
-    (!theme||x.t.includes(theme))&&(!camp||x.cm===camp)&&(!q||JSON.stringify(x).toLowerCase().includes(q)));
+    (!camp||x.cm===camp)&&(!action||x.at===action)&&(!q||JSON.stringify(x).toLowerCase().includes(q)));
 }
 
 function groupKeys(x){
   switch(el('group').value){
-    case 'country':return[x.c||'—'];case 'party':return[x.pn||x.p];case 'theme':return x.t.length?x.t.map(t=>labels[t]||t):['No tagged theme'];
+    case 'country':return[x.c||'—'];case 'party':return[x.pn||x.p];
     case 'actor':return x.ac.length?x.ac:['No named actor'];case 'month':return[x.d.slice(0,7)||'—'];
     case 'camp':return[x.cm==='left'?'Radical left':'Far/right radical right'];case 'source':return[x.pr||'—'];default:return['All items'];
   }
 }
 
 function card(x){
-  const qs=(x.q||[]).map(q=>`<blockquote${x.rtl?' dir="rtl"':''}><div class="orig">${esc(q.o)}</div>${q.t?`<div class="tr">${esc(q.t)}</div>`:''}</blockquote>`).join('');
+  const title=x.ti||x.s||'Untitled item',linked=x.u?`<a href="${esc(x.u)}" rel="noreferrer">${esc(title)}</a>`:esc(title);
+  if(!x.di)return `<article class="report-card"><h4>${linked}</h4><span class="meta"><span class="action-tag">${esc(x.at||'Reported development')}</span>${esc(x.o||x.pr||'Source')} · ${esc(x.d)}</span><p class="summary">${esc(x.s||'')}</p></article>`;
+  const mode=el('quote-display').value;
+  const qs=(x.q||[]).map(q=>{const original=mode!=='english'||!q.t?`<div class="orig">${esc(q.o)}</div>`:'';const translated=mode!=='original'&&q.t?`<div class="tr">${esc(q.t)}</div>`:'';return `<blockquote${x.rtl?' dir="rtl"':''}>${original}${translated}</blockquote>`}).join('');
   const ip=interps[x.id];
   const note=ip&&el('interp').value==='yes'?`<div class="interp sig-${esc(ip.sg||'routine')}"><div class="ih">Interpretation — model inference, not evidence</div><p>${esc(ip.rd||'')}</p></div>`:'';
-  return `<article class="report-card"><h4>${esc(x.pn||x.p)} <span class="meta">${esc(x.c)} · ${esc(x.d)}</span></h4>
-    <p class="summary">${esc(x.s)}</p>${qs}${note}<p class="meta">${(x.t||[]).map(t=>esc(labels[t]||t)).join(' · ')}
-    ${x.u?` · <a href="${esc(x.u)}" rel="noreferrer">source</a>`:''}${x.au?` · <a href="${esc(x.au)}" rel="noreferrer">archived</a>`:''}</p></article>`;
+  return `<article class="report-card"><h4>${esc(x.pn||x.p)} <span class="meta"><span class="action-tag">${esc(x.at||'Public statement')}</span>${esc(x.c)} · ${esc(x.d)}</span></h4>
+    <p><strong>${linked}</strong></p><p class="summary">${esc(x.s)}</p>${qs}${note}<p class="meta">
+    ${x.au?`<a href="${esc(x.au)}" rel="noreferrer">archived</a>`:''}</p></article>`;
+}
+
+function compareWeeks(){
+  const a=el('compare-a').value,b=el('compare-b').value;
+  if(!a||!b){el('comparison').innerHTML='<p class="meta">Two archived weeks are required.</p>';return}
+  const ar=corpus.filter(x=>x.w===a),br=corpus.filter(x=>x.w===b);
+  const ids=[...new Set([...ar,...br].map(x=>x.p))].sort((x,y)=>{
+    const xn=(br.find(r=>r.p===x)||ar.find(r=>r.p===x))?.pn||x,yn=(br.find(r=>r.p===y)||ar.find(r=>r.p===y))?.pn||y;return xn.localeCompare(yn)
+  });
+  const rows=ids.map(id=>{
+    const aa=ar.filter(x=>x.p===id),bb=br.filter(x=>x.p===id),name=(bb[0]||aa[0])?.pn||id;
+    const ad=aa.filter(x=>x.di).length,bd=bb.filter(x=>x.di).length,delta=bd-ad;
+    const before=new Set(aa.map(x=>x.at)),after=[...new Set(bb.map(x=>x.at))],newActions=after.filter(x=>!before.has(x));
+    return `<tr><td>${esc(name)}</td><td class="n">${aa.length} / ${ad}</td><td class="n">${bb.length} / ${bd}</td>
+      <td class="n ${delta>0?'pos':delta<0?'neg':''}">${delta>0?'+':''}${delta}</td><td class="new-actions">${esc(newActions.join(', ')||'—')}</td></tr>`;
+  }).join('');
+  el('comparison').innerHTML=`<table class="rev compare-table"><thead><tr><th>Party</th><th>${esc(a)}<br><span class="meta">total / direct</span></th>
+    <th>${esc(b)}<br><span class="meta">total / direct</span></th><th>Direct Δ</th><th>Actions new in ${esc(b)}</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 async function build(ev){
@@ -132,18 +165,18 @@ async function build(ev){
   const groups=new Map();shown.forEach(x=>groupKeys(x).forEach(k=>{if(!groups.has(k))groups.set(k,[]);groups.get(k).push(x)}));
   const ordered=[...groups.entries()].sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0]));
   el('status').textContent=`${shown.length} matching item${shown.length===1?'':'s'} in ${ordered.length} group${ordered.length===1?'':'s'}.`;
-  el('report').innerHTML=ordered.length?ordered.map(([name,rows])=>`<section class="report-group"><h2>${esc(name)} <span class="meta">${rows.length} items</span></h2>${rows.sort((a,b)=>a.d.localeCompare(b.d)).map(card).join('')}</section>`).join(''):
+  el('report').innerHTML=ordered.length?ordered.map(([name,rows])=>`<section class="report-group"><h2>${esc(name)} <span class="meta">${rows.length} items</span></h2>${rows.sort((a,b)=>Number(b.di)-Number(a.di)||b.d.localeCompare(a.d)).map(card).join('')}</section>`).join(''):
     '<div class="report-empty">No items match. Widen the dates or remove a filter.</div>';
 }
 
 function csv(){
-  const fields=['date','country','party','camp','provenance','themes','actors','summary','source_url','archive_url'];
+  const fields=['date','country','party','camp','action_type','provenance','actors','title','summary','source_url','archive_url'];
   const quote=v=>'"'+String(v??'').replaceAll('"','""')+'"';
-  const lines=[fields.join(',')].concat(shown.map(x=>[x.d,x.c,x.pn,x.cm,x.pr,x.t.join('; '),x.ac.join('; '),x.s,x.u,x.au].map(quote).join(',')));
+  const lines=[fields.join(',')].concat(shown.map(x=>[x.d,x.c,x.pn,x.cm,x.at,x.pr,(x.ac||[]).join('; '),x.ti,x.s,x.u,x.au].map(quote).join(',')));
   const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='radical-party-watch-report.csv';a.click();URL.revokeObjectURL(a.href);
+  a.href=URL.createObjectURL(blob);a.download='neils-parties-report.csv';a.click();URL.revokeObjectURL(a.href);
 }
-el('builder').addEventListener('submit',build);el('csv').addEventListener('click',csv);
+el('builder').addEventListener('submit',build);el('csv').addEventListener('click',csv);el('compare').addEventListener('click',compareWeeks);
 setHistoryLink();loadCorpus();
 </script>
 """

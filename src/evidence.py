@@ -58,7 +58,8 @@ def classify(item: dict, analysis: dict | None = None) -> str:
     kind = (item.get("source_type") or "").casefold()
     if kind in {"parliament", "hansard", "parliamentary_record"}:
         return "parliamentary_record"
-    if kind in {"party_site", "site_feed", "site_scrape", "telegram"}:
+    if kind in {"party_site", "site_feed", "site_scrape", "party_archive",
+                "party_search", "telegram"}:
         return "party_document"
     if kind in {"youtube", "leader", "leader_direct"}:
         return "leader_direct"

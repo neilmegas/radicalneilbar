@@ -1,8 +1,14 @@
-# Radical Party Watch
+# Neil's Parties Report
 
 A Python program that collects public political-party material, stores a
 longitudinal record in SQLite, and generates a plain static website suitable
 for GitHub Pages.
+
+The generated site includes concise weekly summaries, evidence-linked changes
+from the preceding week, action-type labels, collection coverage, follow-up
+watchpoints, party timelines, archive search, two-week comparison, and
+original-language controls. The methodology and revision log are generated
+from the same archive metadata.
 
 For browser-only setup instructions, read **[GUIDE.md](GUIDE.md)**.
 
@@ -58,11 +64,13 @@ Run `python run.py --help` for the complete list.
   your own instrument before coding.
 - `config/reading.yaml`: secondary-reading feeds and search terms.
 - `config/backtranslate.yaml`: languages excluded from round-trip checking.
-- `config/baselines.yaml`: optional survey context displayed in issues.
+- `config/revisions.yaml`: the public methodology revision log.
 
-The supplied source roster is a starting point. Run `discover` and manually
-audit it before trusting coverage. The parliamentary adapter entry point is
-present, but no unverified national adapters are enabled by default.
+The supplied source roster is a starting point. Every weekly run tries each
+party's direct channels, then searches the official domain when a website
+blocks crawling, and finally uses ordinary web and news search as fallbacks.
+Run `discover` and audit Source health before trusting coverage. No automated
+collector can guarantee access to private, logged-in, or non-indexed material.
 
 ## Secrets and environment variables
 
@@ -87,6 +95,9 @@ fallback analysis so the pipeline does not silently discard them.
 - Near-duplicate items are clustered before trend counts.
 - Every collection attempt is logged, including failures.
 - The issue includes an audit table of retained and rejected material.
+- Coverage language distinguishes a checked quiet source from an inaccessible
+  source or a week with no archived collection log.
+- Action labels describe what form an act took, not an ideological topic.
 
 These controls support review; they do not replace it. Validate recall, source
 coverage, translation quality, and coding agreement on a regular sample.

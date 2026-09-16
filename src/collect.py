@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 from dateutil import parser as dateparser
 
 
-UA = "RadicalPartyWatch/1.0 (+research monitoring; contact via repository)"
+UA = "NeilsPartiesReport/1.0 (+research monitoring; contact via repository)"
 HEADERS = {"User-Agent": UA, "Accept-Language": "en,*;q=0.5"}
 TIMEOUT = 15
 
@@ -159,7 +159,7 @@ def from_google_news(party: dict, since: datetime, days: int = 7,
     return out[:240 if until else 30]
 
 
-def _extract_page(url: str) -> tuple[str, str]:
+def _extract_page(url: str) -> tuple[str, str, datetime | None]:
     response = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
@@ -167,7 +167,8 @@ def _extract_page(url: str) -> tuple[str, str]:
         node.decompose()
     title = (soup.find("h1") or soup.find("title"))
     return (title.get_text(" ", strip=True) if title else url,
-            re.sub(r"\s+", " ", soup.get_text(" ", strip=True)))
+            re.sub(r"\s+", " ", soup.get_text(" ", strip=True)),
+            _page_date(soup))
 
 
 def _local_name(tag: str) -> str:
@@ -315,11 +316,118 @@ def from_site_scrape(party: dict, since: datetime) -> list[dict]:
             continue
         seen.add(url)
         try:
-            page_title, body = _extract_page(url)
+            page_title, body, published = _extract_page(url)
+            # Do not turn an undated navigation/static page into activity
+            # for this week merely because it appears on the homepage.
+            if not published or not _within(published.isoformat(), since):
+                continue
             out.append(_item(party, "site_scrape", page_title or title, url,
-                             datetime.now(timezone.utc), body))
+                             published, body))
         except Exception:
             continue
+    return out
+
+
+def from_web_search(party: dict, since: datetime,
+                    until: datetime | None = None,
+                    official_only: bool = False,
+                    max_results: int = 12) -> list[dict]:
+    """Search-engine fallback for party sites that reject direct crawling.
+
+    Bing's RSS result is ordinary web search, not a second news index.  For an
+    official-site result we try to capture the page body, but retain the dated
+    result title and snippet when the site still blocks the request.  This
+    means the report keeps a checkable link instead of silently treating a
+    blocked website as a quiet party.
+    """
+    site = party.get("site") or ""
+    official_domain = urlparse(site).netloc.casefold().removeprefix("www.")
+    terms = list(dict.fromkeys(
+        [party.get("name", ""), party.get("short", "")]
+        + list(party.get("queries") or [])
+    ))
+    names = [t for t in terms if t][:3]
+    if not names:
+        return []
+    search = "(" + " OR ".join(f'"{name}"' for name in names) + ")"
+    if official_only and official_domain:
+        search = f"site:{official_domain} {search}"
+    if until:
+        search += (f" after:{(since.date() - timedelta(days=1)).isoformat()}"
+                   f" before:{until.date().isoformat()}")
+    elif since:
+        search += f" after:{(since.date() - timedelta(days=1)).isoformat()}"
+    feed_url = "https://www.bing.com/search?format=rss&q=" + quote_plus(search)
+    google_fallback = (
+        "https://news.google.com/rss/search?q=" + quote_plus(search)
+        + "&hl=en&gl=GB&ceid=GB:en"
+    )
+    used_google_fallback = False
+    try:
+        response = requests.get(feed_url, headers=HEADERS, timeout=min(TIMEOUT, 8))
+        response.raise_for_status()
+    except Exception:
+        # Some networks block Bing while still exposing Google News results.
+        # The latter is not as complete, but retains dates and working links.
+        response = requests.get(google_fallback, headers=HEADERS,
+                                timeout=min(TIMEOUT, 8))
+        response.raise_for_status()
+        used_google_fallback = True
+    out, seen, page_attempts = [], set(), 0
+    for entry in feedparser.parse(response.content).entries[:max_results]:
+        url = entry.get("link") or ""
+        title = _clean_html(entry.get("title") or "")
+        if not url or not title or url in seen:
+            continue
+        result_domain = urlparse(url).netloc.casefold().removeprefix("www.")
+        is_official = bool((official_only and used_google_fallback) or
+                           (official_domain and (
+            result_domain == official_domain
+            or result_domain.endswith("." + official_domain)
+        )))
+        if official_only and not is_official:
+            continue
+        raw_date = entry.get("published") or entry.get("updated")
+        published = _as_datetime(raw_date)
+        body = _clean_html(entry.get("summary") or entry.get("description") or "")
+        if is_official and page_attempts < 1:
+            page_attempts += 1
+            try:
+                page = requests.get(url, headers=HEADERS, timeout=min(TIMEOUT, 6))
+                page.raise_for_status()
+                soup = BeautifulSoup(page.text, "html.parser")
+                published = _page_date(soup) or published
+                for node in soup(["script", "style", "nav", "footer", "form", "aside"]):
+                    node.decompose()
+                heading = soup.find("h1") or soup.find("title")
+                if heading:
+                    title = heading.get_text(" ", strip=True)
+                captured = re.sub(r"\s+", " ", soup.get_text(" ", strip=True))
+                if len(captured) >= 80:
+                    body = captured
+                url = page.url
+            except Exception:
+                pass
+        # A search result is discovery, not proof that a page was published
+        # this week. Never assign an undated result to an arbitrary period.
+        if not published:
+            continue
+        if not _within(published.isoformat(), since, until):
+            continue
+        seen.add(url)
+        source = entry.get("source", {})
+        outlet = (source.get("title") if isinstance(source, dict) else "")
+        out.append(_item(
+            party,
+            "party_search" if is_official else "web_search",
+            title,
+            url,
+            published.isoformat(),
+            body,
+            outlet or result_domain or "Web search",
+        ))
+        if len(out) >= max_results:
+            return out
     return out
 
 

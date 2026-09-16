@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Radical Party Watch — weekly monitoring portal.
+"""Neil's Parties Report — weekly monitoring portal.
 
   python run.py discover     probe party sites, fill in feeds
   python run.py probe        test the parliamentary adapters
@@ -59,11 +59,11 @@ import trends as tr           # noqa: E402
 
 CONFIG = os.environ.get("RW_CONFIG", "config/sources.yaml")
 COUNTRIES = os.environ.get("RW_COUNTRIES", "config/countries.yaml")
+REVISIONS = os.environ.get("RW_REVISIONS", "config/revisions.yaml")
 SITE_DIR = os.environ.get("RW_SITE", "site")
 DATA_DIR = os.environ.get("RW_EXPORTS", "exports")
 BG_DIR = os.environ.get("RW_BACKGROUND", "background")
 BG_MAX_AGE_DAYS = int(os.environ.get("RW_BG_MAX_AGE", "30"))
-HISTORY_WEEKS = 12
 OVERVIEW_SCOPE = "_overview"
 
 
@@ -88,6 +88,14 @@ def load_countries():
     try:
         with open(COUNTRIES, encoding="utf-8") as f:
             return yaml.safe_load(f)["countries"]
+    except FileNotFoundError:
+        return []
+
+
+def load_revisions():
+    try:
+        with open(REVISIONS, encoding="utf-8") as f:
+            return (yaml.safe_load(f) or {}).get("revisions", [])
     except FileNotFoundError:
         return []
 
@@ -256,32 +264,41 @@ def cmd_collect(cfg, args):
             return []
 
     for p in selected_parties(cfg, args):
-        items = []
+        items, direct, website_direct = [], [], []
         if p.get("feeds"):
             for feed in p["feeds"]:
-                items += run_channel(
+                got = run_channel(
                     p, "site_feed",
                     lambda f=feed: co.from_feed(p, f, since, until),
                 )
+                items += got
+                direct += got
+                website_direct += got
         if historical and p.get("site"):
-            items += run_channel(
+            got = run_channel(
                 p, "party_archive",
                 lambda: co.from_sitemaps(p, since, until),
             )
-        elif not p.get("feeds") and p.get("site"):
-            items += run_channel(p, "site_scrape", lambda: co.from_site_scrape(p, since))
-        items += run_channel(
-            p, "press",
-            lambda: co.from_google_news(p, since, days=args.days, until=until),
-        )
+            items += got
+            direct += got
+            website_direct += got
+        elif not website_direct and p.get("site"):
+            got = run_channel(p, "site_scrape", lambda: co.from_site_scrape(p, since))
+            items += got
+            direct += got
+            website_direct += got
         if p.get("telegram"):
-            items += run_channel(
+            got = run_channel(
                 p, "telegram", lambda: co.from_telegram(p, since, until),
             )
+            items += got
+            direct += got
         if p.get("youtube_channel"):
-            items += run_channel(
+            got = run_channel(
                 p, "youtube", lambda: co.from_youtube(p, since, yt_key, until),
             )
+            items += got
+            direct += got
         parl, perr = [], None
         if p.get("parliament"):
             try:
@@ -291,6 +308,29 @@ def cmd_collect(cfg, args):
             except Exception as ex:
                 st.log_collection(conn, week, p["id"], "parliament", False, 0, str(ex))
         items += parl
+        direct += parl
+
+        # A blocked homepage is not treated as silence. Search the public web
+        # index for dated pages on that exact official domain; if that also
+        # finds nothing, use a normal web search as a second fallback. Press
+        # search still runs for every party, independently of these fallbacks.
+        if not website_direct and p.get("site"):
+            got = run_channel(
+                p, "party_search",
+                lambda: co.from_web_search(p, since, until, official_only=True),
+            )
+            items += got
+            direct += got
+            website_direct += got
+        if not website_direct:
+            items += run_channel(
+                p, "web_search",
+                lambda: co.from_web_search(p, since, until, official_only=False),
+            )
+        items += run_channel(
+            p, "press",
+            lambda: co.from_google_news(p, since, days=args.days, until=until),
+        )
 
         fetched_here = len(items)
         unique = {}
@@ -299,6 +339,12 @@ def cmd_collect(cfg, args):
             unique.setdefault(key, item)
         items = sorted(unique.values(), key=lambda item: item.get("published") or "",
                        reverse=True)
+        direct_types = {"site_feed", "site_scrape", "party_archive", "party_search",
+                        "telegram", "youtube", "parliament", "hansard",
+                        "parliamentary_record"}
+        # Stable sorting keeps newest-first within each class while putting
+        # direct records before press results when the safety cap is active.
+        items.sort(key=lambda item: 0 if item.get("source_type") in direct_types else 1)
         if args.max_items_per_party and args.max_items_per_party > 0:
             items = items[:args.max_items_per_party]
         total += fetched_here
@@ -485,31 +531,38 @@ def cmd_interpret(cfg, args):
 
 
 def cmd_world(cfg, args):
-    """The layers that sit outside any single party: what happened globally,
-    the highlight list, and what is worth reading. Runs after `interpret`
-    because highlights use the significance grades."""
+    """Build the three linked weekly panels without requiring another AI call."""
     conn = st.connect()
     week = args.week or current_week()
     start, end = week_bounds(week)
-    rng = f"{start.strftime('%d %b')} – {end.strftime('%d %b %Y')}"
     items = _enrich(st.week_items(conn, week, analyzed_only=True), cfg)
-
-    print("Writing the world briefing...")
-    st.set_briefing(conn, week, WORLD_SCOPE, dg.world_briefing(rng, items))
-
-    print("Selecting highlights...")
-    hl = dg.highlights(items)
-    st.set_briefing(conn, week, HIGHLIGHT_SCOPE, json.dumps(hl, ensure_ascii=False))
-    print(f"  {len(hl)} highlight(s)")
-
-    print("Gathering the reading list...")
     rcfg = dg.load_reading_config()
-    since = co.window_start(args.days)
-    cands = dg.fetch_reading_feeds(rcfg, since) + dg.search_reading(rcfg, days=args.days)
-    print(f"  {len(cands)} candidates, curating...")
-    reading = dg.curate(cands)
+    print("Building Highlights, This week in the world, and Worth reading...")
+    hl, world, reading = dg.build_panels(
+        rcfg, items, start, end + timedelta(minutes=1),
+    )
+
+    def keep_previous(scope, fresh):
+        """A transient feed outage must not erase an already complete panel."""
+        if len(fresh) >= 2:
+            return fresh
+        try:
+            previous = json.loads(st.get_briefing(conn, week, scope) or "[]")
+        except Exception:
+            previous = []
+        return previous if isinstance(previous, list) and len(previous) >= 2 else fresh
+
+    hl = keep_previous(HIGHLIGHT_SCOPE, hl)
+    world = keep_previous(WORLD_SCOPE, world)
+    reading = keep_previous(READING_SCOPE, reading)
+    st.set_briefing(conn, week, HIGHLIGHT_SCOPE, json.dumps(hl, ensure_ascii=False))
+    st.set_briefing(conn, week, WORLD_SCOPE, json.dumps(world, ensure_ascii=False))
     st.set_briefing(conn, week, READING_SCOPE, json.dumps(reading, ensure_ascii=False))
-    print(f"  {len(reading)} kept")
+    print(f"  {len(hl)} highlights · {len(world)} world · {len(reading)} reading")
+    for label, rows in (("Highlights", hl), ("This week in the world", world),
+                        ("Worth reading", reading)):
+        if len(rows) < 2:
+            print(f"  WARNING: {label} has only {len(rows)} verified result(s).")
 
 
 def cmd_archive(cfg, args):
@@ -563,7 +616,6 @@ GROUPERS = {
     "country": lambda i: [i.get("country") or "—"],
     "party":   lambda i: [i.get("party_name") or "—"],
     "actor":   lambda i: (i.get("analysis") or {}).get("actors") or ["(no named actor)"],
-    "theme":   lambda i: (i.get("analysis") or {}).get("topics") or ["(no theme tagged)"],
     "camp":    lambda i: ["Radical left" if i.get("camp") == "left" else "Far right"],
     "source":  lambda i: [i.get("provenance") or "—"],
     "month":   lambda i: [(i.get("published") or "")[:7] or "—"],
@@ -689,8 +741,6 @@ def cmd_report(cfg, args):
             return False
         if args.actor and not (set(a.get("actors") or []) & set(args.actor)):
             return False
-        if args.theme and not (set(a.get("topics") or []) & set(args.theme)):
-            return False
         if args.camp and i.get("camp") != args.camp:
             return False
         return True
@@ -708,7 +758,7 @@ def cmd_report(cfg, args):
 
     filters = [f"{k}: {', '.join(v)}" for k, v in
                [("countries", args.country), ("parties", args.party),
-                ("actors", args.actor), ("themes", args.theme),
+                ("actors", args.actor),
                 ("camp", [args.camp] if args.camp else [])] if v]
     top = max(len(g) for g in groups.values())
     body = [f'<h1>Report</h1>',
@@ -756,24 +806,22 @@ def cmd_site(cfg, args):
     # so removed demo records (or corrected records) cannot leave stale pages.
     for generated in ("issues", "data", "corpus", "speakers", "parties"):
         shutil.rmtree(os.path.join(SITE_DIR, generated), ignore_errors=True)
+    for stale in ("reliability.html",):
+        try:
+            os.remove(os.path.join(SITE_DIR, stale))
+        except FileNotFoundError:
+            pass
     st_site.write_assets(SITE_DIR)
 
     weeks = st.all_weeks(conn)
+    collection_history = st.collection_history(conn, weeks=max(16, len(weeks)))
     codes = st.get_codes(conn)
-    baselines = {}
-    reference = None
-    try:
-        with open("config/baselines.yaml", encoding="utf-8") as f:
-            b = yaml.safe_load(f)
-            baselines, reference = b.get("baselines") or {}, b.get("reference")
-    except Exception:
-        pass
     all_ids = [r[0] for r in conn.execute("SELECT DISTINCT item_id FROM analysis_meta")]
     extras = {"links": st.latest_link_status(conn),
               "annotations": st.get_annotations(conn),
               "meta": {iid: st.meta_for(conn, iid) for iid in all_ids}}
     index = []
-    for week in weeks:
+    for week_index, week in enumerate(weeks):
         wk_extras = dict(extras)
         try:
             wk_extras["backtrans"] = json.loads(
@@ -785,7 +833,13 @@ def cmd_site(cfg, args):
             continue
         briefs = st.all_briefings(conn, week)
         overview = briefs.pop(OVERVIEW_SCOPE, "")
-        world = briefs.pop(WORLD_SCOPE, "")
+        raw_world = briefs.pop(WORLD_SCOPE, "[]")
+        try:
+            world = json.loads(raw_world)
+            if not isinstance(world, list):
+                world = []
+        except Exception:
+            world = []
         briefs.pop(BACKTRANS_SCOPE, None)
         try:
             retractions = json.loads(briefs.pop(RETRACT_SCOPE, "[]"))
@@ -803,52 +857,55 @@ def cmd_site(cfg, args):
             reading = json.loads(briefs.pop(READING_SCOPE, "[]"))
         except Exception:
             reading = []
-        conv = tr.convergence(conn, cfg["parties"], week, st)
+        if not hl:
+            hl = dg.highlights(items, limit=6, minimum=2)
         sizes = _cluster_sizes(items)
-
-        shifts_by_party = {}
-        hist = tr.iso_weeks_back(week, HISTORY_WEEKS)
-        for p in cfg["parties"]:
-            s = tr.shifts(tr.theme_series(conn, p["id"], hist))
-            if s:
-                shifts_by_party[p.get("short") or p["id"]] = s
+        previous_week = weeks[week_index + 1] if week_index + 1 < len(weeks) else ""
+        previous_items = (_enrich(st.week_items(conn, previous_week, analyzed_only=True),
+                                  cfg, codes) if previous_week else [])
+        one_minute = tr.week_in_one_minute(items, hl)
+        changes = tr.week_changes(items, previous_items, previous_week)
+        coverage = tr.coverage_report(week, cfg["parties"], items,
+                                      collection_history)
+        watch = tr.watch_next(items)
 
         csv_path = os.path.join(DATA_DIR, f"{week}.csv")
-        if not os.path.exists(csv_path):
-            ex.write_csv(ex.rows_for(items, sizes), csv_path)
+        # Exports are generated views, so rebuild them when the report schema
+        # changes (for example when a retired field is removed).
+        ex.write_csv(ex.rows_for(items, sizes), csv_path)
         st_site.copy_export(csv_path, week, SITE_DIR)
 
         st_site.issue_page(week, items, overview, briefs, names, cfg["parties"],
                            _absences(conn, cfg, countries, week),
-                           shifts_by_party, sizes, SITE_DIR,
+                           sizes, SITE_DIR,
                            all_items=_enrich(st.week_items(conn, week), cfg),
-                           convergence=conv, page_changes=page_changes,
+                           page_changes=page_changes,
                            editors_cut=ip.editors_cut(items),
                            world=world, highlights=hl, reading=reading,
                            week_range=f"{week_bounds(week)[0].strftime('%d %b')} – "
                                       f"{week_bounds(week)[1].strftime('%d %b %Y')}",
-                           retractions=retractions, baselines=baselines,
-                           reference=reference)
+                           retractions=retractions, minute=one_minute,
+                           changes=changes, coverage=coverage, watch=watch,
+                           previous_week=previous_week)
 
         relevant = [i for i in items if (i.get("analysis") or {}).get("relevant")]
         start, end = week_bounds(week)
         index.append({
             "week": week,
             "range": f"{start.strftime('%d %b')} – {end.strftime('%d %b %Y')}",
-            "headline": (overview or "").split(". ")[0][:180],
+            "headline": ((overview or (hl[0].get("description") if hl else "") or "")
+                         .split(". ")[0][:180]),
             "items": len(relevant),
             "parties": len({i["party_id"] for i in relevant}),
         })
         print(f"issue {week}: {len(relevant)} items")
 
-    newest = weeks[0] if weeks else current_week()
     totals = {}
     for p in cfg["parties"]:
         pitems = _enrich(st.party_items(conn, p["id"]), cfg)
         rel = [i for i in pitems if (i.get("analysis") or {}).get("relevant")]
         totals[p["id"]] = len(rel)
-        series = tr.theme_series(conn, p["id"], tr.iso_weeks_back(newest, HISTORY_WEEKS))
-        st_site.party_page(p, series, rel, SITE_DIR)
+        st_site.party_page(p, [], rel, SITE_DIR)
 
     # Speakers: disaggregate what the party pages aggregate.
     spk = tr.speaker_index(conn, cfg["parties"], st)
@@ -875,27 +932,23 @@ def cmd_site(cfg, args):
     yrs = st_site.corpus_json(all_relevant, SITE_DIR)
     rb.report_page(SITE_DIR, len(cfg["parties"]),
                    len({p.get("country") for p in cfg["parties"]}))
+    st_site.search_page(SITE_DIR)
+    prompt_versions = st.prompt_versions(conn)
+    st_site.methodology_page(cfg["parties"], prompt_versions,
+                             load_revisions(), SITE_DIR)
     print(f"corpus: {sum(1 for i in all_relevant if (i.get('analysis') or {}).get('relevant'))} "
           f"items across {len(yrs)} year shard(s)")
 
-    # Health, network and reliability: what the system knows about itself.
-    history = st.collection_history(conn, weeks=16)
-    hrows, hweeks = hlth.health_table(history, cfg["parties"])
-    silent = hlth.silent_parties(history, cfg["parties"])
+    # Health and network: what the system knows about its own coverage.
+    hrows, hweeks = hlth.health_table(collection_history, cfg["parties"])
+    silent = hlth.silent_parties(collection_history, cfg["parties"])
     link_status = st.latest_link_status(conn)
     link_summary = {}
     for v in link_status.values():
         link_summary[v["status"]] = link_summary.get(v["status"], 0) + 1
-    st_site.health_page(hrows, hweeks, silent, st.prompt_versions(conn),
+    st_site.health_page(hrows, hweeks, silent, prompt_versions,
                         link_summary, SITE_DIR)
     st_site.network_page(st.all_relations(conn), cfg["parties"], SITE_DIR)
-
-    all_items_flat = []
-    for wk in weeks:
-        all_items_flat += _enrich(st.week_items(conn, wk, analyzed_only=True), cfg, codes)
-    reports = [r for r in (hlth.round_report(conn, st, rid, all_items_flat)
-                           for rid in st.blind_rounds(conn)) if r]
-    st_site.reliability_page(reports, SITE_DIR)
 
     st_site.archive_page(index, SITE_DIR)
     st_site.parties_page(cfg["parties"], totals, SITE_DIR)
@@ -1036,7 +1089,7 @@ def cmd_demo(cfg, args):
                "reading": "A governing prospectus rather than a manifesto: published four days before a vote the party expects to win outright, it is written for the electorate that will produce a minister-president, not for a federal audience. The choice to lead on immigration and family policy rather than economics tells you which coalition of voters it thinks is decisive.",
                "why_now": "Four days before the Saxony-Anhalt vote, and three weeks before Berlin and Mecklenburg-Vorpommern. Publishing now sets the terms for all three.",
                "continuity": "escalation",
-               "continuity_note": "The themes are the party's standing repertoire; what is new is stating them as an implementation programme rather than an opposition platform.",
+               "continuity_note": "The positions are the party's standing repertoire; what is new is stating them as an implementation programme rather than an opposition platform.",
                "comparison": "No other monitored party this week is writing as a prospective governing party.",
                "watch": "Whether the federal party adopts or distances itself from the state programme after Sunday.",
                "frameworks": ["Militant democracy pressure"],
@@ -1214,10 +1267,9 @@ def main():
     ap.add_argument("--country", action="append", default=[])
     ap.add_argument("--party", action="append", default=[])
     ap.add_argument("--actor", action="append", default=[])
-    ap.add_argument("--theme", action="append", default=[])
     ap.add_argument("--camp", choices=["left", "right"])
     ap.add_argument("--group-by", dest="groupby", default="country",
-                    choices=["country", "party", "actor", "theme", "camp",
+                    choices=["country", "party", "actor", "camp",
                              "source", "month", "none"])
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--week")
@@ -1240,8 +1292,10 @@ def main():
             cmd_diff(cfg, args)
             cmd_brief(cfg, args)
             cmd_interpret(cfg, args)
-            cmd_world(cfg, args)
             cmd_archive(cfg, args)
+        # These are bounded RSS/search requests and must also run in fast
+        # mode; otherwise all three top-of-report panels stay blank.
+        cmd_world(cfg, args)
         cmd_export(cfg, args)
         cmd_site(cfg, args)
     elif args.command == "backfill":

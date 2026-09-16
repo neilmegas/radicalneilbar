@@ -1,11 +1,28 @@
-# Secondary sources for the weekly "Worth reading" section.
-# Feed failures are harmless; edit this list to match your own reading routine.
+# The three compact panels shown side by side at the top of each weekly issue.
+# Results are restricted to the issue dates. A direct party record always has
+# priority in Highlights; search is the fallback when party output is thin.
+
+minimum_per_panel: 2
+limit_per_panel: 6
+
+highlights_queries:
+  - European radical right OR far right parties politics
+  - European radical left parties politics
+  - Israel political parties Knesset
+
+world_queries:
+  - global politics elections governments diplomacy
+  - international politics conflict diplomacy United Nations
+  - world political developments democracy elections
+
+# Specialist/long-form sources for Worth reading. Feed failures are followed
+# by dated web-news searches, so the section does not silently stay blank.
 feeds:
   - https://www.europarl.europa.eu/rss/doc/top-stories/en.xml
   - https://www.osce.org/odihr/press-releases/rss
+
 queries:
   - European radical right parties analysis
   - European radical left parties analysis
-  - antisemitism political parties Europe survey
-  - migration European party politics analysis
-limit: 30
+  - Israel party politics analysis
+  - European party system elections analysis

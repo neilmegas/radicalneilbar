@@ -32,3 +32,4 @@ parties:
   - {id: noam, name: Noam, short: Noam, country: IL, camp: right, lang: he, rtl: true, site: "https://noamparty.org.il", queries: ["מפלגת נעם", "אבי מעוז", "Noam party Israel"]}
   - {id: hadash, name: Hadash, short: Hadash, country: IL, camp: left, lang: he, rtl: true, site: "https://hadash.org.il", queries: ["חד״ש", "Hadash party"]}
   - {id: balad, name: Balad, short: Balad, country: IL, camp: left, lang: ar, rtl: true, site: "https://www.balad.org", queries: ["בל״ד", "التجمع الوطني الديمقراطي", "Balad party Israel"]}
+  - {id: daam, name: "Da'am Workers Party", short: "דע״ם / Da'am", country: IL, camp: left, lang: he, rtl: true, site: "https://en.daam.org.il", queries: ["דע״ם", "מפלגת דע״ם", "حزب دعم العمالي", "Da'am Workers Party", "Asma Agbarieh"]}

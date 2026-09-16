@@ -1,0 +1,17 @@
+revisions:
+  - date: "2026-09-16"
+    title: "Action-focused reports and archive tools"
+    changes:
+      - "Added The week in one minute, evidence-linked watchpoints, and a comparison with the preceding archived week."
+      - "Added observable action-type labels without restoring retired ideological theme tags."
+      - "Added party-by-party collection coverage that separates quiet checks, access failures, outside reporting, and missing logs."
+      - "Added party activity timelines, full-text archive search, two-week comparison, and original-language display controls."
+      - "Published this methodology page and revision log."
+  - date: "2026-09-15"
+    title: "Neil's Parties Report redesign"
+    changes:
+      - "Renamed the publication Neil's Parties Report."
+      - "Made direct party documents the central evidence and condensed other reporting into linked context."
+      - "Added weekly highlights, world context, reading recommendations, and collapsible country, party, and review sections."
+      - "Removed the former Israel, antisemitism, and immigration theme presentation."
+      - "Added the Da'am Workers Party to the monitored roster."
