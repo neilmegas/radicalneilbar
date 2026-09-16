@@ -1,0 +1,1 @@
+Net 4 and C#. I would need set send to Browser Cache-Control (Cache-Control: no-cache) in the HTTP Response header for a Web Form page. Any idea how to do it? Thanks for your time.

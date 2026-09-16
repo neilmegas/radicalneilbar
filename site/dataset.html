@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A weekly record of what monitored European and Israeli far-left and far-right parties did and said.">
+<title>Dataset and exports · RAPPORT</title>
+<link rel="stylesheet" href="assets/style.css">
+</head><body><div class="wrap">
+<nav class="top">
+  <span class="brand-lockup"><a class="brand" href="index.html">RAPPORT</a>
+    <small>Radicalism and Party Politics: Observation, Reporting and Tracking</small></span>
+  <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
+    <a href="index.html#latest">Latest weekly report</a>
+    <a href="archive.html">Report archive</a>
+    <a href="report.html">Build custom report</a>
+  </div></details>
+  <details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown">
+    <a href="parties.html">Countries and parties</a>
+    <a href="speakers.html">Speakers</a>
+    <a href="network.html">Party network</a>
+  </div></details>
+  <details class="nav-menu"><summary>Research</summary><div class="nav-dropdown">
+    <a href="methodology.html">Methodology</a>
+    <a href="dataset.html">Dataset and exports</a>
+    <a href="citation.html">Suggested citation</a>
+    <a href="health.html">Collection status</a>
+  </div></details>
+  <a href="search.html">Search</a>
+  <span class="spacer"></span>
+  <span class="meta">public research data</span>
+</nav>
+<h1>Dataset and exports</h1>
+<p class="lede">Download the public evidence index behind RAPPORT. Each record retains its
+source URL, date, party, country, evidence class, observable action type, factual summary,
+and stable weekly-report identifier.</p>
+<div class="statline"><div class="stat"><div class="v">333</div><div class="k">retained records</div></div>
+<div class="stat"><div class="v">65</div><div class="k">monitored parties</div></div>
+<div class="stat"><div class="v">9</div><div class="k">weekly issues</div></div></div>
+<div class="research-pages"><section class="box"><h4>Machine-readable corpus</h4>
+<p>Use the <a href="corpus/index.json">corpus index (JSON)</a> to discover annual shards.</p>
+<ul class="link-list"><li><a class="link-title" href="corpus/2023.json" download>2023 corpus (JSON)</a><span class="link-meta">Retained evidence records for 2023</span></li><li><a class="link-title" href="corpus/2026.json" download>2026 corpus (JSON)</a><span class="link-meta">Retained evidence records for 2026</span></li></ul></section>
+<section class="box"><h4>Weekly coding exports</h4><ul class="link-list">
+<li><a class="link-title" href="data/2026-W38.csv" download>2026-W38 coding rows (CSV)</a><span class="link-meta">14 Sep – 20 Sep 2026 · 135 retained items</span></li><li><a class="link-title" href="data/2026-W37.csv" download>2026-W37 coding rows (CSV)</a><span class="link-meta">07 Sep – 13 Sep 2026 · 33 retained items</span></li><li><a class="link-title" href="data/2026-W36.csv" download>2026-W36 coding rows (CSV)</a><span class="link-meta">31 Aug – 06 Sep 2026 · 54 retained items</span></li><li><a class="link-title" href="data/2023-W05.csv" download>2023-W05 coding rows (CSV)</a><span class="link-meta">30 Jan – 05 Feb 2023 · 8 retained items</span></li><li><a class="link-title" href="data/2023-W04.csv" download>2023-W04 coding rows (CSV)</a><span class="link-meta">23 Jan – 29 Jan 2023 · 15 retained items</span></li><li><a class="link-title" href="data/2023-W03.csv" download>2023-W03 coding rows (CSV)</a><span class="link-meta">16 Jan – 22 Jan 2023 · 23 retained items</span></li><li><a class="link-title" href="data/2023-W02.csv" download>2023-W02 coding rows (CSV)</a><span class="link-meta">09 Jan – 15 Jan 2023 · 27 retained items</span></li><li><a class="link-title" href="data/2023-W01.csv" download>2023-W01 coding rows (CSV)</a><span class="link-meta">02 Jan – 08 Jan 2023 · 35 retained items</span></li><li><a class="link-title" href="data/2022-W52.csv" download>2022-W52 coding rows (CSV)</a><span class="link-meta">26 Dec – 01 Jan 2023 · 3 retained items</span></li></ul></section></div>
+<h2>Compact codebook</h2>
+<table class="rev"><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody>
+<tr><td class="n">id / w / d</td><td>Stable record identifier, ISO reporting week, and publication date.</td></tr>
+<tr><td class="n">p / pn / c</td><td>Party identifier, display name, and country code.</td></tr>
+<tr><td class="n">cm</td><td>Operational roster bucket: far-left or far-right, stored compactly as left/right.</td></tr>
+<tr><td class="n">pr / di</td><td>Evidence provenance and whether the record is a direct party or parliamentary document.</td></tr>
+<tr><td class="n">ti / s / at</td><td>Source title, factual summary, and observable action type.</td></tr>
+<tr><td class="n">u / au</td><td>Original source URL and archived URL, where capture succeeded.</td></tr>
+<tr><td class="n">ac / q</td><td>Named actors and captured quotations.</td></tr>
+</tbody></table>
+<h2>Use and limitations</h2><p>These are records retained by an automated collection and
+screening system, not a complete census of political activity. Dynamic, blocked, deleted,
+or unconfigured sources may be missed. Verify analytical claims against the linked primary
+source and cite the specific weekly issue and record. See the <a href="methodology.html">full methodology</a>
+and <a href="citation.html">suggested citation</a>.</p>
+<h2>Stable links</h2><p>Weekly reports use <code>issues/YYYY-Www.html</code>; individual
+records add <code>#item-ID</code>; party pages use <code>parties/PARTY-ID.html</code>.
+These identifiers do not change when the site is rebuilt.</p>
+<footer class="meta">
+<strong>RAPPORT</strong> — Radicalism and Party Politics: Observation, Reporting and Tracking. Automated research monitoring
+powered by the Claude API. AI-generated material may contain errors; consult the
+cited primary sources. <a href="https://www.neilbar.com" rel="me">Dr. Neil Bar</a>.
+</footer>
+</div></body></html>

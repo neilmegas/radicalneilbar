@@ -1,0 +1,1 @@
+System Restore lets you restore your Windows installation back to its last working state. It does this by creating "restore points" every so often. Restore points are snapshots of your Windows system files, certain program files, registry settings, and hardware drivers.

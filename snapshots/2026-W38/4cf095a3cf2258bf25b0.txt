@@ -1,0 +1,1 @@
+We introduce CLEVER, the first curated benchmark for evaluating the generation of specifications and formally verified code in Lean. The benchmark comprises of 161 programming problems; it evaluates both formal speci-fication generation and implementation synthesis from natural language, requiring formal correctness proofs for both.

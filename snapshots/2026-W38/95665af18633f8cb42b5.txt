@@ -1,0 +1,1 @@
+Microsoft has officially removed the SaRA utility from all in-support versions of Windows updates released on and after March 10, 2026. Can I reuse SaRA scripts with the Get Help command-line tool?

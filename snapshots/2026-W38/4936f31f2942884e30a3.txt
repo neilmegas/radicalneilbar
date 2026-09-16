@@ -1,0 +1,1 @@
+Access Google Sheets with a personal Google account or Google Workspace account (for business use).

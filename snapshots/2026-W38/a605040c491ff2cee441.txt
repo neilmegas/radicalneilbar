@@ -1,0 +1,1 @@
+We have released Security Updates for Exchange Server SE. Exchange Server 2019 and 2016 ESU updates only.

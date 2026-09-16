@@ -1,0 +1,1 @@
+By using System Restore, you can undo these changes without affecting your personal files, providing a safe way to resolve problems without losing important data.

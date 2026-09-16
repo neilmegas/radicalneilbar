@@ -1,0 +1,1 @@
+If you look at the PHP doc help for function session_cache_limiter (), you will see that if the cache_limiter parameter is set to private or nocache the Expires HTTP header is set to a const date (Thu, 19 Nov 1981 08:52:00 GMT).

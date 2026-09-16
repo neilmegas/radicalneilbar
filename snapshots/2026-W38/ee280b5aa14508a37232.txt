@@ -1,0 +1,1 @@
+A factory restore erases the information and settings on your iPhone, iPad, or iPod and installs the latest version of iOS, iPadOS, or iPod software.

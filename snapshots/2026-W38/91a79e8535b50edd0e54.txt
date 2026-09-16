@@ -1,0 +1,1 @@
+We wanted to provide an update on Exchange Online EWS deprecation.

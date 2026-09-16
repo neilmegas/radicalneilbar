@@ -1,0 +1,1 @@
+TL;DR: We introduce CLEVER, a hand-curated benchmark for verified code generation in Lean. It requires full formal specs and proofs. No few-shot method solves all stages, making it a strong testbed for synthesis and formal reasoning.

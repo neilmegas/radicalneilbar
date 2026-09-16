@@ -1,0 +1,1 @@
+Free, open-source CleanMyMac alternative for macOS. Native SwiftUI cleaner with app uninstaller, disk analyzer, duplicate finder, Xcode/Docker cleanup, Apple Intelligence and zero telemetry.

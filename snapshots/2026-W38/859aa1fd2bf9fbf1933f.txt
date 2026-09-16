@@ -1,0 +1,1 @@
+Restore is the act of retrieving data from a backup and returning it to its original location or a new one. This process is typically used when files have been lost, corrupted, or accidentally deleted.

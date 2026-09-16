@@ -1,0 +1,1 @@
+Important When you close your Microsoft account, your email and contacts are deleted from our servers and can't be recovered. If you use your Microsoft account with Xbox, Skype, OneDrive, or other Microsoft services, you'll no longer be able to access those services. You will also lose access to any saved BitLocker recovery keys.

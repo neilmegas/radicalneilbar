@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A weekly record of what monitored European and Israeli far-left and far-right parties did and said.">
+<title>Reconquête · RAPPORT</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head><body><div class="wrap">
+<nav class="top">
+  <span class="brand-lockup"><a class="brand" href="../index.html">RAPPORT</a>
+    <small>Radicalism and Party Politics: Observation, Reporting and Tracking</small></span>
+  <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
+    <a href="../index.html#latest">Latest weekly report</a>
+    <a href="../archive.html">Report archive</a>
+    <a href="../report.html">Build custom report</a>
+  </div></details>
+  <details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown">
+    <a href="../parties.html">Countries and parties</a>
+    <a href="../speakers.html">Speakers</a>
+    <a href="../network.html">Party network</a>
+  </div></details>
+  <details class="nav-menu"><summary>Research</summary><div class="nav-dropdown">
+    <a href="../methodology.html">Methodology</a>
+    <a href="../dataset.html">Dataset and exports</a>
+    <a href="../citation.html">Suggested citation</a>
+    <a href="../health.html">Collection status</a>
+  </div></details>
+  <a href="../search.html">Search</a>
+  <span class="spacer"></span>
+  <span class="meta">FR</span>
+</nav>
+<h1>Reconquête</h1><p class="meta">FR</p><section aria-labelledby="representation-heading"><h2 id="representation-heading">Representation</h2><p class="meta">Current representation is kept separate from election-result seats. Figures appear only after source verification.</p><div class="profile-links"><a href="https://www.parti-reconquete.fr" rel="noreferrer">Official party website</a><a href="https://www.assemblee-nationale.fr/" rel="noreferrer">National Assembly · institutional directory</a><a href="https://www.europarl.europa.eu/meps/en/search/advanced" rel="noreferrer">European Parliament members · member directory</a><a href="https://www.resultats-elections.interieur.gouv.fr/" rel="noreferrer">Ministry of the Interior election results</a></div><div class="representation-grid"><section class="seat-card"><h3>National parliament</h3><p class="seat-pending">A verified seat total has not yet been published in RAPPORT. <a href="https://www.assemblee-nationale.fr/" rel="noreferrer">Check official source</a>.</p></section><section class="seat-card"><h3>European Parliament</h3><p class="seat-pending">A verified seat total has not yet been published in RAPPORT. <a href="https://www.europarl.europa.eu/meps/en/search/advanced" rel="noreferrer">Check official source</a>.</p></section></div><h3>Last three concluded national elections</h3><div class="box dashed"><p>Election comparison awaiting verification.</p><p class="meta">RAPPORT will not infer historical seats. Use the <a href="https://www.resultats-elections.interieur.gouv.fr/" rel="noreferrer">official election source</a> until three sourced results are entered.</p></div><p class="meta">Institutional links checked 2026-09-16.</p></section><div class="statline"><div class="stat"><div class="v">1</div><div class="k">items on file</div></div><div class="stat"><div class="v">0</div><div class="k">direct records</div></div><div class="stat"><div class="v">0</div><div class="k">with a captured quote</div></div></div><div class="quote-tools"><span class="meta">Quoted text</span><span><button type="button" data-quote-mode="both" class="active">Original + English</button> <button type="button" data-quote-mode="english">English</button> <button type="button" data-quote-mode="original">Original</button></span></div><div class="timeline-tools"><label>Search this party<input id="timeline-query" type="search" placeholder="words in titles and summaries"></label><label>Action type<select id="timeline-action"><option value="">All actions</option><option>Election or campaign</option></select></label><label>Evidence<select id="timeline-source"><option value="">All retained items</option><option value="direct">Direct records only</option><option value="coverage">Outside reporting only</option></select></label></div><h2>Activity timeline</h2><details class="timeline-period" open><summary><span>2026-W38</span><span class="summary-count">0 direct · 1 coverage</span></summary><div class="timeline-content"><h3>Other reporting and context</h3><ul class="link-list"><li class="timeline-entry" id="item-c5e0df0d94cbc10be9c7" data-action="Election or campaign" data-direct="0" data-search="marine le pen emerges in the presidential race as the &quot;top favourite&quot; - el mundo america marine le pen is described as emerging as the top favourite in the presidential race. reconquête election or campaign"><a class="link-title" href="https://news.google.com/rss/articles/CBMigwFBVV95cUxQM25qQ1VEaHJKVEtEanVCQnU4am8zTjc3bmRRT2xhREcwWE05NHE3UFd3eDN0NmV0M1pUXzNSVW5Bc09IeUFRMXMzOS1nRzFVWTVNeHZaNGZpZm9VMld4Sk54Nmt6b0NOUGhjM1lNRkVrNHNWaXBRYTBQR0tSUzd2T1FqUQ?oc=5" rel="noreferrer">Marine Le Pen emerges in the presidential race as the &quot;top favourite&quot; - El Mundo America</a><span class="link-meta"><span class="action-tag">Election or campaign</span> El Mundo America · 2026-09-15</span><span class="link-desc">Marine Le Pen is described as emerging as the top favourite in the presidential race.</span></li></ul></div></details><div class="box dashed"><p>No direct records captured yet.</p><p class="meta">The timeline contains outside reporting only. Check Collection status to distinguish a quiet period from a blocked source.</p></div><script>
+function setQuoteMode(mode){
+  document.body.classList.remove('quotes-both','quotes-english','quotes-original');
+  document.body.classList.add('quotes-'+mode);
+  document.querySelectorAll('[data-quote-mode]').forEach(b=>b.classList.toggle('active',b.dataset.quoteMode===mode));
+  try{localStorage.setItem('rapport-quote-mode',mode)}catch(_e){}
+}
+document.querySelectorAll('[data-quote-mode]').forEach(b=>b.addEventListener('click',()=>setQuoteMode(b.dataset.quoteMode)));
+let savedMode='both';try{savedMode=localStorage.getItem('rapport-quote-mode')||'both'}catch(_e){}
+setQuoteMode(['both','english','original'].includes(savedMode)?savedMode:'both');
+
+const timelineQuery=document.getElementById('timeline-query');
+const timelineAction=document.getElementById('timeline-action');
+const timelineSource=document.getElementById('timeline-source');
+function filterTimeline(){
+  const q=(timelineQuery?.value||'').trim().toLocaleLowerCase();
+  const action=timelineAction?.value||'',source=timelineSource?.value||'';
+  document.querySelectorAll('.timeline-entry').forEach(row=>{
+    const direct=row.dataset.direct==='1';
+    const visible=(!q||(row.dataset.search||'').includes(q))&&
+      (!action||row.dataset.action===action)&&
+      (!source||(source==='direct'?direct:!direct));
+    row.hidden=!visible;
+  });
+  document.querySelectorAll('.timeline-period').forEach(period=>{
+    const any=[...period.querySelectorAll('.timeline-entry')].some(row=>!row.hidden);
+    period.hidden=!any;
+    if(any&&(q||action||source))period.open=true;
+  });
+}
+[timelineQuery,timelineAction,timelineSource].forEach(control=>control?.addEventListener('input',filterTimeline));
+
+</script>
+<footer class="meta">
+<strong>RAPPORT</strong> — Radicalism and Party Politics: Observation, Reporting and Tracking. Automated research monitoring
+powered by the Claude API. AI-generated material may contain errors; consult the
+cited primary sources. <a href="https://www.neilbar.com" rel="me">Dr. Neil Bar</a>.
+</footer>
+</div></body></html>

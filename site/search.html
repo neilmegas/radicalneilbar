@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A weekly record of what monitored European and Israeli far-left and far-right parties did and said.">
+<title>Search · RAPPORT</title>
+<link rel="stylesheet" href="assets/style.css">
+</head><body><div class="wrap">
+<nav class="top">
+  <span class="brand-lockup"><a class="brand" href="index.html">RAPPORT</a>
+    <small>Radicalism and Party Politics: Observation, Reporting and Tracking</small></span>
+  <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
+    <a href="index.html#latest">Latest weekly report</a>
+    <a href="archive.html">Report archive</a>
+    <a href="report.html">Build custom report</a>
+  </div></details>
+  <details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown">
+    <a href="parties.html">Countries and parties</a>
+    <a href="speakers.html">Speakers</a>
+    <a href="network.html">Party network</a>
+  </div></details>
+  <details class="nav-menu"><summary>Research</summary><div class="nav-dropdown">
+    <a href="methodology.html">Methodology</a>
+    <a href="dataset.html">Dataset and exports</a>
+    <a href="citation.html">Suggested citation</a>
+    <a href="health.html">Collection status</a>
+  </div></details>
+  <a href="search.html">Search</a>
+  <span class="spacer"></span>
+  <span class="meta">full archive</span>
+</nav>
+
+<h1>Search the archive</h1>
+<p class="lede">Search titles, summaries, parties, named actors, action types, and captured
+quotes across every report. Results link back to the complete evidence record.</p>
+<div class="search-tools">
+  <label>Words<input id="search-query" type="search" placeholder="e.g. coalition, protest, deportation"></label>
+  <label>Party<select id="search-party"><option value="">All parties</option></select></label>
+  <label>Action<select id="search-action"><option value="">All actions</option></select></label>
+  <label>Evidence<select id="search-source"><option value="">All evidence</option>
+    <option value="direct">Direct records</option><option value="coverage">Outside reporting</option></select></label>
+</div>
+<p id="search-status" class="meta">Loading archive…</p>
+<div id="search-results"></div>
+<script>
+const searchEl=id=>document.getElementById(id);
+const searchEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let searchCorpus=[];
+function searchable(x){return [x.ti,x.s,x.pn,x.p,x.c,x.at,x.o,...(x.ac||[]),...(x.q||[]).flatMap(q=>[q.o,q.t,q.sp])].join(' ').toLocaleLowerCase()}
+function renderSearch(){
+  const q=searchEl('search-query').value.trim().toLocaleLowerCase();
+  const party=searchEl('search-party').value,action=searchEl('search-action').value,source=searchEl('search-source').value;
+  const found=searchCorpus.filter(x=>(!q||searchable(x).includes(q))&&(!party||x.p===party)&&
+    (!action||x.at===action)&&(!source||(source==='direct'?x.di:!x.di)))
+    .sort((a,b)=>(b.d||'').localeCompare(a.d||'')).slice(0,100);
+  searchEl('search-status').textContent=`${found.length}${found.length===100?' shown':''} matching record${found.length===1?'':'s'}.`;
+  searchEl('search-results').innerHTML=found.length?found.map(x=>{
+    const issue=x.w?`issues/${encodeURIComponent(x.w)}.html#item-${encodeURIComponent(x.id)}`:'';
+    const title=x.ti||x.s||'Untitled item';
+    return `<article class="search-result"><h3>${issue?`<a href="${issue}">${searchEsc(title)}</a>`:searchEsc(title)}</h3>
+      <p class="meta"><span class="action-tag">${searchEsc(x.at||'Recorded development')}</span>
+      ${searchEsc(x.pn||x.p)} · ${searchEsc(x.c)} · ${searchEsc(x.d)} · ${x.di?'direct record':'outside reporting'}</p>
+      <p>${searchEsc(x.s||'')}</p>${x.u?`<p class="meta"><a href="${searchEsc(x.u)}" rel="noreferrer">original source</a></p>`:''}</article>`;
+  }).join(''):'<div class="box dashed">No records match. Try fewer words or clear a filter.</div>';
+}
+async function loadSearch(){
+  try{
+    const idx=await fetch('corpus/index.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json()});
+    searchCorpus=(await Promise.all(idx.years.map(y=>fetch(`corpus/${y}.json`).then(r=>r.json())))).flat();
+    const parties=[...new Map(searchCorpus.map(x=>[x.p,x.pn||x.p])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+    parties.forEach(([id,name])=>searchEl('search-party').insertAdjacentHTML('beforeend',`<option value="${searchEsc(id)}">${searchEsc(name)}</option>`));
+    [...new Set(searchCorpus.map(x=>x.at).filter(Boolean))].sort().forEach(action=>searchEl('search-action').insertAdjacentHTML('beforeend',`<option>${searchEsc(action)}</option>`));
+    renderSearch();
+  }catch(err){searchEl('search-status').textContent='The archive could not be loaded. Open this page through the GitHub Pages URL.'}
+}
+['search-query','search-party','search-action','search-source'].forEach(id=>searchEl(id).addEventListener('input',renderSearch));
+loadSearch();
+</script>
+<footer class="meta">
+<strong>RAPPORT</strong> — Radicalism and Party Politics: Observation, Reporting and Tracking. Automated research monitoring
+powered by the Claude API. AI-generated material may contain errors; consult the
+cited primary sources. <a href="https://www.neilbar.com" rel="me">Dr. Neil Bar</a>.
+</footer>
+</div></body></html>
