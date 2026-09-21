@@ -1,0 +1,1 @@
+How do I define <meta http-equiv="cache-control" content="no-cache" /> in HTML5? It is no longer valid according to the W3C Validator and the documentation.

@@ -1,0 +1,1 @@
+Convert centimeters to feet and inches (cm to ft) for height, length or distance measurements.

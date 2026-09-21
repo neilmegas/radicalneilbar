@@ -1,0 +1,1 @@
+Select and hold (or right-click) the Speakers icon on the taskbar. Next, select the arrow to the right of the speaker volume slider to open a list of audio devices connected to your computer.

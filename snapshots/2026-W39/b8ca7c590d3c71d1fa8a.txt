@@ -1,0 +1,1 @@
+I had same problem "failed to load widgetset.nocache.js" but I solved it by reinstalling the "vaadin" plugin steps : 1) help -> eclipse market place -> search for vaadin -> (if it is already installed)uninstall it and again install it by clicking on the "installed" button 2)recompile the project and run it

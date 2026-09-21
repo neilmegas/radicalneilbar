@@ -1,0 +1,1 @@
+Free plan? Yes Schedule data extraction? Yes. You can choose minutes, hours, days, weeks, months. Direct integrations? You can sync the extracted data to Google Sheets (and you can trigger a Zap on those newly added rows, if you’d like) and Airtable. Simplescraper According to them: Extract data from any website in seconds.

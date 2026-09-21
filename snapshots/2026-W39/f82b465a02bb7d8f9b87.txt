@@ -1,0 +1,1 @@
+This prevents Windows from using the monitor as a speaker, which usually kills the associated mute icon. If the icon persists, please visit the Microsoft support portal.

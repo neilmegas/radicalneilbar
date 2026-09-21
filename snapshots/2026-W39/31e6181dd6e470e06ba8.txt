@@ -1,0 +1,1 @@
+If the speaker icon works there, the problem is almost certainly a third-party startup item, driver, or shell hook rather than Windows itself. Microsoft’s clean boot guidance is the best official way to prove that.

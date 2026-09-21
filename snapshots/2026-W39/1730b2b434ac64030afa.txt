@@ -1,0 +1,1 @@
+Apparently someone has discovered that using SetCacheability with NoCache also disables the ASP.NET output cache (server-side cache). They suggest to use the ServerAndNoCache option instead.

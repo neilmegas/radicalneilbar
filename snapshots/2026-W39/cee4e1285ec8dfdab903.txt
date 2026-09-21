@@ -1,0 +1,1 @@
+Your system might be missing necessary audio drivers. Please navigate to your laptop or motherboard support page to download and install audio drivers for your system. If you have trouble finding the right one, please give me your laptop or motherboard model. Was this answer helpful? 9 people found this answer helpful.

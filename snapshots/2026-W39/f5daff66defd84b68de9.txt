@@ -1,0 +1,1 @@
+Please follow the steps below on how to get this fixed. Please hover your mouse to the sound icon at the lower right-hand corner then right-click it and click Troubleshoot Sound. Let the troubleshooter finish until it's done then this should either fix the problem or give us an error message.

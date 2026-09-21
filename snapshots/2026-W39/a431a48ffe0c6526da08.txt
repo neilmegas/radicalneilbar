@@ -1,0 +1,1 @@
+En este artículo se proporciona una guía completa para resolver problemas de audio en Windows. Las sugerencias se enumeran en orden, por lo que debes empezar por la primera; comprobar si se soluciona el problema y, de no ser así, continuar por la siguiente.
