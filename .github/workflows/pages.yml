@@ -36,6 +36,37 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
+      - name: Verify RAPPORT update consistency
+        env:
+          PYTHONPATH: src
+        run: |
+          python - <<'PY'
+          import inspect
+          import yaml
+          from portal import issue_page
+
+          with open("config/sources.yaml", encoding="utf-8") as handle:
+              parties = yaml.safe_load(handle).get("parties") or []
+          party_ids = {party.get("id") for party in parties}
+          required = {
+              "symmachiaellinon", "forzanuova", "poterealpopolo", "rifondazione",
+              "daam", "zehut", "fvd", "pvdd", "denk", "akel", "elam",
+              "bsw", "dielinke", "greenparty", "reformuk", "lega", "syriza",
+              "podemos", "bloco", "roedt", "enhedslisten", "pbp",
+          }
+          missing = sorted(required - party_ids)
+          if len(parties) != 69 or missing:
+              raise SystemExit(
+                  "Incomplete config upload: expected 69 parties; "
+                  f"found {len(parties)}. Missing required IDs: {missing}"
+              )
+          if "research" not in inspect.signature(issue_page).parameters:
+              raise SystemExit(
+                  "Incomplete src upload: src/portal.py is from an older release."
+              )
+          print("Consistency check passed: 69 parties and matching report generator.")
+          PY
+
       - name: Build website
         run: |
           if [ -f data/items.db ]; then
