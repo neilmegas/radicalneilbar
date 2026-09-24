@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 
 PROVENANCE = {
@@ -29,6 +29,43 @@ PROVENANCE = {
         "A news outlet characterises a position without a captured verbatim statement.",
     ),
 }
+
+
+# Stable utility pages are useful for navigating a party website but are not
+# dated evidence of political activity.  Keep the list conservative so a news
+# item that merely mentions contact, privacy, or accessibility is not removed.
+STATIC_UTILITY_SEGMENTS = {
+    "contact", "contact-us", "contacts", "kontakt", "kontakte", "contatti",
+    "contacto", "contactos", "contato", "epikoinonia", "επικοινωνια",
+    "privacy", "privacy-policy", "datenschutz", "cookies", "cookie-policy",
+    "terms", "terms-of-use", "legal", "legal-notice", "impressum",
+    "accessibility", "accessibility-statement", "sitemap",
+}
+STATIC_UTILITY_TITLES = {
+    "contact", "contact us", "contact information", "contacts", "kontakt",
+    "contatti", "contacto", "contactos", "contato", "επικοινωνία",
+    "privacy", "privacy policy", "cookie policy", "legal notice", "impressum",
+    "terms of use", "accessibility", "accessibility statement", "sitemap",
+}
+
+
+def is_static_utility_page(url: str, title: str = "") -> bool:
+    """Return True for contact/legal/privacy/navigation utility pages."""
+    path = unquote(urlparse(url or "").path).casefold().strip("/")
+    segments = set()
+    for segment in path.split("/"):
+        segment = segment.strip()
+        if not segment:
+            continue
+        segments.add(segment)
+        # Common file suffixes should not keep an otherwise exact utility
+        # slug from matching; internal hyphens remain significant so an
+        # article such as ``contact-between-leaders`` is retained.
+        segments.add(re.sub(r"\.(?:html?|php|aspx?)$", "", segment))
+    if segments & STATIC_UTILITY_SEGMENTS:
+        return True
+    clean_title = re.sub(r"\s+", " ", title or "").strip().casefold()
+    return clean_title in STATIC_UTILITY_TITLES
 
 
 def _tokens(text: str) -> list[str]:
