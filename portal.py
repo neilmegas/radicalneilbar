@@ -264,6 +264,25 @@ details[open].timeline-period>summary::before{content:'−'}
 .profile-links{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 1.35rem}
 .profile-links a{display:inline-block;padding:.38rem .58rem;border:1px solid var(--hair);
   background:var(--surface);font-size:.8rem;text-decoration:none}
+.party-directory-tools{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(145px,.7fr));
+  gap:.65rem;padding:.8rem;margin:1.1rem 0;border:1px solid var(--hair);background:var(--surface)}
+.party-directory-tools label{font-size:.7rem;color:var(--muted);font-weight:600}
+.party-directory-tools input,.party-directory-tools select{display:block;width:100%;margin-top:.2rem;
+  min-height:2.45rem;padding:.42rem .5rem;border:1px solid var(--hair);background:white;color:var(--ink)}
+.party-directory-status{display:flex;align-items:end;justify-content:flex-end;font-size:.76rem;
+  color:var(--muted);padding-bottom:.42rem}
+.party-directory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:.8rem}
+.party-card{display:flex;flex-direction:column;gap:.42rem;border:1px solid var(--hair);
+  border-top:3px solid var(--right);padding:.8rem .85rem;background:white;min-width:0}
+.party-card.left{border-top-color:var(--left)}
+.party-card h2{border:0;margin:0;padding:0;font-size:.98rem;line-height:1.35}
+.party-card h2 a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+.party-tags{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:auto}
+.party-tag{display:inline-flex;align-items:center;min-height:1.45rem;padding:.12rem .42rem;
+  border:1px solid var(--hair);background:var(--surface);font-size:.65rem;color:#344250;border-radius:999px}
+.party-tag.power{border-color:var(--rule);color:var(--accent-dk);background:#F2FAFC;font-weight:600}
+.party-card-foot{display:flex;justify-content:space-between;gap:.7rem;font-size:.72rem;color:var(--muted)}
+.party-directory-empty{padding:1rem;border:1px dashed var(--hair);color:var(--muted)}
 .representation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;
   margin:.8rem 0 1rem}
 .seat-card{border:1px solid var(--hair);padding:.75rem;background:var(--surface)}
@@ -424,6 +443,9 @@ table.rev tr.filtered td{color:var(--muted)}
   line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .front-stat .k{font-size:.78rem;color:var(--muted);text-transform:uppercase;
   letter-spacing:.04em}
+.site-release{display:inline-flex;align-items:center;gap:.35rem;margin:.15rem 0 .9rem;
+  padding:.2rem .48rem;border:1px solid var(--hair);background:var(--surface);
+  color:var(--muted);font-size:.7rem;line-height:1.35}
 .quick-actions{display:flex;flex-wrap:wrap;gap:.45rem;margin:-.25rem 0 1.35rem}
 .quick-actions a{display:inline-flex;align-items:center;min-height:2.35rem;padding:.42rem .72rem;
   border:1px solid var(--hair);border-radius:3px;background:var(--paper);color:var(--ink);
@@ -499,11 +521,14 @@ input.q{font-size:14px;padding:.5rem .6rem;border:1px solid var(--hair);
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);max-width:68rem}
 @media(max-width:850px){.weekly-panels{grid-template-columns:1fr}.wrap{max-width:880px}
   .four-week-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .party-directory-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
   .map-shell{grid-template-columns:1fr}.map-visual{border-right:0;border-bottom:1px solid var(--hair)}
   .passport-grid,.tool-grid,.provenance-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:650px){.timeline-tools input,.search-tools input{min-width:0;width:100%}
   .front-stats{gap:.5rem}.front-stat{display:block;padding:.65rem .7rem}
   .front-stat .k{display:block;margin-top:.2rem}.country-directory-grid{grid-template-columns:1fr}
+  .party-directory-tools,.party-directory-grid{grid-template-columns:1fr}
+  .party-directory-status{justify-content:flex-start;padding-bottom:0}
   .map-section-head h2{min-width:100%}
   nav.top{align-items:flex-start;gap:.35rem .8rem}.brand-lockup{width:100%;margin-bottom:.25rem}
   .representation-grid,.research-pages,.four-week-grid{grid-template-columns:1fr}
@@ -529,6 +554,24 @@ def e(s):
 def camp_label(value):
     """Public label for the compact internal left/right roster value."""
     return "far-left" if value == "left" else "far-right"
+
+
+def party_display_name(party):
+    """Consistent public name: English / original language (acronym).
+
+    English-language names are not pointlessly repeated on both sides of the
+    slash, but still carry their acronym when one is configured.
+    """
+    english = str(party.get("name") or party.get("short") or party.get("id") or "")
+    original = str(party.get("original_name") or "").strip()
+    acronym = str(party.get("acronym") or "").strip()
+    if original and original.casefold() != english.casefold():
+        label = f"{english} / {original}"
+    else:
+        label = english
+    if acronym:
+        label += f" ({acronym})"
+    return label
 
 
 def layout(title, body, depth=0, subtitle=""):
@@ -1516,11 +1559,15 @@ def _seat_card(label, row, fallback_source=None):
     width = min(100, max(0, 100 * seats / total)) if total else 0
     source = row.get("source") or (fallback_source or {}).get("url")
     source_link = (f'<a href="{e(source)}" rel="noreferrer">source</a>' if source else "")
-    return (f'<section class="seat-card"><h3>{e(label)}</h3>'
+    basis = row.get("basis") or ""
+    note = row.get("note") or ""
+    context = " · ".join(v for v in (str(row.get("as_of") or "current verified total"),
+                                      str(basis)) if v)
+    note_html = f'<p class="seat-pending">{e(note)}</p>' if note else ""
+    return (f'<section class="seat-card"><h3>{e(row.get("label") or label)}</h3>'
             f'<div class="seat-value">{seats} <span class="meta">/ {total}</span></div>'
             f'<div class="seat-bar" aria-label="{seats} of {total} seats"><i style="width:{width:.2f}%"></i></div>'
-            f'<p class="meta">{e(row.get("as_of") or "current verified total")} '
-            f'{source_link}</p></section>')
+            f'<p class="meta">{e(context)} {source_link}</p>{note_html}</section>')
 
 
 def representation_html(party, representation):
@@ -1597,7 +1644,7 @@ def representation_html(party, representation):
 
 
 def party_page(party, series, items, out_dir, representation=None):
-    body = [f'<h1>{e(party.get("name"))}</h1>',
+    body = [f'<h1>{e(party_display_name(party))}</h1>',
             f'<p class="meta">{e(party.get("country",""))} · '
             f'<a href="../inclusion.html">inclusion dossier</a> · '
             f'<a href="../sources.html">source registry</a></p>',
@@ -2514,21 +2561,101 @@ q.addEventListener('input',()=>{{
     return path
 
 
-def parties_page(parties, totals, out_dir):
-    def block(camp, title):
-        rows = "".join(
-            f'<div class="grow"><span><a href="parties/{e(p["id"])}.html">'
-            f'{e(p.get("short") or p["id"])}</a> <span class="meta">{e(p.get("country",""))}</span></span>'
-            f'<span class="meta">{totals.get(p["id"],0)}</span></div>'
-            for p in sorted(parties, key=lambda x: (x.get("country",""), x.get("short","")))
-            if p.get("camp") == camp)
-        return f'<h2>{title}</h2><div class="grid">{rows}</div>'
+def parties_page(parties, totals, country_names, out_dir, representation=None):
+    """A single sortable directory; alphabetical by English name by default."""
+    profiles = ((representation or {}).get("parties") or {})
+    ordered = sorted(parties, key=lambda p: (party_display_name(p).casefold(), p["id"]))
+    country_options = "".join(
+        f'<option value="{e(code)}">{e(country_names.get(code, code))}</option>'
+        for code in sorted({p.get("country") for p in parties if p.get("country")},
+                           key=lambda code: country_names.get(code, code))
+    )
+    cards = []
+    for party in ordered:
+        country_code = party.get("country") or ""
+        country = country_names.get(country_code, country_code)
+        family = camp_label(party.get("camp"))
+        current = (profiles.get(party["id"], {}).get("current") or {}).get("national") or {}
+        verified = current.get("seats") is not None and bool(current.get("total"))
+        seats = int(current.get("seats") or 0) if verified else -1
+        total = int(current.get("total") or 0) if verified else 0
+        status = "represented" if seats > 0 else ("unrepresented" if verified else "pending")
+        power = (f'{seats} / {total} national seats' if verified
+                 else 'national seat total pending')
+        records = int(totals.get(party["id"], 0))
+        cards.append(
+            f'<article class="party-card {e(party.get("camp") or "right")}" '
+            f'data-name="{e(party_display_name(party).casefold())}" '
+            f'data-country="{e(country_code)}" data-country-name="{e(country.casefold())}" '
+            f'data-family="{e(party.get("camp") or "right")}" data-status="{status}" '
+            f'data-records="{records}" data-seats="{seats}">'
+            f'<h2><a href="parties/{e(party["id"])}.html">'
+            f'{e(party_display_name(party))}</a></h2>'
+            f'<div class="party-tags"><span class="party-tag">{e(country)}</span>'
+            f'<span class="party-tag">{e(family)}</span>'
+            f'<span class="party-tag power">{e(power)}</span></div>'
+            f'<div class="party-card-foot"><span>{records} retained records</span>'
+            '<span>Open profile →</span></div></article>'
+        )
 
-    body = (f'<h1>Parties</h1><p class="lede">{len(parties)} parties across '
-            f'{len({p.get("country") for p in parties if p.get("country")})} countries. '
-            'The figure is everything collected to date.</p>'
-            + block("right", "far-right")
-            + block("left", "far-left"))
+    body = f'''<h1>Parties</h1><p class="lede">{len(parties)} parties across
+{len({p.get("country") for p in parties if p.get("country")})} countries. Names follow
+English / original language (acronym). Political-power figures are dated on each profile.</p>
+<div class="party-directory-tools" role="search" aria-label="Filter and sort parties">
+ <label>Find a party<input id="party-query" type="search" placeholder="Name or acronym" autocomplete="off"></label>
+ <label>Country<select id="party-country"><option value="">All countries</option>{country_options}</select></label>
+ <label>Party family<select id="party-family"><option value="">Both families</option>
+  <option value="left">far-left</option><option value="right">far-right</option></select></label>
+ <label>National parliament<select id="party-status"><option value="">Any status</option>
+  <option value="represented">Represented</option><option value="unrepresented">No seats</option>
+  <option value="pending">Verification pending</option></select></label>
+ <label>Sort<select id="party-sort"><option value="name">Name A–Z</option>
+  <option value="country">Country A–Z</option><option value="family">Party family</option>
+  <option value="records">Most records</option><option value="seats">Most national seats</option></select></label>
+ <div class="party-directory-status" id="party-count" aria-live="polite">{len(parties)} parties</div>
+</div>
+<div class="party-directory-grid" id="party-grid">{''.join(cards)}</div>
+<div class="party-directory-empty" id="party-empty" hidden>No parties match these filters.</div>
+<script>
+(() => {{
+  const grid = document.getElementById('party-grid');
+  const cards = [...grid.querySelectorAll('.party-card')];
+  const query = document.getElementById('party-query');
+  const country = document.getElementById('party-country');
+  const family = document.getElementById('party-family');
+  const status = document.getElementById('party-status');
+  const sort = document.getElementById('party-sort');
+  const count = document.getElementById('party-count');
+  const empty = document.getElementById('party-empty');
+  const text = value => (value || '').toLocaleLowerCase();
+  function apply() {{
+    const needle = text(query.value.trim());
+    const visible = cards.filter(card => {{
+      const matches = (!needle || text(card.textContent).includes(needle)) &&
+        (!country.value || card.dataset.country === country.value) &&
+        (!family.value || card.dataset.family === family.value) &&
+        (!status.value || card.dataset.status === status.value);
+      card.hidden = !matches;
+      return matches;
+    }});
+    const compareText = (a, b, field) => a.dataset[field].localeCompare(
+      b.dataset[field], undefined, {{sensitivity:'base'}});
+    visible.sort((a, b) => {{
+      if (sort.value === 'records') return Number(b.dataset.records) - Number(a.dataset.records) || compareText(a,b,'name');
+      if (sort.value === 'seats') return Number(b.dataset.seats) - Number(a.dataset.seats) || compareText(a,b,'name');
+      if (sort.value === 'country') return compareText(a,b,'countryName') || compareText(a,b,'name');
+      if (sort.value === 'family') return compareText(a,b,'family') || compareText(a,b,'name');
+      return compareText(a,b,'name');
+    }});
+    visible.forEach(card => grid.append(card));
+    count.textContent = `${{visible.length}} ${{visible.length === 1 ? 'party' : 'parties'}}`;
+    empty.hidden = visible.length !== 0;
+  }}
+  [query, country, family, status, sort].forEach(control => control.addEventListener(
+    control === query ? 'input' : 'change', apply));
+  apply();
+}})();
+</script>'''
     path = os.path.join(out_dir, "parties.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout("Parties", body, subtitle=f"{len(parties)} monitored"))
@@ -2747,13 +2874,22 @@ def _home_map(parties, country_names):
 </section>{script}"""
 
 
-def home_page(latest, index, parties, country_names, out_dir):
+def home_page(latest, index, parties, country_names, out_dir, research=None):
     country_count = len({p.get("country") for p in parties if p.get("country")})
+    research = research or {}
+    version = str(research.get("version") or "unversioned")
+    release = str(research.get("release_date") or "")
+    try:
+        release_label = datetime.fromisoformat(release).strftime("%-d %b %Y")
+    except (TypeError, ValueError):
+        release_label = release
+    release_html = (f'<div class="site-release">Website version {e(version)}'
+                    f'{" · released " + e(release_label) if release_label else ""}</div>')
     latest_action = (f'<a class="primary" href="issues/{e(latest["week"])}.html">'
                      'Read latest report</a>' if latest else
                      '<a class="primary" href="archive.html">Browse reports</a>')
     intro = f"""<p class="meta">{e(SITE_EXPANSION)}</p><h1>{SITE_NAME}</h1>
-<p class="lede">{e(SITE_DESCRIPTION)}</p>
+<p class="lede">{e(SITE_DESCRIPTION)}</p>{release_html}
 <p class="research-note">This is an automated AI system powered by the Claude API,
 created by <strong>Dr. Neil Bar</strong> solely for academic research into contemporary
 far-right and far-left parties. Project information and contact:

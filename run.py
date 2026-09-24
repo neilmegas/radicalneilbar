@@ -175,7 +175,8 @@ def selected_parties(cfg, args):
     selectors = [str(x).strip().casefold() for x in (args.party or []) if str(x).strip()]
     if selectors:
         def matched(p):
-            names = {str(p.get(k, "")).strip().casefold() for k in ("id", "name", "short")}
+            names = {str(p.get(k, "")).strip().casefold()
+                     for k in ("id", "name", "original_name", "acronym", "short")}
             return any(s in names for s in selectors)
         parties = [p for p in parties if matched(p)]
     if (countries or selectors) and not parties:
@@ -193,6 +194,11 @@ def iso_week(value: str, fallback: str) -> str:
 
 
 def _enrich(items, cfg, codes=None, extras=None):
+    # Contact, privacy, cookie, accessibility and similar utility pages may
+    # exist in older databases from before collection-time filtering.  Keep
+    # the raw record for auditability, but never publish it as party activity.
+    items = [i for i in items if not ev.is_static_utility_page(
+        i.get("url") or "", i.get("title") or "")]
     by_id = {p["id"]: p for p in cfg["parties"]}
     codes = codes or {}
     extras = extras or {}
@@ -1050,9 +1056,10 @@ def cmd_site(cfg, args):
     st_site.corrections_page(SITE_DIR)
 
     st_site.archive_page(index, SITE_DIR)
-    st_site.parties_page(cfg["parties"], totals, SITE_DIR)
+    st_site.parties_page(cfg["parties"], totals, names, SITE_DIR,
+                         representation=representation)
     st_site.home_page(index[0] if index else None, index,
-                      cfg["parties"], names, SITE_DIR)
+                      cfg["parties"], names, SITE_DIR, research=research)
     st_site.write_index_json(index, SITE_DIR)
     print(f"\nPortal built: {len(index)} issue(s), {len(cfg['parties'])} party pages -> {SITE_DIR}/")
 
