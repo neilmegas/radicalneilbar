@@ -14,6 +14,8 @@ import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as dateparser
 
+from evidence import is_static_utility_page
+
 
 UA = "RAPPORTResearchMonitor/1.0 (+academic research; https://www.neilbar.com)"
 HEADERS = {"User-Agent": UA, "Accept-Language": "en,*;q=0.5"}
@@ -111,11 +113,14 @@ def from_feed(party: dict, feed_url: str, since: datetime,
         published_iso = _date(published)
         if published and not _within(published_iso, since, until):
             continue
+        url = entry.get("link") or feed_url
+        title = entry.get("title") or "Untitled"
+        if is_static_utility_page(url, title):
+            continue
         body = entry.get("content", [{}])[0].get("value") if entry.get("content") else ""
         body = body or entry.get("summary") or entry.get("description") or ""
         out.append(_item(
-            party, "site_feed", entry.get("title") or "Untitled",
-            entry.get("link") or feed_url, published_iso, _clean_html(body),
+            party, "site_feed", title, url, published_iso, _clean_html(body),
             urlparse(feed_url).netloc,
         ))
     return out
@@ -143,8 +148,11 @@ def from_google_news(party: dict, since: datetime, days: int = 7,
         parsed = feedparser.parse(response.content)
         for entry in parsed.entries[:100]:
             link = entry.get("link") or ""
-            key = (entry.get("title") or "").casefold()
+            title = entry.get("title") or ""
+            key = title.casefold()
             if not key or key in seen:
+                continue
+            if is_static_utility_page(link, title):
                 continue
             seen.add(key)
             pub = _date(entry.get("published") or entry.get("updated"))
@@ -153,7 +161,7 @@ def from_google_news(party: dict, since: datetime, days: int = 7,
             source = entry.get("source", {})
             outlet = source.get("title") if isinstance(source, dict) else "Google News"
             out.append(_item(
-                party, "press", entry.get("title"), link, pub,
+                party, "press", title, link, pub,
                 _clean_html(entry.get("summary") or ""), outlet or "Google News",
             ))
     return out[:240 if until else 30]
@@ -217,6 +225,8 @@ def _page_date(soup: BeautifulSoup) -> datetime | None:
 
 def _historical_page(party: dict, url: str, url_date: datetime | None,
                      since: datetime, until: datetime) -> dict | None:
+    if is_static_utility_page(url):
+        return None
     response = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
@@ -229,6 +239,8 @@ def _historical_page(party: dict, url: str, url_date: datetime | None,
         node.decompose()
     title_node = soup.find("h1") or soup.find("title")
     title = title_node.get_text(" ", strip=True) if title_node else url
+    if is_static_utility_page(response.url, title):
+        return None
     body = re.sub(r"\s+", " ", soup.get_text(" ", strip=True))
     if len(body) < 80:
         return None
@@ -266,6 +278,8 @@ def from_sitemaps(party: dict, since: datetime, until: datetime,
             fields = {_local_name(node.tag): (node.text or "").strip() for node in child}
             loc = fields.get("loc")
             if not loc:
+                continue
+            if is_static_utility_page(loc):
                 continue
             if kind == "sitemapindex":
                 if loc not in seen_maps and len(queue) + len(seen_maps) < max_sitemaps * 2:
@@ -314,9 +328,13 @@ def from_site_scrape(party: dict, since: datetime) -> list[dict]:
     for title, url in candidates[:8]:
         if url in seen:
             continue
+        if is_static_utility_page(url, title):
+            continue
         seen.add(url)
         try:
             page_title, body, published = _extract_page(url)
+            if is_static_utility_page(url, page_title):
+                continue
             # Do not turn an undated navigation/static page into activity
             # for this week merely because it appears on the homepage.
             if not published or not _within(published.isoformat(), since):
@@ -379,6 +397,8 @@ def from_web_search(party: dict, since: datetime,
         title = _clean_html(entry.get("title") or "")
         if not url or not title or url in seen:
             continue
+        if is_static_utility_page(url, title):
+            continue
         result_domain = urlparse(url).netloc.casefold().removeprefix("www.")
         is_official = bool((official_only and used_google_fallback) or
                            (official_domain and (
@@ -402,6 +422,8 @@ def from_web_search(party: dict, since: datetime,
                 heading = soup.find("h1") or soup.find("title")
                 if heading:
                     title = heading.get_text(" ", strip=True)
+                if is_static_utility_page(page.url, title):
+                    continue
                 captured = re.sub(r"\s+", " ", soup.get_text(" ", strip=True))
                 if len(captured) >= 80:
                     body = captured
