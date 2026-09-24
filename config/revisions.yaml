@@ -1,4 +1,13 @@
 revisions:
+  - date: "2026-09-24"
+    title: "Party directory and political-power release (website 1.2)"
+    changes:
+      - "Standardised every party label strictly as English name / original-language name (acronym), including when the English and original names are identical."
+      - "Restored the compact two-column party-list presentation while retaining country, family, parliamentary-power, search, filtering, and sorting controls; alphabetical order is the default."
+      - "Added dated national-seat figures for every monitored party and a clearly labelled 2024 European-election delegation baseline for EU parties."
+      - "Excluded contact, privacy, cookie, legal, accessibility, and sitemap utility pages from new collection and all published reports while preserving any old raw records for audit."
+      - "Added website version 1.2 to the homepage and documented that routine report refreshes do not create a new website version."
+      - "Applied a restrained site-wide visual refinement to navigation, typography, spacing, controls, lists, and research panels without changing the information architecture."
   - date: "2026-09-23"
     title: "Research-transparency and scholarly-tools release"
     changes:
