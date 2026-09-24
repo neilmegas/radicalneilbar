@@ -271,17 +271,22 @@ details[open].timeline-period>summary::before{content:'−'}
   min-height:2.45rem;padding:.42rem .5rem;border:1px solid var(--hair);background:white;color:var(--ink)}
 .party-directory-status{display:flex;align-items:end;justify-content:flex-end;font-size:.76rem;
   color:var(--muted);padding-bottom:.42rem}
-.party-directory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:.8rem}
-.party-card{display:flex;flex-direction:column;gap:.42rem;border:1px solid var(--hair);
-  border-top:3px solid var(--right);padding:.8rem .85rem;background:white;min-width:0}
-.party-card.left{border-top-color:var(--left)}
-.party-card h2{border:0;margin:0;padding:0;font-size:.98rem;line-height:1.35}
-.party-card h2 a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
-.party-tags{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:auto}
+.party-directory-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.35rem;
+  margin-top:.45rem;border-top:2px solid var(--ink)}
+.party-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:.55rem;
+  min-width:0;padding:.62rem .1rem;border-bottom:1px solid var(--hair)}
+.party-camp-mark{display:block;width:9px;height:9px;margin-top:.35rem;background:var(--right)}
+.party-row.left .party-camp-mark{background:var(--left)}
+.party-row-main{min-width:0}
+.party-row h2{border:0;margin:0 0 .3rem;padding:0;font-size:.9rem;line-height:1.32;font-weight:600}
+.party-row h2 a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+.party-tags{display:flex;flex-wrap:wrap;gap:.25rem}
 .party-tag{display:inline-flex;align-items:center;min-height:1.45rem;padding:.12rem .42rem;
   border:1px solid var(--hair);background:var(--surface);font-size:.65rem;color:#344250;border-radius:999px}
 .party-tag.power{border-color:var(--rule);color:var(--accent-dk);background:#F2FAFC;font-weight:600}
-.party-card-foot{display:flex;justify-content:space-between;gap:.7rem;font-size:.72rem;color:var(--muted)}
+.party-row-records{min-width:3.6rem;text-align:right;color:var(--muted);font-size:.65rem;
+  white-space:nowrap;padding-top:.05rem}
+.party-row-records strong{display:block;color:var(--ink);font-size:.86rem;font-weight:600}
 .party-directory-empty{padding:1rem;border:1px dashed var(--hair);color:var(--muted)}
 .representation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;
   margin:.8rem 0 1rem}
@@ -527,7 +532,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);max-wid
 @media(max-width:650px){.timeline-tools input,.search-tools input{min-width:0;width:100%}
   .front-stats{gap:.5rem}.front-stat{display:block;padding:.65rem .7rem}
   .front-stat .k{display:block;margin-top:.2rem}.country-directory-grid{grid-template-columns:1fr}
-  .party-directory-tools,.party-directory-grid{grid-template-columns:1fr}
+  .party-directory-tools,.party-directory-list{grid-template-columns:1fr}
   .party-directory-status{justify-content:flex-start;padding-bottom:0}
   .map-section-head h2{min-width:100%}
   nav.top{align-items:flex-start;gap:.35rem .8rem}.brand-lockup{width:100%;margin-bottom:.25rem}
@@ -557,18 +562,11 @@ def camp_label(value):
 
 
 def party_display_name(party):
-    """Consistent public name: English / original language (acronym).
-
-    English-language names are not pointlessly repeated on both sides of the
-    slash, but still carry their acronym when one is configured.
-    """
+    """Consistent public name: English / original language (acronym)."""
     english = str(party.get("name") or party.get("short") or party.get("id") or "")
     original = str(party.get("original_name") or "").strip()
     acronym = str(party.get("acronym") or "").strip()
-    if original and original.casefold() != english.casefold():
-        label = f"{english} / {original}"
-    else:
-        label = english
+    label = f"{english} / {original}" if original else english
     if acronym:
         label += f" ({acronym})"
     return label
@@ -2570,7 +2568,7 @@ def parties_page(parties, totals, country_names, out_dir, representation=None):
         for code in sorted({p.get("country") for p in parties if p.get("country")},
                            key=lambda code: country_names.get(code, code))
     )
-    cards = []
+    rows = []
     for party in ordered:
         country_code = party.get("country") or ""
         country = country_names.get(country_code, country_code)
@@ -2583,19 +2581,20 @@ def parties_page(parties, totals, country_names, out_dir, representation=None):
         power = (f'{seats} / {total} national seats' if verified
                  else 'national seat total pending')
         records = int(totals.get(party["id"], 0))
-        cards.append(
-            f'<article class="party-card {e(party.get("camp") or "right")}" '
+        rows.append(
+            f'<article class="party-row {e(party.get("camp") or "right")}" '
             f'data-name="{e(party_display_name(party).casefold())}" '
             f'data-country="{e(country_code)}" data-country-name="{e(country.casefold())}" '
             f'data-family="{e(party.get("camp") or "right")}" data-status="{status}" '
             f'data-records="{records}" data-seats="{seats}">'
-            f'<h2><a href="parties/{e(party["id"])}.html">'
-            f'{e(party_display_name(party))}</a></h2>'
+            '<span class="party-camp-mark" aria-hidden="true"></span>'
+            '<div class="party-row-main">'
+            f'<h2><a href="parties/{e(party["id"])}.html">{e(party_display_name(party))}</a></h2>'
             f'<div class="party-tags"><span class="party-tag">{e(country)}</span>'
             f'<span class="party-tag">{e(family)}</span>'
-            f'<span class="party-tag power">{e(power)}</span></div>'
-            f'<div class="party-card-foot"><span>{records} retained records</span>'
-            '<span>Open profile →</span></div></article>'
+            f'<span class="party-tag power">{e(power)}</span></div></div>'
+            f'<div class="party-row-records"><strong>{records}</strong>'
+            f'<span>{"record" if records == 1 else "records"}</span></div></article>'
         )
 
     body = f'''<h1>Parties</h1><p class="lede">{len(parties)} parties across
@@ -2614,12 +2613,12 @@ English / original language (acronym). Political-power figures are dated on each
   <option value="records">Most records</option><option value="seats">Most national seats</option></select></label>
  <div class="party-directory-status" id="party-count" aria-live="polite">{len(parties)} parties</div>
 </div>
-<div class="party-directory-grid" id="party-grid">{''.join(cards)}</div>
+<div class="party-directory-list" id="party-grid">{''.join(rows)}</div>
 <div class="party-directory-empty" id="party-empty" hidden>No parties match these filters.</div>
 <script>
 (() => {{
   const grid = document.getElementById('party-grid');
-  const cards = [...grid.querySelectorAll('.party-card')];
+  const cards = [...grid.querySelectorAll('.party-row')];
   const query = document.getElementById('party-query');
   const country = document.getElementById('party-country');
   const family = document.getElementById('party-family');
