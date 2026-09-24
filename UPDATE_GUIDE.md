@@ -48,7 +48,7 @@ collecting them automatically; old material is only added if you run
 
 ## What changed
 
-- The front page now opens with live totals for **20 countries** and **65
+- The front page now opens with live totals for **20 countries** and **69
   parties**, followed by an interactive map focused on Europe and Israel.
 - Point to, tab to, or select a highlighted country to see every party tracked
   there. A collapsible text directory provides the same information without
@@ -65,7 +65,7 @@ collecting them automatically; old material is only added if you run
   contain at least two entries when verified sources are available.
 - Countries, parties, and Everything reviewed are collapsible.
 - The former topic tags/filters and survey-baseline blocks are gone.
-- The watch list now contains **65 parties**. Requested and suggested parties were
+- The watch list now contains **69 parties**. Requested and suggested parties were
   added; Greek Solution and Podemos were already present and were not duplicated.
 - Every party is displayed using only **far-left** or **far-right**. These are
   the report's two monitoring buckets, not a claim that every external source
@@ -90,5 +90,15 @@ collecting them automatically; old material is only added if you run
   still needs verification; RAPPORT does not invent or carry stale seat totals.
 - Every weekly report now has representation changes, a four-week timeline,
   compact citation, stable-link copy, CSV, and print/PDF controls.
+- Every full record now has an authorship-labelled provenance card with source,
+  snapshot, prompt/model, translation-audit, confidence, and human-review fields.
+- Every report now has a Research Passport. New research pages cover validation,
+  coverage, missingness, source configuration, inclusion decisions, prompts,
+  verified elections, comparisons, quotations, events, tutorials, and corrections.
+- New downloads include BibTeX, RIS, CITATION.cff, a teaching sample, and a
+  replication notebook. The comparison tool can download its data and chart.
+- Added **Συμμαχία Ελλήνων / Alliance of Greeks** with its verified official
+  website, programme, parliamentary-work, and press-office pages; web/news
+  search remains available as a collection fallback.
 - The public custom-report builder only filters the published archive in the
   visitor's browser. It cannot call Claude or spend your API tokens.

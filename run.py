@@ -25,6 +25,7 @@
 
 import argparse
 import copy
+import hashlib
 import json
 import math
 import os
@@ -60,6 +61,8 @@ CONFIG = os.environ.get("RW_CONFIG", "config/sources.yaml")
 COUNTRIES = os.environ.get("RW_COUNTRIES", "config/countries.yaml")
 REVISIONS = os.environ.get("RW_REVISIONS", "config/revisions.yaml")
 REPRESENTATION = os.environ.get("RW_REPRESENTATION", "config/representation.yaml")
+RESEARCH = os.environ.get("RW_RESEARCH", "config/research.yaml")
+PROMPTS = os.environ.get("RW_PROMPTS", "config/prompts.yaml")
 SITE_DIR = os.environ.get("RW_SITE", "site")
 DATA_DIR = os.environ.get("RW_EXPORTS", "exports")
 BG_DIR = os.environ.get("RW_BACKGROUND", "background")
@@ -103,6 +106,22 @@ def load_revisions():
 def load_representation():
     try:
         with open(REPRESENTATION, encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        return {}
+
+
+def load_research():
+    try:
+        with open(RESEARCH, encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        return {}
+
+
+def load_prompts():
+    try:
+        with open(PROMPTS, encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
     except FileNotFoundError:
         return {}
@@ -191,16 +210,26 @@ def _enrich(items, cfg, codes=None, extras=None):
         c = codes.get((i["id"], 0))
         if c and c.get("category"):
             i["coded"] = c["category"]
+            i["code_detail"] = c
         ls = links.get(i["id"])
         if ls:
             i["link_status"] = ls.get("status")
+            i["link_check"] = ls
         if annos.get(i["id"]):
             i["annotation"] = annos[i["id"]]
         if btr.get(i["id"]):
             i["backtranslation"] = btr[i["id"]]
-        m = metas.get(i["id"], {}).get("analyze")
+        i["analysis_meta"] = metas.get(i["id"], {})
+        m = i["analysis_meta"].get("analyze")
         if m:
             i["meta_stamp"] = f"{m.get('model','')} · {m.get('prompt_ver','')}"
+        snapshot = i.get("snapshot_path")
+        if snapshot and os.path.isfile(snapshot):
+            try:
+                with open(snapshot, "rb") as fh:
+                    i["snapshot_sha256"] = hashlib.sha256(fh.read()).hexdigest()[:16]
+            except OSError:
+                pass
     return items
 
 
@@ -811,10 +840,12 @@ def cmd_site(cfg, args):
     countries = load_countries()
     names = country_names(countries)
     representation = load_representation()
+    research = load_research()
+    prompt_archive = load_prompts()
     party_lookup = {p["id"]: p for p in cfg["parties"]}
     # These directories are generated views of the database.  Recreate them
     # so removed demo records (or corrected records) cannot leave stale pages.
-    for generated in ("issues", "data", "corpus", "speakers", "parties"):
+    for generated in ("issues", "data", "corpus", "speakers", "parties", "downloads"):
         shutil.rmtree(os.path.join(SITE_DIR, generated), ignore_errors=True)
     for stale in ("reliability.html",):
         try:
@@ -827,9 +858,17 @@ def cmd_site(cfg, args):
     collection_history = st.collection_history(conn, weeks=max(16, len(weeks)))
     codes = st.get_codes(conn)
     all_ids = [r[0] for r in conn.execute("SELECT DISTINCT item_id FROM analysis_meta")]
+    all_backtrans = {}
+    for archived_week in weeks:
+        try:
+            all_backtrans.update(json.loads(
+                st.get_briefing(conn, archived_week, BACKTRANS_SCOPE) or "{}"))
+        except Exception:
+            pass
     extras = {"links": st.latest_link_status(conn),
               "annotations": st.get_annotations(conn),
-              "meta": {iid: st.meta_for(conn, iid) for iid in all_ids}}
+              "meta": {iid: st.meta_for(conn, iid) for iid in all_ids},
+              "backtrans": all_backtrans}
     index = []
     for week_index, week in enumerate(weeks):
         wk_extras = dict(extras)
@@ -876,7 +915,7 @@ def cmd_site(cfg, args):
         if previous_week not in weeks:
             previous_week = ""
         previous_items = (_enrich(st.week_items(conn, previous_week, analyzed_only=True),
-                                  cfg, codes) if previous_week else [])
+                                  cfg, codes, extras) if previous_week else [])
         one_minute = tr.week_in_one_minute(items, hl)
         changes = tr.week_changes(items, previous_items, previous_week)
         coverage = tr.coverage_report(week, cfg["parties"], items,
@@ -888,7 +927,7 @@ def cmd_site(cfg, args):
             timeline_iso = timeline_dt.isocalendar()
             timeline_week = f"{timeline_iso.year}-W{timeline_iso.week:02d}"
             timeline_items = (_enrich(
-                st.week_items(conn, timeline_week, analyzed_only=True), cfg, codes)
+                st.week_items(conn, timeline_week, analyzed_only=True), cfg, codes, extras)
                               if timeline_week in weeks else [])
             four_week_periods.append((timeline_week, timeline_items))
         start_date = week_bounds(week)[0].date().isoformat()
@@ -911,7 +950,7 @@ def cmd_site(cfg, args):
         st_site.issue_page(week, items, overview, briefs, names, cfg["parties"],
                            _absences(conn, cfg, countries, week),
                            sizes, SITE_DIR,
-                           all_items=_enrich(st.week_items(conn, week), cfg),
+                           all_items=_enrich(st.week_items(conn, week), cfg, codes, wk_extras),
                            page_changes=page_changes,
                            editors_cut=ip.editors_cut(items),
                            world=world, highlights=hl, reading=reading,
@@ -921,7 +960,8 @@ def cmd_site(cfg, args):
                            changes=changes, coverage=coverage, watch=watch,
                            previous_week=previous_week,
                            representation_changes=representation_changes,
-                           four_week_periods=four_week_periods)
+                           four_week_periods=four_week_periods,
+                           research=research)
 
         relevant = [i for i in items if (i.get("analysis") or {}).get("relevant")]
         start, end = week_bounds(week)
@@ -937,7 +977,7 @@ def cmd_site(cfg, args):
 
     totals = {}
     for p in cfg["parties"]:
-        pitems = _enrich(st.party_items(conn, p["id"]), cfg)
+        pitems = _enrich(st.party_items(conn, p["id"]), cfg, codes, extras)
         rel = [i for i in pitems if (i.get("analysis") or {}).get("relevant")]
         totals[p["id"]] = len(rel)
         st_site.party_page(p, [], rel, SITE_DIR, representation=representation)
@@ -946,7 +986,7 @@ def cmd_site(cfg, args):
     spk = tr.speaker_index(conn, cfg["parties"], st)
     all_by_id = {}
     for wk in weeks:
-        for it in _enrich(st.week_items(conn, wk, analyzed_only=True), cfg):
+        for it in _enrich(st.week_items(conn, wk, analyzed_only=True), cfg, codes, extras):
             all_by_id[it["id"]] = it
     for key, rec in spk.items():
         st_site.speaker_page(key, rec,
@@ -961,18 +1001,25 @@ def cmd_site(cfg, args):
     st_site.roster_page(cand, SITE_DIR)
 
     # Corpus for the in-browser report builder.
-    all_relevant = []
+    all_records = []
     for wk in weeks:
-        all_relevant += _enrich(st.week_items(conn, wk, analyzed_only=True), cfg, codes)
+        all_records += _enrich(st.week_items(conn, wk, analyzed_only=True),
+                               cfg, codes, extras)
+    all_relevant = [row for row in all_records
+                    if (row.get("analysis") or {}).get("relevant")]
     yrs = st_site.corpus_json(all_relevant, SITE_DIR)
+    export_info = st_site.scholarly_exports(all_relevant, research, SITE_DIR)
     rb.report_page(SITE_DIR, len(cfg["parties"]),
                    len({p.get("country") for p in cfg["parties"]}))
     st_site.search_page(SITE_DIR)
-    st_site.dataset_page(index, cfg["parties"], yrs, SITE_DIR)
+    st_site.compare_page(SITE_DIR)
+    st_site.quotes_page(SITE_DIR)
+    st_site.dataset_page(index, cfg["parties"], yrs, SITE_DIR,
+                         research=research, export_info=export_info)
     st_site.citation_page(SITE_DIR)
     prompt_versions = st.prompt_versions(conn)
     st_site.methodology_page(cfg["parties"], prompt_versions,
-                             load_revisions(), SITE_DIR)
+                             load_revisions(), SITE_DIR, research=research)
     print(f"corpus: {sum(1 for i in all_relevant if (i.get('analysis') or {}).get('relevant'))} "
           f"items across {len(yrs)} year shard(s)")
 
@@ -986,6 +1033,21 @@ def cmd_site(cfg, args):
     st_site.health_page(hrows, hweeks, silent, prompt_versions,
                         link_summary, SITE_DIR)
     st_site.network_page(st.all_relations(conn), cfg["parties"], SITE_DIR)
+    reliability_reports = []
+    for round_id in st.blind_rounds(conn):
+        report = hlth.round_report(conn, st, round_id, all_records)
+        if report:
+            reliability_reports.append(report)
+    st_site.quality_page(cfg["parties"], all_records, collection_history, weeks,
+                         prompt_versions, research, reliability_reports, SITE_DIR)
+    st_site.source_registry_page(cfg["parties"], collection_history, SITE_DIR)
+    st_site.inclusion_page(cfg["parties"], research, representation, SITE_DIR)
+    st_site.prompts_page(prompt_archive, prompt_versions, SITE_DIR)
+    st_site.elections_page(cfg["parties"], representation, SITE_DIR)
+    st_site.events_page(research.get("events") or [], all_relevant,
+                        cfg["parties"], SITE_DIR)
+    st_site.tutorials_page(SITE_DIR)
+    st_site.corrections_page(SITE_DIR)
 
     st_site.archive_page(index, SITE_DIR)
     st_site.parties_page(cfg["parties"], totals, SITE_DIR)

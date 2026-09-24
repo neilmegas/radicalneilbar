@@ -1,0 +1,16 @@
+frameworks:
+  - id: horseshoe
+    name: Horseshoe convergence
+    description: Opposing camps adopt similar language or political framing without necessarily sharing a position.
+  - id: selective-realignment
+    name: Selective realignment
+    description: A party changes one issue position while retaining the rest of its established programme.
+  - id: national-memory
+    name: National-memory competition
+    description: Parties compete over commemorations, historical narratives, symbols, or claims to national continuity.
+  - id: militant-democracy
+    name: Militant democracy pressure
+    description: Party bans, registration rules, surveillance, disqualification, or other democratic self-defence mechanisms shape behaviour.
+  - id: extended-nationalism
+    name: Extended nationalism
+    description: Domestic nationalism is projected through diaspora, border, civilisational, or transnational claims.

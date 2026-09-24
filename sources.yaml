@@ -4,6 +4,10 @@ parties:
   - {id: ellinikilisi, name: Greek Solution, short: Greek Solution, country: GR, camp: right, lang: el, site: "https://elliniki-lisi.gr", queries: ["Ελληνική Λύση", "Κυριάκος Βελόπουλος"]}
   - {id: niki, name: NIKI, short: NIKI, country: GR, camp: right, lang: el, site: "https://nikh.gr", queries: ["ΝΙΚΗ κόμμα", "Δημήτρης Νατσιός"]}
   - {id: spartiates, name: Spartans, short: Spartans, country: GR, camp: right, lang: el, site: "https://spartiates.gr", queries: ["Σπαρτιάτες κόμμα"]}
+  # Official site verified 2026-09-23. Programme and parliamentary pages are
+  # watched explicitly so substantive documents are collected even when the
+  # home page changes.
+  - {id: symmachiaellinon, name: "Συμμαχία Ελλήνων / Alliance of Greeks", short: "Συμμαχία Ελλήνων", country: GR, camp: right, lang: el, site: "https://symmaxia.net/", queries: ["Συμμαχία Ελλήνων", "Ηλίας Κασιδιάρης Συμμαχία Ελλήνων", "Alliance of Greeks Kasidiaris"], watch_pages: ["https://symmaxia.net/idrytiki-diakiryxi/", "https://symmaxia.net/kyvernitiko-programma/", "https://symmaxia.net/koinovoyleytiko-ergo/", "https://symmaxia.net/grafeio-typoy/"]}
   - {id: fonilogikis, name: Voice of Reason, short: Voice of Reason, country: GR, camp: right, lang: el, site: "https://fonilogikis.gr", queries: ["Φωνή Λογικής", "Αφροδίτη Λατινοπούλου"]}
   - {id: mera25, name: MeRA25, short: MeRA25, country: GR, camp: left, lang: el, site: "https://mera25.gr", queries: ["ΜέΡΑ25", "Γιάνης Βαρουφάκης"]}
   - {id: syriza, name: SYRIZA – Progressive Alliance, short: SYRIZA, country: GR, camp: left, lang: el, site: "https://syriza.gr", queries: ["ΣΥΡΙΖΑ", "SYRIZA", "Σωκράτης Φάμελλος"]}

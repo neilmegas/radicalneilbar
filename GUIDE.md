@@ -123,9 +123,11 @@ You can always find the exact link again under **Settings → Pages**.
 Use the top menu after publication:
 
 - **Reports** opens the latest report, archive, and custom report builder.
-- **Explore** opens countries and parties, speakers, and the party network.
-- **Research** opens Methodology, Dataset and exports, Suggested citation, and
-  Collection status.
+- **Explore** opens countries and parties, comparisons, quotations, cross-party
+  events, speakers, and the party network.
+- **Research** opens Methodology, Quality and validation, the source registry,
+  inclusion dossiers, prompt archive, verified elections, datasets, tutorials,
+  citations, collection status, and the correction form.
 - **Search** searches titles, summaries, actors, quotations, parties, and
   action labels across the archive.
 
@@ -141,7 +143,7 @@ was not changed to **GitHub Actions**.
 
 ## Step 6 — check the project configuration
 
-The starter list contains 65 parties. Websites and leader names change, so do
+The starter list contains 69 parties. Websites and leader names change, so do
 not assume every address is correct.
 
 1. Go to **Actions**.

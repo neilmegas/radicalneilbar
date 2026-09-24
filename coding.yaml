@@ -1,0 +1,10 @@
+coder: researcher
+
+# Starter categories only. Replace these with your own coding instrument before
+# using the coding queue for research.
+categories:
+  - Not coded
+  - Essential direct record
+  - Useful direct record
+  - Useful contextual source
+  - Exclude / insufficient evidence

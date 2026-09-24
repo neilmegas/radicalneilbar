@@ -9,8 +9,10 @@ for GitHub Pages.
 The generated site includes an interactive monitoring map, concise weekly
 summaries, evidence-linked changes from the preceding week, action-type labels,
 collection coverage, follow-up watchpoints, party timelines, archive search,
-two-week comparison, four-week report timelines, representation panels,
-dataset exports, stable citations, and original-language controls. The map
+interactive party/country and longitudinal comparison, four-week report timelines,
+representation panels, a quotation explorer, event context, provenance cards,
+validation and language-quality dashboards, dataset and citation-manager exports,
+a replication notebook, a teaching sample, stable citations, and original-language controls. The map
 counts and party lists come directly from the source roster, while the
 methodology and revision log are generated from the archive metadata.
 
@@ -69,6 +71,9 @@ Run `python run.py --help` for the complete list.
 - `config/reading.yaml`: secondary-reading feeds and search terms.
 - `config/backtranslate.yaml`: languages excluded from round-trip checking.
 - `config/revisions.yaml`: the public methodology revision log.
+- `config/research.yaml`: unit of analysis, inclusion/exclusion and negative-
+  evidence rules, confidence dimensions, event contexts, and documented roster notes.
+- `config/prompts.yaml`: public, versioned archive of the current AI instructions.
 - `config/representation.yaml`: official institutional links and verified seat
   and election-history records. Unverified figures are deliberately left blank.
 - `config/map_geometry.json`: bundled Natural Earth country outlines used by
@@ -95,9 +100,28 @@ claim of academic consensus or party self-identification.
 Without an Anthropic key, live items receive a plainly marked low-confidence
 fallback analysis so the pipeline does not silently discard them.
 
+### Public access and API-cost safety
+
+Publishing `site/` through GitHub Pages does **not** expose or spend the
+Anthropic key. The report builder, search, comparisons, quotation explorer,
+map, charts, and downloads are static browser tools: they read only the JSON,
+HTML, and CSV files already published with the site. A restrictive Content
+Security Policy also limits browser data connections to the RAPPORT site
+itself, so public pages cannot call the Anthropic API.
+
+Claude is called only by the private Python pipeline in GitHub Actions. Public
+visitors cannot run those workflows and cannot read repository secrets.
+Preserve that boundary by keeping the repository private, limiting write or
+Actions access to trusted collaborators, requiring two-factor authentication,
+never putting an API key in `site/` or JavaScript, and never adding a public
+server endpoint that forwards arbitrary visitor prompts to Claude. Set an
+Anthropic workspace spending limit and usage alert as a final cost backstop.
+
 ## Evidence and research safeguards
 
 - Original text and generated analysis are stored separately.
+- Every full record carries a provenance card with retrieval, snapshot, source,
+  link-check, prompt/model, translation, confidence, and human-review fields.
 - Quotes are included only when captured verbatim; the program is instructed
   never to reconstruct one.
 - Interpretation is visually labelled as model inference and excluded from the
@@ -109,6 +133,9 @@ fallback analysis so the pipeline does not silently discard them.
 - Coverage language distinguishes a checked quiet source from an inaccessible
   source or a week with no archived collection log.
 - Action labels describe what form an act took, not an ideological topic.
+- Every report includes a Research Passport; the Quality page publishes the
+  collection funnel, missing-data warnings, coverage matrix, language audit,
+  and the current (possibly incomplete) validation state.
 
 These controls support review; they do not replace it. Validate recall, source
 coverage, translation quality, and coding agreement on a regular sample.

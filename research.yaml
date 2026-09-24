@@ -1,0 +1,83 @@
+version: "1.1"
+release_date: "2026-09-23"
+
+unit_of_analysis:
+  label: Evidence record
+  definition: >-
+    One dated, source-addressable party document, parliamentary intervention,
+    leader statement, or external report describing a substantive observable
+    act by or about one monitored party. A record is not a claim, sentence,
+    social-media post fragment, party-week, or ideological theme.
+  duplicate_rule: >-
+    Substantively identical syndicated reports are clustered; the evidence
+    record remains attached to the stable source URL used at collection.
+  time_rule: >-
+    Records are assigned to the ISO week containing their recorded publication
+    date. Undated pages are not treated as dated evidence.
+
+inclusion_rules:
+  - The organisation is an active political party or electoral formation in a monitored European country or Israel.
+  - It contests, or publicly prepares to contest, national, regional, or European elections.
+  - It belongs to the researcher-defined far-left or far-right comparison families used by RAPPORT.
+  - A discoverable official channel is preferred; where none is verified, named-party web and news search is used and disclosed.
+
+exclusion_rules:
+  - Historical organisations with no current electoral or organisational activity.
+  - Movements that do not operate as a party or electoral formation.
+  - Routine navigation, event calendars, duplicate syndication, and incidental mentions without a substantive party act.
+  - Records whose date, party attribution, or source cannot be established with sufficient confidence.
+
+negative_evidence:
+  - A blank party-week never means that the party was inactive.
+  - '"No dated activity retained" is used only when at least one configured collection channel completed successfully.'
+  - '"Official source inaccessible" and "No archived check" are reported separately and must not be interpreted as silence.'
+  - Search fallback is disclosed because search indexes are selective and change over time.
+  - Comparisons use retained records and coverage denominators; raw document counts alone are not behavioural measures.
+
+confidence_dimensions:
+  source_identity: Whether the publisher is a verified party, parliament, named news outlet, or unresolved source.
+  date: Whether a publication date is recorded for the source.
+  attribution: Whether the act or quotation is directly attributable to the party or a named actor.
+  translation: Whether English text is unnecessary, model-translated, round-trip checked, or flagged.
+  relevance: The analysis-stage confidence that the record meets the stated inclusion rule.
+
+validation:
+  status: "Not yet independently validated"
+  statement: >-
+    RAPPORT exposes reproducible blind-coding infrastructure, but no completed
+    independent validation round is present in the current database. Automated
+    confidence labels are not substitutes for inter-coder reliability.
+
+events:
+  - id: gr-alliance-of-greeks-launch-2026
+    date: "2026-09-21"
+    title: Kasidiaris publicly backs Alliance of Greeks
+    countries: [GR]
+    parties: [symmachiaellinon, spartiates]
+    description: >-
+      Ilias Kasidiaris announced support for the Alliance of Greeks, a formation
+      reported as established in 2025; subsequent reporting connected it with
+      independent MPs originally elected for the Spartans.
+    sources:
+      - label: eKathimerini announcement report
+        url: "https://www.ekathimerini.com/politics/1315847/kasidiaris-backs-new-far-right-party-ahead-of-elections/"
+      - label: eKathimerini parliamentary-representation report
+        url: "https://www.ekathimerini.com/politics/1315881/far-right-mp-says-he-will-represent-new-party-linked-with-kasidiaris/"
+
+party_notes:
+  symmachiaellinon:
+    status: Newly monitored; official website verified 2026-09-23
+    rationale: >-
+      Included following its public launch into current electoral politics and
+      reported connection to sitting independent MPs. The party now publishes
+      its founding declaration, programme, MPs, and parliamentary activity on
+      its official website. The classification remains a researcher-defined
+      roster decision and should be revisited after it contests an election.
+    added: "2026-09-23"
+    references:
+      - label: Official party website
+        url: "https://symmaxia.net/"
+      - label: eKathimerini, 21 September 2026
+        url: "https://www.ekathimerini.com/politics/1315847/kasidiaris-backs-new-far-right-party-ahead-of-elections/"
+      - label: eKathimerini, 22 September 2026
+        url: "https://www.ekathimerini.com/politics/1315881/far-right-mp-says-he-will-represent-new-party-linked-with-kasidiaris/"

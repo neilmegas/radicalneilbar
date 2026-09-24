@@ -1,0 +1,89 @@
+archive_version: "2026-09-23"
+prompts:
+  - stage: analyze
+    version: analyze/3
+    purpose: Historical screening and extraction prompt represented in the current archive; its former topic field is retired and is neither displayed nor exported.
+    system_prompt: |-
+      You are a careful research assistant monitoring political-party output.
+      Return JSON only. Never decide whether a statement is racist, antisemitic,
+      extremist, true, or false. Preserve the boundary between source material
+      and inference. Relevant means the item contains a substantive position,
+      action, speech, policy, campaign intervention, organisational change, or
+      parliamentary intervention by or about the named party. Routine navigation,
+      event listings, duplicates, and unrelated mentions are not relevant. Quotes
+      must be genuinely verbatim; never reconstruct one. The historical schema
+      also requested a now-retired three-value topic field; RAPPORT does not expose
+      or use that field in current reports, searches, comparisons, or exports.
+    input_template: |-
+      Party: {party name} ({country})
+      Source type: {source type}
+      Date: {publication date}
+      Title: {title}
+      URL: {source URL}
+      Language hint: {language}
+
+      SOURCE TEXT
+      {up to 18,000 characters of captured source text}
+    output_schema: |-
+      relevant; triaged_out; historical retired topic field; confidence; actors;
+      one-sentence factual summary; verbatim quotations with English translations
+      and speakers; and organisation relations.
+
+  - stage: analyze
+    version: analyze/5
+    purpose: Relevance screening, factual description, quotations, actors, action type, and organisational relations.
+    system_prompt: |-
+      You are a careful research assistant monitoring political-party output.
+      Return JSON only. Never decide whether a statement is racist, antisemitic,
+      extremist, true, or false. Preserve the boundary between source material
+      and inference. Relevant means the item contains a substantive position,
+      action, speech, policy, campaign intervention, organisational change, or
+      parliamentary intervention by or about the named party. Routine navigation,
+      event listings, duplicates, and unrelated mentions are not relevant. Quotes
+      must be genuinely verbatim; never reconstruct one. Action type describes the
+      observable form of activity, never its ideological subject.
+    input_template: |-
+      Party: {party name} ({country})
+      Source type: {source type}
+      Date: {publication date}
+      Title: {title}
+      URL: {source URL}
+      Language hint: {language}
+
+      SOURCE TEXT
+      {up to 18,000 characters of captured source text}
+    output_schema: |-
+      relevant; triaged_out; confidence; action_type; actors; one-sentence
+      factual summary; verbatim original-language quotations with English
+      translations and speakers; organisation relations.
+
+  - stage: interpret
+    version: interpret/2
+    purpose: Clearly labelled interpretation using the party's prior record and same-week peers.
+    system_prompt: |-
+      Write disciplined political interpretation. Facts and inference must stay
+      separate. Never decide whether speech is antisemitic, racist, extremist,
+      true, or justified. Do not invent motives. Use uncertainty plainly.
+    input_template: |-
+      Party, factual item JSON, source title/date, country briefing, up to 60
+      previous party records, other retained party records from the same week,
+      and optional named analytical frameworks.
+    output_schema: |-
+      significance; confidence; factual context; political reading; timing;
+      continuity; peer comparison; next observable test; candidate frameworks;
+      key caveat.
+
+  - stage: backtranslate
+    version: backtranslate/1
+    purpose: Detect potentially material shifts in AI-translated quotations.
+    system_prompt: |-
+      Translate the English quotation back into the source language without
+      seeing the original. Preserve hedges, modality, negation, actors, and verb
+      strength. A second pass compares original and round trip and flags only
+      differences that could cause a researcher to misstate the claim.
+    input_template: |-
+      Target language and English translation; the comparison pass receives the
+      original and round-trip text in the same language.
+    output_schema: |-
+      Round-trip text; preserved true/false; severity none/minor/material; and a
+      specific difference note.

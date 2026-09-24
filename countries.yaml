@@ -1,0 +1,87 @@
+countries:
+  - code: GR
+    name: Greece
+    languages: [el, en]
+    news_queries: [Greece politics election parties]
+    occasions:
+      - name: Grammos and Vitsi commemorations
+        month: 8
+        start_day: 24
+        end_day: 31
+        keywords: [Grammos, Vitsi, Γράμμος, Βίτσι]
+  - code: DE
+    name: Germany
+    languages: [de, en]
+    news_queries: [Germany politics Bundestag parties]
+  - code: FR
+    name: France
+    languages: [fr, en]
+    news_queries: [France politics Assemblée nationale parties]
+  - code: AT
+    name: Austria
+    languages: [de, en]
+    news_queries: [Austria politics parliament parties]
+  - code: NL
+    name: Netherlands
+    languages: [nl, en]
+    news_queries: [Netherlands politics parliament parties]
+  - code: BE
+    name: Belgium
+    languages: [nl, fr, en]
+    news_queries: [Belgium politics parliament parties]
+  - code: SE
+    name: Sweden
+    languages: [sv, en]
+    news_queries: [Sweden politics Riksdag parties]
+  - code: FI
+    name: Finland
+    languages: [fi, sv, en]
+    news_queries: [Finland politics parliament parties]
+  - code: IT
+    name: Italy
+    languages: [it, en]
+    news_queries: [Italy politics parliament parties]
+  - code: ES
+    name: Spain
+    languages: [es, en]
+    news_queries: [Spain politics Congreso parties]
+  - code: GB
+    name: United Kingdom
+    languages: [en]
+    news_queries: [United Kingdom politics parliament parties]
+  - code: IL
+    name: Israel
+    languages: [he, ar, en]
+    news_queries: [Israel Knesset party politics]
+  - code: CY
+    name: Cyprus
+    languages: [el, tr, en]
+    news_queries: [Cyprus politics parliament parties]
+  - code: PT
+    name: Portugal
+    languages: [pt, en]
+    news_queries: [Portugal politics Assembleia parties]
+  - code: "NO"
+    name: Norway
+    languages: ["no", nn, en]
+    news_queries: [Norway politics Storting parties]
+  - code: DK
+    name: Denmark
+    languages: [da, en]
+    news_queries: [Denmark politics Folketing parties]
+  - code: IE
+    name: Ireland
+    languages: [en, ga]
+    news_queries: [Ireland politics Dáil parties]
+  - code: LU
+    name: Luxembourg
+    languages: [lb, fr, de, en]
+    news_queries: [Luxembourg politics Chamber of Deputies parties]
+  - code: CH
+    name: Switzerland
+    languages: [de, fr, it, en]
+    news_queries: [Switzerland politics Federal Assembly cantonal elections parties]
+  - code: IS
+    name: Iceland
+    languages: [is, en]
+    news_queries: [Iceland politics Althing parties]

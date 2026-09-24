@@ -1,0 +1,4 @@
+# Quotes in these languages are not round-trip checked.
+# Add languages you can verify yourself.
+skip_languages:
+  - en
