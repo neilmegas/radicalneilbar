@@ -4,6 +4,10 @@ parties:
   - {id: ellinikilisi, name: Greek Solution, short: Greek Solution, country: GR, camp: right, lang: el, site: "https://elliniki-lisi.gr", queries: ["Ελληνική Λύση", "Κυριάκος Βελόπουλος"]}
   - {id: niki, name: NIKI, short: NIKI, country: GR, camp: right, lang: el, site: "https://nikh.gr", queries: ["ΝΙΚΗ κόμμα", "Δημήτρης Νατσιός"]}
   - {id: spartiates, name: Spartans, short: Spartans, country: GR, camp: right, lang: el, site: "https://spartiates.gr", queries: ["Σπαρτιάτες κόμμα"]}
+  # Official site verified 2026-09-23. Programme and parliamentary pages are
+  # watched explicitly so substantive documents are collected even when the
+  # home page changes.
+  - {id: symmachiaellinon, name: "Συμμαχία Ελλήνων / Alliance of Greeks", short: "Συμμαχία Ελλήνων", country: GR, camp: right, lang: el, site: "https://symmaxia.net/", queries: ["Συμμαχία Ελλήνων", "Ηλίας Κασιδιάρης Συμμαχία Ελλήνων", "Alliance of Greeks Kasidiaris"], watch_pages: ["https://symmaxia.net/idrytiki-diakiryxi/", "https://symmaxia.net/kyvernitiko-programma/", "https://symmaxia.net/koinovoyleytiko-ergo/", "https://symmaxia.net/grafeio-typoy/"]}
   - {id: fonilogikis, name: Voice of Reason, short: Voice of Reason, country: GR, camp: right, lang: el, site: "https://fonilogikis.gr", queries: ["Φωνή Λογικής", "Αφροδίτη Λατινοπούλου"]}
   - {id: mera25, name: MeRA25, short: MeRA25, country: GR, camp: left, lang: el, site: "https://mera25.gr", queries: ["ΜέΡΑ25", "Γιάνης Βαρουφάκης"]}
   - {id: syriza, name: SYRIZA – Progressive Alliance, short: SYRIZA, country: GR, camp: left, lang: el, site: "https://syriza.gr", queries: ["ΣΥΡΙΖΑ", "SYRIZA", "Σωκράτης Φάμελλος"]}
@@ -39,6 +43,9 @@ parties:
   - {id: fdi, name: Brothers of Italy, short: FdI, country: IT, camp: right, lang: it, site: "https://www.fratelli-italia.it", queries: ["Fratelli d'Italia", "Giorgia Meloni"]}
   - {id: casapound, name: CasaPound Italia, short: CasaPound, country: IT, camp: right, lang: it, site: "https://www.casapounditalia.org", queries: ["CasaPound Italia"]}
   - {id: lega, name: Lega per Salvini Premier, short: Lega, country: IT, camp: right, lang: it, site: "https://legaonline.it", queries: ["Lega per Salvini Premier", "Lega partito", "Matteo Salvini"]}
+  - {id: forzanuova, name: Forza Nuova, short: Forza Nuova, country: IT, camp: right, lang: it, site: "https://www.forzanuova1997.it", queries: ["Forza Nuova", "Roberto Fiore", "Luca Castellini"]}
+  - {id: poterealpopolo, name: Potere al Popolo!, short: Potere al Popolo, country: IT, camp: left, lang: it, site: "https://poterealpopolo.org", queries: ["Potere al Popolo", "PaP Italia", "Giuliano Granato", "Marta Collot"]}
+  - {id: rifondazione, name: Partito della Rifondazione Comunista, short: Rifondazione Comunista, country: IT, camp: left, lang: it, site: "https://www.rifondazione.it", queries: ["Rifondazione Comunista", "PRC Italia", "Maurizio Acerbo"]}
   - {id: vox, name: Vox, short: Vox, country: ES, camp: right, lang: es, site: "https://www.voxespana.es", queries: ["Vox España", "Santiago Abascal"]}
   - {id: podemos, name: Podemos, short: Podemos, country: ES, camp: left, lang: es, site: "https://podemos.info", queries: ["Podemos partido", "Ione Belarra"]}
   - {id: reformuk, name: Reform UK, short: Reform UK, country: GB, camp: right, lang: en, site: "https://www.reformparty.uk", queries: ["Reform UK", "Nigel Farage"]}

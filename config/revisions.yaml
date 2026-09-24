@@ -1,4 +1,13 @@
 revisions:
+  - date: "2026-09-23"
+    title: "Research-transparency and scholarly-tools release"
+    changes:
+      - "Added record-level provenance cards, report Research Passports, a source registry, translation-audit labels, and a prompt archive."
+      - "Added validation, coverage, language-quality, collection-funnel, missing-data, and multidimensional-confidence dashboards."
+      - "Added interactive comparison, longitudinal, quotation, cross-party event, election-series, figure-download, citation-manager, and replication tools."
+      - "Added a correction workflow, usage tutorials, and a downloadable teaching sample."
+      - "Added Συμμαχία Ελλήνων / Alliance of Greeks and verified symmaxia.net as its official website, with dedicated programme and parliamentary watch pages."
+      - "Polished navigation, responsive controls, keyboard access, typography, and homepage wayfinding; added a restrictive browser connection policy so the public interface can load only first-party data."
   - date: "2026-09-16"
     title: "RAPPORT public research release"
     changes:
