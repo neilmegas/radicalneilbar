@@ -30,11 +30,10 @@ PUBLIC_URL = "https://neilmegas.github.io/radicalneilbar/"
 
 CSS = """
 :root{
-  --paper:#FCFDFD; --surface:#F3F6F7; --ink:#102432; --muted:#607079;
-  --accent:#168EAA; --accent-dk:#08677A; --grey:#87939A;
-  --track:#E7ECEE; --rule:#B2D9E2; --hair:#D9E3E6;
-  --shadow:0 12px 34px rgba(16,36,50,.11); --soft-shadow:0 3px 14px rgba(16,36,50,.055);
-  --radius:6px;
+  --paper:#FFFFFF; --surface:#F6F8F9; --ink:#0A1B2E; --muted:#5C6670;
+  --accent:#00A3C8; --accent-dk:#006B80; --grey:#8E8E8E;
+  --track:#E9E9E9; --rule:#A8D9E6; --hair:#DCE3E6;
+  --shadow:0 10px 30px rgba(10,27,46,.12);
   /* Camps take navy and cyan from the palette. */
   --right:#0A1B2E; --left:#00A3C8;
 }
@@ -42,12 +41,12 @@ CSS = """
 html{scroll-behavior:smooth;scroll-padding-top:5.5rem}
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1140px;margin:0 auto;padding:0 1.35rem 5rem}
+  font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 1.25rem 5rem}
 main{min-height:55vh}
 .meta{font-size:12.5px;line-height:1.45;color:var(--muted)}
 .num{font-family:Georgia,'Times New Roman',serif;font-variant-numeric:tabular-nums}
-a{color:var(--accent-dk);text-underline-offset:.16em} a:hover{color:var(--ink)}
+a{color:var(--accent-dk)} a:hover{color:var(--ink)}
 a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,
 select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 [dir="rtl"]{text-align:right}
@@ -57,10 +56,10 @@ button{touch-action:manipulation}
   padding:.5rem .75rem;background:var(--ink);color:white;text-decoration:none;font-weight:700}
 .skip-link:focus{transform:translateY(0);color:white}
 
-nav.top{border-bottom:1px solid var(--hair);padding:1rem .1rem .85rem;margin-bottom:2rem;
+nav.top{border-bottom:3px solid var(--ink);padding:1.15rem 0 .75rem;margin-bottom:1.6rem;
   display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;position:sticky;top:0;z-index:20;
-  background:rgba(252,253,253,.97);backdrop-filter:blur(12px);box-shadow:0 7px 17px -17px rgba(16,36,50,.75)}
-nav.top .brand{font-weight:750;font-size:1.18rem;letter-spacing:.035em;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(10px)}
+nav.top .brand{font-weight:700;font-size:1.2rem;letter-spacing:-.02em;
   text-decoration:none;color:var(--ink)}
 nav.top a:not(.brand),nav.top summary{font-size:13px;color:var(--muted);text-decoration:none}
 nav.top a:not(.brand):hover{color:var(--accent-dk)}
@@ -75,7 +74,7 @@ nav.top .spacer{flex:1}
 .nav-menu[open] summary::after{content:' ▴'}
 .nav-dropdown{position:absolute;left:-.65rem;top:calc(100% + .35rem);min-width:205px;
   padding:.45rem;background:var(--paper);border:1px solid var(--hair);
-  box-shadow:var(--shadow);display:grid;z-index:30;border-radius:var(--radius)}
+  box-shadow:var(--shadow);display:grid;z-index:30;border-radius:4px}
 .nav-dropdown a{padding:.42rem .55rem;white-space:nowrap;border-radius:3px}
 .nav-dropdown a:hover{background:var(--surface)}
 .nav-dropdown-wide{left:auto;right:-.65rem;min-width:440px;
@@ -87,10 +86,10 @@ nav.top .spacer{flex:1}
 .brand-lockup small{font-size:.55rem;color:var(--muted);font-weight:500;
   letter-spacing:.025em;margin-top:.18rem;max-width:235px}
 
-h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.15rem,5.4vw,3rem);
-  font-weight:600;letter-spacing:-.025em;line-height:1.04;margin:0 0 .45rem}
-h2{font-size:1.28rem;font-weight:700;letter-spacing:-.012em;margin:2.5rem 0 .3rem;
-  padding-bottom:.45rem;border-bottom:1px solid var(--rule)}
+h1{font-size:clamp(2rem,5.4vw,2.9rem);font-weight:700;letter-spacing:-.03em;
+  line-height:1.02;margin:0 0 .35rem}
+h2{font-size:1.32rem;font-weight:700;letter-spacing:-.015em;margin:2.4rem 0 .2rem;
+  padding-bottom:.4rem;border-bottom:2px solid var(--ink)}
 h3{font-size:1.1rem;font-weight:600;margin:1.9rem 0 .3rem;color:var(--ink)}
 h3 .cc{color:var(--accent);font-weight:700}
 p{margin:.65rem 0}
@@ -193,8 +192,7 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 .confidence-chip{font-size:.67rem;border:1px solid var(--hair);padding:.06rem .3rem;background:white}
 
 /* blocks */
-.box{background:var(--surface);border:1px solid var(--hair);padding:1rem 1.08rem;margin:1rem 0;
-  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
+.box{background:var(--surface);border:1px solid var(--hair);padding:.95rem 1.05rem;margin:1rem 0}
 .box.dashed{border-style:dashed;background:var(--paper)}
 .box.flag{border-left:4px solid var(--accent);background:var(--paper)}
 .box h4{margin:0 0 .4rem;font-size:1rem;font-weight:600}
@@ -210,9 +208,8 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 /* weekly overview and collapsible report structure */
 .weekly-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem;
   margin:1.5rem 0 2.2rem}
-.weekly-card{border:1px solid var(--hair);border-top:3px solid var(--accent);
-  padding:.9rem;background:var(--surface);min-width:0;border-radius:var(--radius);
-  box-shadow:var(--soft-shadow)}
+.weekly-card{border:1px solid var(--hair);border-top:4px solid var(--accent);
+  padding:.85rem;background:var(--surface);min-width:0}
 .weekly-card h2{font-size:1.05rem;margin:0 0 .55rem;padding:0;border:0}
 .weekly-card ul{margin:.2rem 0 0;padding-left:1.1rem}
 .weekly-card li{margin:.6rem 0;line-height:1.35}
@@ -222,14 +219,12 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 .action-tag{display:inline-block;font-size:10.5px;line-height:1.25;padding:.12rem .42rem;
   border:1px solid var(--rule);color:var(--accent-dk);background:#F2FAFC;
   border-radius:2px;margin:.1rem .35rem .1rem 0;vertical-align:.08em}
-.minute{border:1px solid var(--ink);border-left:4px solid var(--ink);padding:.95rem 1.08rem;
-  margin:1.25rem 0;border-radius:var(--radius);background:#FFFFFF}
+.minute{border:2px solid var(--ink);padding:.9rem 1.05rem;margin:1.25rem 0}
 .minute h2,.change-box h2,.watch-box h2{border:0;margin:0 0 .45rem;padding:0;font-size:1.12rem}
 .minute ul,.change-list,.watch-list{margin:.3rem 0 0;padding-left:1.2rem}
 .minute li,.change-list li,.watch-list li{margin:.55rem 0}
-.change-box,.watch-box{background:var(--surface);border:1px solid var(--hair);
-  border-left:4px solid var(--accent);padding:.85rem 1rem;margin:1.25rem 0;
-  border-radius:var(--radius)}
+.change-box,.watch-box{background:var(--surface);border-left:4px solid var(--accent);
+  padding:.8rem 1rem;margin:1.25rem 0}
 .change-kind{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
   color:var(--muted);font-weight:600;margin-right:.35rem}
 .coverage-strip{display:flex;flex-wrap:wrap;gap:.55rem 1rem;margin:.55rem 0}
@@ -241,7 +236,7 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 .coverage-error{display:block;max-width:38rem;white-space:normal}
 .quote-tools,.timeline-tools,.search-tools,.compare-box{display:flex;flex-wrap:wrap;
   align-items:end;gap:.55rem 1rem;padding:.7rem .8rem;background:var(--surface);
-  border:1px solid var(--hair);margin:1rem 0;border-radius:var(--radius)}
+  border:1px solid var(--hair);margin:1rem 0}
 .quote-tools{justify-content:space-between;align-items:center;padding:.45rem .7rem}
 .quote-tools button{border:1px solid var(--hair);background:white;color:var(--ink);
   font:inherit;font-size:.77rem;padding:.25rem .5rem;cursor:pointer}
@@ -268,38 +263,10 @@ details[open].timeline-period>summary::before{content:'−'}
 .comparison{overflow-x:auto}
 .profile-links{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 1.35rem}
 .profile-links a{display:inline-block;padding:.38rem .58rem;border:1px solid var(--hair);
-  background:var(--surface);font-size:.8rem;text-decoration:none;border-radius:4px}
-.party-directory-tools{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(145px,.7fr));
-  gap:.65rem;padding:.85rem;margin:1.1rem 0 1.25rem;border:1px solid var(--hair);
-  background:#FFFFFF;border-radius:var(--radius);box-shadow:var(--soft-shadow)}
-.party-directory-tools label{font-size:.7rem;color:var(--muted);font-weight:600}
-.party-directory-tools input,.party-directory-tools select{display:block;width:100%;margin-top:.2rem;
-  min-height:2.45rem;padding:.42rem .5rem;border:1px solid var(--hair);border-radius:4px;
-  background:var(--paper);color:var(--ink)}
-.party-directory-status{display:flex;align-items:end;justify-content:flex-end;font-size:.76rem;
-  color:var(--muted);padding-bottom:.42rem}
-.party-directory-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.35rem;
-  margin-top:.45rem;border-top:2px solid var(--ink)}
-.party-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:.55rem;
-  min-width:0;padding:.68rem .35rem;border-bottom:1px solid var(--hair);transition:background .12s ease}
-.party-row:hover{background:var(--surface)}
-.party-camp-mark{display:block;width:9px;height:9px;margin-top:.35rem;background:var(--right)}
-.party-row.left .party-camp-mark{background:var(--left)}
-.party-row-main{min-width:0}
-.party-row h2{border:0;margin:0 0 .3rem;padding:0;font-size:.9rem;line-height:1.32;font-weight:600}
-.party-row h2 a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
-.party-tags{display:flex;flex-wrap:wrap;gap:.25rem}
-.party-tag{display:inline-flex;align-items:center;min-height:1.45rem;padding:.12rem .42rem;
-  border:1px solid var(--hair);background:var(--surface);font-size:.65rem;color:#344250;border-radius:999px}
-.party-tag.power{border-color:var(--rule);color:var(--accent-dk);background:#F2FAFC;font-weight:600}
-.party-row-records{min-width:3.6rem;text-align:right;color:var(--muted);font-size:.65rem;
-  white-space:nowrap;padding-top:.05rem}
-.party-row-records strong{display:block;color:var(--ink);font-size:.86rem;font-weight:600}
-.party-directory-empty{padding:1rem;border:1px dashed var(--hair);color:var(--muted)}
+  background:var(--surface);font-size:.8rem;text-decoration:none}
 .representation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;
   margin:.8rem 0 1rem}
-.seat-card{border:1px solid var(--hair);padding:.8rem;background:var(--surface);
-  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
+.seat-card{border:1px solid var(--hair);padding:.75rem;background:var(--surface)}
 .seat-card h3{font-size:.85rem;margin:0 0 .35rem}.seat-card .seat-value{font-family:Georgia,'Times New Roman',serif;
   font-size:1.75rem;line-height:1.1}.seat-bar{height:.45rem;background:var(--track);margin:.55rem 0 .3rem}
 .seat-bar i{display:block;height:100%;background:var(--accent);min-width:0}
@@ -312,24 +279,21 @@ details[open].timeline-period>summary::before{content:'−'}
 .research-pages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin:1rem 0}
 .research-pages .box{margin:0}
 .report-tools{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem .7rem;
-  border:1px solid var(--hair);background:var(--surface);padding:.7rem .8rem;margin:1rem 0;
-  border-radius:var(--radius)}
+  border:1px solid var(--hair);background:var(--surface);padding:.7rem .8rem;margin:1rem 0}
 .report-tools .citation-text{flex:1 1 420px;font-size:.78rem;color:#2B3947}
 .report-tools a,.report-tools button{border:1px solid var(--hair);background:white;color:var(--ink);
   padding:.38rem .58rem;font:inherit;font-size:.76rem;cursor:pointer;text-decoration:none;border-radius:3px}
 .report-tools a:hover,.report-tools button:hover{border-color:var(--accent-dk);background:#F2FAFC}
 .representation-change{border-left-color:var(--ink)}
 .four-week-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin:.65rem 0 1.4rem}
-.four-week-card{border:1px solid var(--hair);padding:.7rem;background:var(--surface);min-width:0;
-  border-radius:var(--radius)}
+.four-week-card{border:1px solid var(--hair);padding:.65rem;background:var(--surface);min-width:0}
 .four-week-card h3{font-size:.86rem;margin:0 0 .3rem}.four-week-card ul{margin:.2rem 0 0;padding-left:1rem}
 .four-week-card li{font-size:.75rem;line-height:1.35;margin:.42rem 0}.four-week-card .meta{font-size:.67rem}
 .method-step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;padding:.65rem 0;
   border-bottom:1px solid var(--hair)}
 .method-step .step{font-family:Georgia,'Times New Roman',serif;font-size:1.35rem;
   color:var(--accent-dk)}
-.passport{border:1px solid var(--ink);border-top:4px solid var(--ink);padding:.85rem 1rem;
-  margin:1.1rem 0;background:white;border-radius:var(--radius)}
+.passport{border:2px solid var(--ink);padding:.8rem 1rem;margin:1.1rem 0;background:white}
 .passport h2{border:0;margin:0 0 .4rem;padding:0;font-size:1.05rem}
 .passport-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem}
 .passport-grid div{border-top:2px solid var(--rule);padding-top:.35rem;min-width:0}
@@ -345,8 +309,7 @@ details[open].timeline-period>summary::before{content:'−'}
 .funnel{display:grid;gap:.35rem;margin:1rem 0;max-width:760px}.funnel-row{display:grid;
   grid-template-columns:9rem 1fr 4rem;gap:.55rem;align-items:center;font-size:.8rem}
 .funnel-track{height:.75rem;background:var(--track)}.funnel-track i{display:block;height:100%;background:var(--accent)}
-.research-tool{border:1px solid var(--hair);background:var(--surface);padding:.85rem;margin:1rem 0;
-  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
+.research-tool{border:1px solid var(--hair);background:var(--surface);padding:.8rem;margin:1rem 0}
 .research-tool label{font-size:.72rem;color:var(--muted)}
 .research-tool input,.research-tool select,.research-tool textarea{display:block;width:100%;margin-top:.15rem;
   padding:.42rem .5rem;border:1px solid var(--hair);background:white;color:var(--ink);font:inherit;font-size:.86rem}
@@ -382,8 +345,7 @@ details.reviewed>summary::before{content:'+';color:var(--accent-dk);font-weight:
 details[open].country-section>summary::before,details[open].party-section>summary::before,
 details[open].reviewed>summary::before{content:'−'}
 .country-content{padding:0 .2rem 1rem}
-details.party-section{border:1px solid var(--hair);margin:.65rem 0;background:var(--surface);
-  border-radius:var(--radius);overflow:hidden}
+details.party-section{border:1px solid var(--hair);margin:.65rem 0;background:var(--surface)}
 details.party-section>summary{padding:.65rem .75rem;font-weight:600}
 .party-content{padding:.1rem .85rem .9rem;background:var(--paper)}
 .party-content h4{margin:1rem 0 .1rem;font-size:.93rem}
@@ -424,7 +386,6 @@ table.idx th,table.rev th{text-align:left;font-size:11.5px;color:var(--muted);
   border-bottom:2px solid var(--ink);padding:.4rem .5rem .4rem 0}
 table.idx td,table.rev td{padding:.5rem .5rem .5rem 0;border-bottom:1px solid var(--hair);
   vertical-align:top}
-table.idx tbody tr:hover,table.rev tbody tr:hover{background:var(--surface)}
 table.rev{font-size:.9rem}
 table.idx td.n,table.rev td.n{font-size:13px;color:var(--muted);white-space:nowrap;
   font-variant-numeric:tabular-nums}
@@ -457,16 +418,12 @@ table.rev tr.filtered td{color:var(--muted)}
 .research-note .email{white-space:nowrap;color:var(--ink);font-weight:500}
 .front-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;
   max-width:35rem;margin:1.35rem 0 1.15rem}
-.front-stat{display:flex;align-items:baseline;gap:.65rem;padding:.85rem 1rem;
-  border:1px solid var(--hair);border-top:3px solid var(--accent);background:var(--surface);
-  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
+.front-stat{display:flex;align-items:baseline;gap:.65rem;padding:.8rem .95rem;
+  border:1px solid var(--hair);border-top:4px solid var(--accent);background:var(--surface)}
 .front-stat .v{font-family:Georgia,'Times New Roman',serif;font-size:2.2rem;
   line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .front-stat .k{font-size:.78rem;color:var(--muted);text-transform:uppercase;
   letter-spacing:.04em}
-.site-release{display:inline-flex;align-items:center;gap:.35rem;margin:.15rem 0 .9rem;
-  padding:.2rem .48rem;border:1px solid var(--hair);background:var(--surface);
-  color:var(--muted);font-size:.7rem;line-height:1.35;border-radius:999px}
 .quick-actions{display:flex;flex-wrap:wrap;gap:.45rem;margin:-.25rem 0 1.35rem}
 .quick-actions a{display:inline-flex;align-items:center;min-height:2.35rem;padding:.42rem .72rem;
   border:1px solid var(--hair);border-radius:3px;background:var(--paper);color:var(--ink);
@@ -484,8 +441,7 @@ table.rev tr.filtered td{color:var(--muted)}
   background:#EDF2F4}
 .map-legend i.watched{background:var(--accent);border-color:var(--accent-dk)}
 .map-shell{display:grid;grid-template-columns:minmax(0,2.25fr) minmax(240px,.75fr);
-  border:1px solid var(--hair);background:var(--surface);border-radius:var(--radius);
-  overflow:hidden;box-shadow:var(--soft-shadow)}
+  border:1px solid var(--hair);background:var(--surface)}
 .map-visual{position:relative;min-width:0;overflow:hidden;background:#F4FAFC;
   border-right:1px solid var(--hair)}
 .map-svg{display:block;width:100%;height:auto;max-height:600px}
@@ -540,17 +496,14 @@ table.rev tr.filtered td{color:var(--muted)}
 input.q{font-size:14px;padding:.5rem .6rem;border:1px solid var(--hair);
   background:var(--surface);width:100%;max-width:340px;color:var(--ink);
   font-family:inherit}
-footer{margin-top:3.5rem;padding:1.15rem 0 1.5rem;border-top:1px solid var(--rule);max-width:68rem}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);max-width:68rem}
 @media(max-width:850px){.weekly-panels{grid-template-columns:1fr}.wrap{max-width:880px}
   .four-week-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .party-directory-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
   .map-shell{grid-template-columns:1fr}.map-visual{border-right:0;border-bottom:1px solid var(--hair)}
   .passport-grid,.tool-grid,.provenance-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:650px){.timeline-tools input,.search-tools input{min-width:0;width:100%}
   .front-stats{gap:.5rem}.front-stat{display:block;padding:.65rem .7rem}
   .front-stat .k{display:block;margin-top:.2rem}.country-directory-grid{grid-template-columns:1fr}
-  .party-directory-tools,.party-directory-list{grid-template-columns:1fr}
-  .party-directory-status{justify-content:flex-start;padding-bottom:0}
   .map-section-head h2{min-width:100%}
   nav.top{align-items:flex-start;gap:.35rem .8rem}.brand-lockup{width:100%;margin-bottom:.25rem}
   .representation-grid,.research-pages,.four-week-grid{grid-template-columns:1fr}
@@ -576,17 +529,6 @@ def e(s):
 def camp_label(value):
     """Public label for the compact internal left/right roster value."""
     return "far-left" if value == "left" else "far-right"
-
-
-def party_display_name(party):
-    """Consistent public name: English / original language (acronym)."""
-    english = str(party.get("name") or party.get("short") or party.get("id") or "")
-    original = str(party.get("original_name") or "").strip()
-    acronym = str(party.get("acronym") or "").strip()
-    label = f"{english} / {original}" if original else english
-    if acronym:
-        label += f" ({acronym})"
-    return label
 
 
 def layout(title, body, depth=0, subtitle=""):
@@ -1574,15 +1516,11 @@ def _seat_card(label, row, fallback_source=None):
     width = min(100, max(0, 100 * seats / total)) if total else 0
     source = row.get("source") or (fallback_source or {}).get("url")
     source_link = (f'<a href="{e(source)}" rel="noreferrer">source</a>' if source else "")
-    basis = row.get("basis") or ""
-    note = row.get("note") or ""
-    context = " · ".join(v for v in (str(row.get("as_of") or "current verified total"),
-                                      str(basis)) if v)
-    note_html = f'<p class="seat-pending">{e(note)}</p>' if note else ""
-    return (f'<section class="seat-card"><h3>{e(row.get("label") or label)}</h3>'
+    return (f'<section class="seat-card"><h3>{e(label)}</h3>'
             f'<div class="seat-value">{seats} <span class="meta">/ {total}</span></div>'
             f'<div class="seat-bar" aria-label="{seats} of {total} seats"><i style="width:{width:.2f}%"></i></div>'
-            f'<p class="meta">{e(context)} {source_link}</p>{note_html}</section>')
+            f'<p class="meta">{e(row.get("as_of") or "current verified total")} '
+            f'{source_link}</p></section>')
 
 
 def representation_html(party, representation):
@@ -1659,7 +1597,7 @@ def representation_html(party, representation):
 
 
 def party_page(party, series, items, out_dir, representation=None):
-    body = [f'<h1>{e(party_display_name(party))}</h1>',
+    body = [f'<h1>{e(party.get("name"))}</h1>',
             f'<p class="meta">{e(party.get("country",""))} · '
             f'<a href="../inclusion.html">inclusion dossier</a> · '
             f'<a href="../sources.html">source registry</a></p>',
@@ -2576,102 +2514,21 @@ q.addEventListener('input',()=>{{
     return path
 
 
-def parties_page(parties, totals, country_names, out_dir, representation=None):
-    """A single sortable directory; alphabetical by English name by default."""
-    profiles = ((representation or {}).get("parties") or {})
-    ordered = sorted(parties, key=lambda p: (party_display_name(p).casefold(), p["id"]))
-    country_options = "".join(
-        f'<option value="{e(code)}">{e(country_names.get(code, code))}</option>'
-        for code in sorted({p.get("country") for p in parties if p.get("country")},
-                           key=lambda code: country_names.get(code, code))
-    )
-    rows = []
-    for party in ordered:
-        country_code = party.get("country") or ""
-        country = country_names.get(country_code, country_code)
-        family = camp_label(party.get("camp"))
-        current = (profiles.get(party["id"], {}).get("current") or {}).get("national") or {}
-        verified = current.get("seats") is not None and bool(current.get("total"))
-        seats = int(current.get("seats") or 0) if verified else -1
-        total = int(current.get("total") or 0) if verified else 0
-        status = "represented" if seats > 0 else ("unrepresented" if verified else "pending")
-        power = (f'{seats} / {total} national seats' if verified
-                 else 'national seat total pending')
-        records = int(totals.get(party["id"], 0))
-        rows.append(
-            f'<article class="party-row {e(party.get("camp") or "right")}" '
-            f'data-name="{e(party_display_name(party).casefold())}" '
-            f'data-country="{e(country_code)}" data-country-name="{e(country.casefold())}" '
-            f'data-family="{e(party.get("camp") or "right")}" data-status="{status}" '
-            f'data-records="{records}" data-seats="{seats}">'
-            '<span class="party-camp-mark" aria-hidden="true"></span>'
-            '<div class="party-row-main">'
-            f'<h2><a href="parties/{e(party["id"])}.html">{e(party_display_name(party))}</a></h2>'
-            f'<div class="party-tags"><span class="party-tag">{e(country)}</span>'
-            f'<span class="party-tag">{e(family)}</span>'
-            f'<span class="party-tag power">{e(power)}</span></div></div>'
-            f'<div class="party-row-records"><strong>{records}</strong>'
-            f'<span>{"record" if records == 1 else "records"}</span></div></article>'
-        )
+def parties_page(parties, totals, out_dir):
+    def block(camp, title):
+        rows = "".join(
+            f'<div class="grow"><span><a href="parties/{e(p["id"])}.html">'
+            f'{e(p.get("short") or p["id"])}</a> <span class="meta">{e(p.get("country",""))}</span></span>'
+            f'<span class="meta">{totals.get(p["id"],0)}</span></div>'
+            for p in sorted(parties, key=lambda x: (x.get("country",""), x.get("short","")))
+            if p.get("camp") == camp)
+        return f'<h2>{title}</h2><div class="grid">{rows}</div>'
 
-    body = f'''<h1>Parties</h1><p class="lede">{len(parties)} parties across
-{len({p.get("country") for p in parties if p.get("country")})} countries. Names follow
-English / original language (acronym). Political-power figures are dated on each profile.</p>
-<div class="party-directory-tools" role="search" aria-label="Filter and sort parties">
- <label>Find a party<input id="party-query" type="search" placeholder="Name or acronym" autocomplete="off"></label>
- <label>Country<select id="party-country"><option value="">All countries</option>{country_options}</select></label>
- <label>Party family<select id="party-family"><option value="">Both families</option>
-  <option value="left">far-left</option><option value="right">far-right</option></select></label>
- <label>National parliament<select id="party-status"><option value="">Any status</option>
-  <option value="represented">Represented</option><option value="unrepresented">No seats</option>
-  <option value="pending">Verification pending</option></select></label>
- <label>Sort<select id="party-sort"><option value="name">Name A–Z</option>
-  <option value="country">Country A–Z</option><option value="family">Party family</option>
-  <option value="records">Most records</option><option value="seats">Most national seats</option></select></label>
- <div class="party-directory-status" id="party-count" aria-live="polite">{len(parties)} parties</div>
-</div>
-<div class="party-directory-list" id="party-grid">{''.join(rows)}</div>
-<div class="party-directory-empty" id="party-empty" hidden>No parties match these filters.</div>
-<script>
-(() => {{
-  const grid = document.getElementById('party-grid');
-  const cards = [...grid.querySelectorAll('.party-row')];
-  const query = document.getElementById('party-query');
-  const country = document.getElementById('party-country');
-  const family = document.getElementById('party-family');
-  const status = document.getElementById('party-status');
-  const sort = document.getElementById('party-sort');
-  const count = document.getElementById('party-count');
-  const empty = document.getElementById('party-empty');
-  const text = value => (value || '').toLocaleLowerCase();
-  function apply() {{
-    const needle = text(query.value.trim());
-    const visible = cards.filter(card => {{
-      const matches = (!needle || text(card.textContent).includes(needle)) &&
-        (!country.value || card.dataset.country === country.value) &&
-        (!family.value || card.dataset.family === family.value) &&
-        (!status.value || card.dataset.status === status.value);
-      card.hidden = !matches;
-      return matches;
-    }});
-    const compareText = (a, b, field) => a.dataset[field].localeCompare(
-      b.dataset[field], undefined, {{sensitivity:'base'}});
-    visible.sort((a, b) => {{
-      if (sort.value === 'records') return Number(b.dataset.records) - Number(a.dataset.records) || compareText(a,b,'name');
-      if (sort.value === 'seats') return Number(b.dataset.seats) - Number(a.dataset.seats) || compareText(a,b,'name');
-      if (sort.value === 'country') return compareText(a,b,'countryName') || compareText(a,b,'name');
-      if (sort.value === 'family') return compareText(a,b,'family') || compareText(a,b,'name');
-      return compareText(a,b,'name');
-    }});
-    visible.forEach(card => grid.append(card));
-    count.textContent = `${{visible.length}} ${{visible.length === 1 ? 'party' : 'parties'}}`;
-    empty.hidden = visible.length !== 0;
-  }}
-  [query, country, family, status, sort].forEach(control => control.addEventListener(
-    control === query ? 'input' : 'change', apply));
-  apply();
-}})();
-</script>'''
+    body = (f'<h1>Parties</h1><p class="lede">{len(parties)} parties across '
+            f'{len({p.get("country") for p in parties if p.get("country")})} countries. '
+            'The figure is everything collected to date.</p>'
+            + block("right", "far-right")
+            + block("left", "far-left"))
     path = os.path.join(out_dir, "parties.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout("Parties", body, subtitle=f"{len(parties)} monitored"))
@@ -2890,22 +2747,13 @@ def _home_map(parties, country_names):
 </section>{script}"""
 
 
-def home_page(latest, index, parties, country_names, out_dir, research=None):
+def home_page(latest, index, parties, country_names, out_dir):
     country_count = len({p.get("country") for p in parties if p.get("country")})
-    research = research or {}
-    version = str(research.get("version") or "unversioned")
-    release = str(research.get("release_date") or "")
-    try:
-        release_label = datetime.fromisoformat(release).strftime("%-d %b %Y")
-    except (TypeError, ValueError):
-        release_label = release
-    release_html = (f'<div class="site-release">Website version {e(version)}'
-                    f'{" · released " + e(release_label) if release_label else ""}</div>')
     latest_action = (f'<a class="primary" href="issues/{e(latest["week"])}.html">'
                      'Read latest report</a>' if latest else
                      '<a class="primary" href="archive.html">Browse reports</a>')
     intro = f"""<p class="meta">{e(SITE_EXPANSION)}</p><h1>{SITE_NAME}</h1>
-<p class="lede">{e(SITE_DESCRIPTION)}</p>{release_html}
+<p class="lede">{e(SITE_DESCRIPTION)}</p>
 <p class="research-note">This is an automated AI system powered by the Claude API,
 created by <strong>Dr. Neil Bar</strong> solely for academic research into contemporary
 far-right and far-left parties. Project information and contact:
