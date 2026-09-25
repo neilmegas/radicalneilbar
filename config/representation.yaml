@@ -3,7 +3,7 @@
 # the linked parliament or election authority.  The site deliberately shows
 # an explicit verification-pending state instead of guessing or carrying a
 # stale number forward.
-checked_on: "2026-09-24"
+checked_on: "2026-09-25"
 european_parliament:
   label: European Parliament members
   url: "https://www.europarl.europa.eu/meps/en/search/advanced"
@@ -134,12 +134,14 @@ parties:
   mera25: {current: {national: {<<: *gr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   syriza: {current: {national: {<<: *gr_current, seats: 10}, european: {<<: *eu_2024, seats: 4}}}
   kke: {current: {national: {<<: *gr_current, seats: 21}, european: {<<: *eu_2024, seats: 2}}}
+  antarsya: {current: {national: {<<: *gr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   afd: {current: {national: {<<: *de_current, seats: 152}, european: {<<: *eu_2024, seats: 15}}}
   dritteweg: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   heimat: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 1}}}
   bsw: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 6}}}
   dielinke: {current: {national: {<<: *de_current, seats: 64}, european: {<<: *eu_2024, seats: 3}}}
+  mlpd: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   rn: {current: {national: {<<: *fr_current, seats: 122}, european: {<<: *eu_2024, seats: 30}}}
   lfi: {current: {national: {<<: *fr_current, seats: 71}, european: {<<: *eu_2024, seats: 9}}}
@@ -148,6 +150,9 @@ parties:
       national: {<<: *fr_current, label: "PCF-affiliated deputies", seats: 9, note: "Party-affiliated deputies are shown, not the full 17-member GDR parliamentary group."}
       european: {<<: *eu_2024, seats: 0}
   reconquete: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 5}}}
+  lo: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  npaa: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  npar: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   fpo: {current: {national: {<<: *at_current, seats: 57}, european: {<<: *eu_2024, seats: 6}}}
   kpoe: {current: {national: {<<: *at_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
@@ -158,6 +163,7 @@ parties:
   denk: {current: {national: {<<: *nl_current, seats: 3}, european: {<<: *eu_2024, seats: 0}}}
   ja21: {current: {national: {<<: *nl_current, seats: 9}, european: {<<: *eu_2024, seats: 0}}}
   spnl: {current: {national: {<<: *nl_current, seats: 3}, european: {<<: *eu_2024, seats: 0}}}
+  bij1: {current: {national: {<<: *nl_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   vlaamsbelang: {current: {national: {<<: *be_current, seats: 20}, european: {<<: *eu_2024, seats: 3}}}
   ptb: {current: {national: {<<: *be_current, seats: 15}, european: {<<: *eu_2024, seats: 2}}}
@@ -165,9 +171,11 @@ parties:
   sd: {current: {national: {<<: *se_current, seats: 62}, european: {<<: *eu_2024, seats: 3}}}
   nmr: {current: {national: {<<: *se_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   vansterpartiet: {current: {national: {<<: *se_current, seats: 30}, european: {<<: *eu_2024, seats: 2}}}
+  afs: {current: {national: {<<: *se_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   finns: {current: {national: {<<: *fi_current, seats: 45}, european: {<<: *eu_2024, seats: 1}}}
   vasemmistoliitto: {current: {national: {<<: *fi_current, seats: 11}, european: {<<: *eu_2024, seats: 3}}}
+  skp: {current: {national: {<<: *fi_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   fdi:
     links:
@@ -178,14 +186,28 @@ parties:
   forzanuova: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   poterealpopolo: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   rifondazione: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  pci: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   vox: {current: {national: {<<: *es_current, seats: 32}, european: {<<: *eu_2024, seats: 6}}}
   podemos: {current: {national: {<<: *es_current, seats: 4}, european: {<<: *eu_2024, seats: 2}}}
+  pce:
+    links:
+      domestic: {label: Enrique Santiago · Congress of Deputies, url: "https://www.congreso.es/es/busqueda-de-diputados?_diputadomodule_mostrarFicha=true&codParlamentario=125&idLegislatura=XV"}
+    current:
+      national: {<<: *es_current, label: "PCE-affiliated deputies", seats: 1, note: "The party's secretary-general, Enrique Santiago, sits within the Sumar parliamentary group."}
+      european: {<<: *eu_2024, seats: 0}
+  fejons: {current: {national: {<<: *es_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   reformuk: {current: {national: {<<: *gb_current, seats: 8}}}
   restorebritain: {current: {national: {<<: *gb_current, seats: 1}}}
   wpb: {current: {national: {<<: *gb_current, seats: 0}}}
   greenparty: {current: {national: {<<: *gb_current, seats: 5}}}
+  cpb: {current: {national: {<<: *gb_current, seats: 0}}}
+  yourparty:
+    links:
+      domestic: {label: Your Party Central Executive Committee and public office holders, url: "https://www.yourparty.uk/cec/"}
+    current:
+      national: {<<: *gb_current, label: "Party-identified MPs", seats: 2, source: "https://www.yourparty.uk/cec/", note: "The party's official CEC page identifies Jeremy Corbyn MP and Zarah Sultana MP as public office holders; the House of Commons directory may continue to display parliamentary affiliations separately."}
 
   akel: {current: {national: {<<: *cy_current, seats: 15}, european: {<<: *eu_2024, seats: 1}}}
   elam: {current: {national: {<<: *cy_current, seats: 8}, european: {<<: *eu_2024, seats: 1}}}
@@ -197,6 +219,8 @@ parties:
   roedt: {current: {national: {<<: *no_current, seats: 9}}}
   svno: {current: {national: {<<: *no_current, seats: 9}}}
   frp: {current: {national: {<<: *no_current, seats: 47}}}
+  norgesdemokratene: {current: {national: {<<: *no_current, seats: 0}}}
+  nkp: {current: {national: {<<: *no_current, seats: 0}}}
 
   enhedslisten: {current: {national: {<<: *dk_current, seats: 11}, european: {<<: *eu_2024, seats: 1}}}
   danmarksdemokraterne: {current: {national: {<<: *dk_current, seats: 10}, european: {<<: *eu_2024, seats: 0}}}
@@ -206,20 +230,30 @@ parties:
     current:
       national: {<<: *ie_current, seats: 2, note: "People Before Profit has two TDs; the wider People Before Profit–Solidarity technical group has three."}
       european: {<<: *eu_2024, seats: 0}
+  nationalpartyie: {current: {national: {<<: *ie_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  irishfreedom: {current: {national: {<<: *ie_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  workerspartyie: {current: {national: {<<: *ie_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   deilenk: {current: {national: {<<: *lu_current, seats: 2}, european: {<<: *eu_2024, seats: 0}}}
   adr: {current: {national: {<<: *lu_current, seats: 5}, european: {<<: *eu_2024, seats: 0}}}
+  kpl: {current: {national: {<<: *lu_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   svp: {current: {national: {<<: *ch_current, seats: 62}}}
   solidarites: {current: {national: {<<: *ch_current, seats: 0}}}
   legaticinesi: {current: {national: {<<: *ch_current, seats: 1}}}
   mcg: {current: {national: {<<: *ch_current, seats: 2}}}
+  pda: {current: {national: {<<: *ch_current, seats: 0}}}
 
   socialistiskflokk: {current: {national: {<<: *is_current, seats: 0}}}
 
   otzma: {current: {national: {<<: *il_current, seats: 6}}}
   noam: {current: {national: {<<: *il_current, seats: 1}}}
   zehut: {current: {national: {<<: *il_current, seats: 0}}}
+  religiouszionism:
+    links:
+      domestic: {label: Religious Zionist Party election and representation profile, url: "https://en.idi.org.il/israeli-elections-and-parties/parties/religious-zionist-party/"}
+    current:
+      national: {<<: *il_current, seats: 7, note: "Seven of the fourteen seats won by the joint Religious Zionism list in 2022 were allocated to the Religious Zionist Party."}
   hadash:
     current:
       national: {<<: *il_current, label: "Hadash-affiliated MKs", seats: 3, note: "Hadash-affiliated members are shown; the joint Hadash–Ta’al faction has five seats."}

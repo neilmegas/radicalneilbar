@@ -1,4 +1,20 @@
 revisions:
+  - date: "2026-09-25"
+    title: "Last-election roster expansion (website 1.4)"
+    changes:
+      - "Expanded the monitored roster from 69 to 90 parties while retaining the same 20-country scope."
+      - "Added twenty parties that participated in the latest completed domestic parliamentary election in their respective countries, with official sites, local-language discovery terms, and current representation records."
+      - "Added Your Party as a transparent prospective-election exception: it formed after the 2024 UK general election and is not presented as a contestant in that election."
+      - "Added party dossiers and explicit current national-seat figures for every new entry, including source notes for the PCE, Religious Zionist Party, and Your Party."
+      - "Recorded the Irish Freedom Party's 2026 registration cancellation as a review flag while preserving its last-election monitoring record and active official source."
+  - date: "2026-09-25"
+    title: "Map-first editorial homepage release (website 1.3)"
+    changes:
+      - "Reworked the homepage hierarchy around an editorial introduction, a four-part monitoring overview, the geographic party explorer, and a clearer latest-report panel."
+      - "Retained RAPPORT's original navy, cyan, white, and pale-blue palette with more restrained borders, spacing, and typography."
+      - "Placed the monitored-country map before the latest-report section and made Germany the initial example while preserving mouse, keyboard, and touch selection."
+      - "Updated map party labels to the standard English name / original-language name (acronym) format and kept every name linked to its party dossier."
+      - "Removed the Submit a correction page, its navigation entry, and record-level links to that form."
   - date: "2026-09-24"
     title: "Party directory and political-power release (website 1.2)"
     changes:

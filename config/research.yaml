@@ -1,5 +1,5 @@
-version: "1.2"
-release_date: "2026-09-24"
+version: "1.4"
+release_date: "2026-09-25"
 versioning:
   policy: >-
     The website version changes only for a meaningful public feature,
@@ -87,3 +87,33 @@ party_notes:
         url: "https://www.ekathimerini.com/politics/1315847/kasidiaris-backs-new-far-right-party-ahead-of-elections/"
       - label: eKathimerini, 22 September 2026
         url: "https://www.ekathimerini.com/politics/1315881/far-right-mp-says-he-will-represent-new-party-linked-with-kasidiaris/"
+  yourparty:
+    status: Prospective-election exception; official website verified 2026-09-25
+    rationale: >-
+      Included at the researcher's instruction as an explicit exception to the
+      latest-general-election filter. Your Party was formed after the 2024 UK
+      general election, so RAPPORT does not describe it as a 2024 contestant.
+      Its official website identifies MPs and active electoral preparations,
+      making it eligible under the separate prospective-election rule.
+    added: "2026-09-25"
+    references:
+      - label: Official party website
+        url: "https://www.yourparty.uk/"
+      - label: Central Executive Committee and public office holders
+        url: "https://www.yourparty.uk/cec/"
+      - label: 2026 electoral participation statement
+        url: "https://www.yourparty.uk/english-local-elections-2026/"
+  irishfreedom:
+    status: Monitored for last-election continuity; electoral status requires review
+    rationale: >-
+      Included because it contested Ireland's latest completed general election
+      and retains an active official website. Ireland's Electoral Commission
+      announced the cancellation of its registration in 2026, so RAPPORT must
+      not treat continued eligibility to nominate candidates as established
+      without a fresh official check.
+    added: "2026-09-25"
+    references:
+      - label: Official party website
+        url: "https://www.irishfreedom.ie/"
+      - label: Electoral Commission registration notice
+        url: "https://www.electoralcommission.ie/media-release/registration-of-irish-freedom-party-cancelled/"
