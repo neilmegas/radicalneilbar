@@ -853,7 +853,7 @@ def cmd_site(cfg, args):
     # so removed demo records (or corrected records) cannot leave stale pages.
     for generated in ("issues", "data", "corpus", "speakers", "parties", "downloads"):
         shutil.rmtree(os.path.join(SITE_DIR, generated), ignore_errors=True)
-    for stale in ("reliability.html",):
+    for stale in ("reliability.html", "corrections.html"):
         try:
             os.remove(os.path.join(SITE_DIR, stale))
         except FileNotFoundError:
@@ -1053,7 +1053,6 @@ def cmd_site(cfg, args):
     st_site.events_page(research.get("events") or [], all_relevant,
                         cfg["parties"], SITE_DIR)
     st_site.tutorials_page(SITE_DIR)
-    st_site.corrections_page(SITE_DIR)
 
     st_site.archive_page(index, SITE_DIR)
     st_site.parties_page(cfg["parties"], totals, names, SITE_DIR,

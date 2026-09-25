@@ -30,10 +30,11 @@ PUBLIC_URL = "https://neilmegas.github.io/radicalneilbar/"
 
 CSS = """
 :root{
-  --paper:#FFFFFF; --surface:#F6F8F9; --ink:#0A1B2E; --muted:#5C6670;
-  --accent:#00A3C8; --accent-dk:#006B80; --grey:#8E8E8E;
-  --track:#E9E9E9; --rule:#A8D9E6; --hair:#DCE3E6;
-  --shadow:0 10px 30px rgba(10,27,46,.12);
+  --paper:#FCFDFD; --surface:#F3F6F7; --ink:#102432; --muted:#607079;
+  --accent:#168EAA; --accent-dk:#08677A; --grey:#87939A;
+  --track:#E7ECEE; --rule:#B2D9E2; --hair:#D9E3E6;
+  --shadow:0 12px 34px rgba(16,36,50,.11); --soft-shadow:0 3px 14px rgba(16,36,50,.055);
+  --radius:6px;
   /* Camps take navy and cyan from the palette. */
   --right:#0A1B2E; --left:#00A3C8;
 }
@@ -41,12 +42,12 @@ CSS = """
 html{scroll-behavior:smooth;scroll-padding-top:5.5rem}
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-  font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1180px;margin:0 auto;padding:0 1.25rem 5rem}
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1140px;margin:0 auto;padding:0 1.35rem 5rem}
 main{min-height:55vh}
 .meta{font-size:12.5px;line-height:1.45;color:var(--muted)}
 .num{font-family:Georgia,'Times New Roman',serif;font-variant-numeric:tabular-nums}
-a{color:var(--accent-dk)} a:hover{color:var(--ink)}
+a{color:var(--accent-dk);text-underline-offset:.16em} a:hover{color:var(--ink)}
 a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,
 select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 [dir="rtl"]{text-align:right}
@@ -56,10 +57,10 @@ button{touch-action:manipulation}
   padding:.5rem .75rem;background:var(--ink);color:white;text-decoration:none;font-weight:700}
 .skip-link:focus{transform:translateY(0);color:white}
 
-nav.top{border-bottom:3px solid var(--ink);padding:1.15rem 0 .75rem;margin-bottom:1.6rem;
+nav.top{border-bottom:1px solid var(--hair);padding:1rem .1rem .85rem;margin-bottom:2rem;
   display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;position:sticky;top:0;z-index:20;
-  background:rgba(255,255,255,.97);backdrop-filter:blur(10px)}
-nav.top .brand{font-weight:700;font-size:1.2rem;letter-spacing:-.02em;
+  background:rgba(252,253,253,.97);backdrop-filter:blur(12px);box-shadow:0 7px 17px -17px rgba(16,36,50,.75)}
+nav.top .brand{font-weight:750;font-size:1.18rem;letter-spacing:.035em;
   text-decoration:none;color:var(--ink)}
 nav.top a:not(.brand),nav.top summary{font-size:13px;color:var(--muted);text-decoration:none}
 nav.top a:not(.brand):hover{color:var(--accent-dk)}
@@ -74,7 +75,7 @@ nav.top .spacer{flex:1}
 .nav-menu[open] summary::after{content:' ▴'}
 .nav-dropdown{position:absolute;left:-.65rem;top:calc(100% + .35rem);min-width:205px;
   padding:.45rem;background:var(--paper);border:1px solid var(--hair);
-  box-shadow:var(--shadow);display:grid;z-index:30;border-radius:4px}
+  box-shadow:var(--shadow);display:grid;z-index:30;border-radius:var(--radius)}
 .nav-dropdown a{padding:.42rem .55rem;white-space:nowrap;border-radius:3px}
 .nav-dropdown a:hover{background:var(--surface)}
 .nav-dropdown-wide{left:auto;right:-.65rem;min-width:440px;
@@ -86,10 +87,10 @@ nav.top .spacer{flex:1}
 .brand-lockup small{font-size:.55rem;color:var(--muted);font-weight:500;
   letter-spacing:.025em;margin-top:.18rem;max-width:235px}
 
-h1{font-size:clamp(2rem,5.4vw,2.9rem);font-weight:700;letter-spacing:-.03em;
-  line-height:1.02;margin:0 0 .35rem}
-h2{font-size:1.32rem;font-weight:700;letter-spacing:-.015em;margin:2.4rem 0 .2rem;
-  padding-bottom:.4rem;border-bottom:2px solid var(--ink)}
+h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.15rem,5.4vw,3rem);
+  font-weight:600;letter-spacing:-.025em;line-height:1.04;margin:0 0 .45rem}
+h2{font-size:1.28rem;font-weight:700;letter-spacing:-.012em;margin:2.5rem 0 .3rem;
+  padding-bottom:.45rem;border-bottom:1px solid var(--rule)}
 h3{font-size:1.1rem;font-weight:600;margin:1.9rem 0 .3rem;color:var(--ink)}
 h3 .cc{color:var(--accent);font-weight:700}
 p{margin:.65rem 0}
@@ -192,7 +193,8 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 .confidence-chip{font-size:.67rem;border:1px solid var(--hair);padding:.06rem .3rem;background:white}
 
 /* blocks */
-.box{background:var(--surface);border:1px solid var(--hair);padding:.95rem 1.05rem;margin:1rem 0}
+.box{background:var(--surface);border:1px solid var(--hair);padding:1rem 1.08rem;margin:1rem 0;
+  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
 .box.dashed{border-style:dashed;background:var(--paper)}
 .box.flag{border-left:4px solid var(--accent);background:var(--paper)}
 .box h4{margin:0 0 .4rem;font-size:1rem;font-weight:600}
@@ -208,8 +210,9 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 /* weekly overview and collapsible report structure */
 .weekly-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem;
   margin:1.5rem 0 2.2rem}
-.weekly-card{border:1px solid var(--hair);border-top:4px solid var(--accent);
-  padding:.85rem;background:var(--surface);min-width:0}
+.weekly-card{border:1px solid var(--hair);border-top:3px solid var(--accent);
+  padding:.9rem;background:var(--surface);min-width:0;border-radius:var(--radius);
+  box-shadow:var(--soft-shadow)}
 .weekly-card h2{font-size:1.05rem;margin:0 0 .55rem;padding:0;border:0}
 .weekly-card ul{margin:.2rem 0 0;padding-left:1.1rem}
 .weekly-card li{margin:.6rem 0;line-height:1.35}
@@ -219,12 +222,14 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 .action-tag{display:inline-block;font-size:10.5px;line-height:1.25;padding:.12rem .42rem;
   border:1px solid var(--rule);color:var(--accent-dk);background:#F2FAFC;
   border-radius:2px;margin:.1rem .35rem .1rem 0;vertical-align:.08em}
-.minute{border:2px solid var(--ink);padding:.9rem 1.05rem;margin:1.25rem 0}
+.minute{border:1px solid var(--ink);border-left:4px solid var(--ink);padding:.95rem 1.08rem;
+  margin:1.25rem 0;border-radius:var(--radius);background:#FFFFFF}
 .minute h2,.change-box h2,.watch-box h2{border:0;margin:0 0 .45rem;padding:0;font-size:1.12rem}
 .minute ul,.change-list,.watch-list{margin:.3rem 0 0;padding-left:1.2rem}
 .minute li,.change-list li,.watch-list li{margin:.55rem 0}
-.change-box,.watch-box{background:var(--surface);border-left:4px solid var(--accent);
-  padding:.8rem 1rem;margin:1.25rem 0}
+.change-box,.watch-box{background:var(--surface);border:1px solid var(--hair);
+  border-left:4px solid var(--accent);padding:.85rem 1rem;margin:1.25rem 0;
+  border-radius:var(--radius)}
 .change-kind{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
   color:var(--muted);font-weight:600;margin-right:.35rem}
 .coverage-strip{display:flex;flex-wrap:wrap;gap:.55rem 1rem;margin:.55rem 0}
@@ -236,7 +241,7 @@ details.provenance-card>summary{cursor:pointer;padding:.38rem .55rem;font-size:1
 .coverage-error{display:block;max-width:38rem;white-space:normal}
 .quote-tools,.timeline-tools,.search-tools,.compare-box{display:flex;flex-wrap:wrap;
   align-items:end;gap:.55rem 1rem;padding:.7rem .8rem;background:var(--surface);
-  border:1px solid var(--hair);margin:1rem 0}
+  border:1px solid var(--hair);margin:1rem 0;border-radius:var(--radius)}
 .quote-tools{justify-content:space-between;align-items:center;padding:.45rem .7rem}
 .quote-tools button{border:1px solid var(--hair);background:white;color:var(--ink);
   font:inherit;font-size:.77rem;padding:.25rem .5rem;cursor:pointer}
@@ -263,29 +268,38 @@ details[open].timeline-period>summary::before{content:'−'}
 .comparison{overflow-x:auto}
 .profile-links{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 1.35rem}
 .profile-links a{display:inline-block;padding:.38rem .58rem;border:1px solid var(--hair);
-  background:var(--surface);font-size:.8rem;text-decoration:none}
+  background:var(--surface);font-size:.8rem;text-decoration:none;border-radius:4px}
 .party-directory-tools{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(4,minmax(145px,.7fr));
-  gap:.65rem;padding:.8rem;margin:1.1rem 0;border:1px solid var(--hair);background:var(--surface)}
+  gap:.65rem;padding:.85rem;margin:1.1rem 0 1.25rem;border:1px solid var(--hair);
+  background:#FFFFFF;border-radius:var(--radius);box-shadow:var(--soft-shadow)}
 .party-directory-tools label{font-size:.7rem;color:var(--muted);font-weight:600}
 .party-directory-tools input,.party-directory-tools select{display:block;width:100%;margin-top:.2rem;
-  min-height:2.45rem;padding:.42rem .5rem;border:1px solid var(--hair);background:white;color:var(--ink)}
+  min-height:2.45rem;padding:.42rem .5rem;border:1px solid var(--hair);border-radius:4px;
+  background:var(--paper);color:var(--ink)}
 .party-directory-status{display:flex;align-items:end;justify-content:flex-end;font-size:.76rem;
   color:var(--muted);padding-bottom:.42rem}
-.party-directory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin-top:.8rem}
-.party-card{display:flex;flex-direction:column;gap:.42rem;border:1px solid var(--hair);
-  border-top:3px solid var(--right);padding:.8rem .85rem;background:white;min-width:0}
-.party-card.left{border-top-color:var(--left)}
-.party-card h2{border:0;margin:0;padding:0;font-size:.98rem;line-height:1.35}
-.party-card h2 a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
-.party-tags{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:auto}
+.party-directory-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.35rem;
+  margin-top:.45rem;border-top:2px solid var(--ink)}
+.party-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:.55rem;
+  min-width:0;padding:.68rem .35rem;border-bottom:1px solid var(--hair);transition:background .12s ease}
+.party-row:hover{background:var(--surface)}
+.party-camp-mark{display:block;width:9px;height:9px;margin-top:.35rem;background:var(--right)}
+.party-row.left .party-camp-mark{background:var(--left)}
+.party-row-main{min-width:0}
+.party-row h2{border:0;margin:0 0 .3rem;padding:0;font-size:.9rem;line-height:1.32;font-weight:600}
+.party-row h2 a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+.party-tags{display:flex;flex-wrap:wrap;gap:.25rem}
 .party-tag{display:inline-flex;align-items:center;min-height:1.45rem;padding:.12rem .42rem;
   border:1px solid var(--hair);background:var(--surface);font-size:.65rem;color:#344250;border-radius:999px}
 .party-tag.power{border-color:var(--rule);color:var(--accent-dk);background:#F2FAFC;font-weight:600}
-.party-card-foot{display:flex;justify-content:space-between;gap:.7rem;font-size:.72rem;color:var(--muted)}
+.party-row-records{min-width:3.6rem;text-align:right;color:var(--muted);font-size:.65rem;
+  white-space:nowrap;padding-top:.05rem}
+.party-row-records strong{display:block;color:var(--ink);font-size:.86rem;font-weight:600}
 .party-directory-empty{padding:1rem;border:1px dashed var(--hair);color:var(--muted)}
 .representation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;
   margin:.8rem 0 1rem}
-.seat-card{border:1px solid var(--hair);padding:.75rem;background:var(--surface)}
+.seat-card{border:1px solid var(--hair);padding:.8rem;background:var(--surface);
+  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
 .seat-card h3{font-size:.85rem;margin:0 0 .35rem}.seat-card .seat-value{font-family:Georgia,'Times New Roman',serif;
   font-size:1.75rem;line-height:1.1}.seat-bar{height:.45rem;background:var(--track);margin:.55rem 0 .3rem}
 .seat-bar i{display:block;height:100%;background:var(--accent);min-width:0}
@@ -298,21 +312,24 @@ details[open].timeline-period>summary::before{content:'−'}
 .research-pages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin:1rem 0}
 .research-pages .box{margin:0}
 .report-tools{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem .7rem;
-  border:1px solid var(--hair);background:var(--surface);padding:.7rem .8rem;margin:1rem 0}
+  border:1px solid var(--hair);background:var(--surface);padding:.7rem .8rem;margin:1rem 0;
+  border-radius:var(--radius)}
 .report-tools .citation-text{flex:1 1 420px;font-size:.78rem;color:#2B3947}
 .report-tools a,.report-tools button{border:1px solid var(--hair);background:white;color:var(--ink);
   padding:.38rem .58rem;font:inherit;font-size:.76rem;cursor:pointer;text-decoration:none;border-radius:3px}
 .report-tools a:hover,.report-tools button:hover{border-color:var(--accent-dk);background:#F2FAFC}
 .representation-change{border-left-color:var(--ink)}
 .four-week-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin:.65rem 0 1.4rem}
-.four-week-card{border:1px solid var(--hair);padding:.65rem;background:var(--surface);min-width:0}
+.four-week-card{border:1px solid var(--hair);padding:.7rem;background:var(--surface);min-width:0;
+  border-radius:var(--radius)}
 .four-week-card h3{font-size:.86rem;margin:0 0 .3rem}.four-week-card ul{margin:.2rem 0 0;padding-left:1rem}
 .four-week-card li{font-size:.75rem;line-height:1.35;margin:.42rem 0}.four-week-card .meta{font-size:.67rem}
 .method-step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;padding:.65rem 0;
   border-bottom:1px solid var(--hair)}
 .method-step .step{font-family:Georgia,'Times New Roman',serif;font-size:1.35rem;
   color:var(--accent-dk)}
-.passport{border:2px solid var(--ink);padding:.8rem 1rem;margin:1.1rem 0;background:white}
+.passport{border:1px solid var(--ink);border-top:4px solid var(--ink);padding:.85rem 1rem;
+  margin:1.1rem 0;background:white;border-radius:var(--radius)}
 .passport h2{border:0;margin:0 0 .4rem;padding:0;font-size:1.05rem}
 .passport-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem}
 .passport-grid div{border-top:2px solid var(--rule);padding-top:.35rem;min-width:0}
@@ -328,7 +345,8 @@ details[open].timeline-period>summary::before{content:'−'}
 .funnel{display:grid;gap:.35rem;margin:1rem 0;max-width:760px}.funnel-row{display:grid;
   grid-template-columns:9rem 1fr 4rem;gap:.55rem;align-items:center;font-size:.8rem}
 .funnel-track{height:.75rem;background:var(--track)}.funnel-track i{display:block;height:100%;background:var(--accent)}
-.research-tool{border:1px solid var(--hair);background:var(--surface);padding:.8rem;margin:1rem 0}
+.research-tool{border:1px solid var(--hair);background:var(--surface);padding:.85rem;margin:1rem 0;
+  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
 .research-tool label{font-size:.72rem;color:var(--muted)}
 .research-tool input,.research-tool select,.research-tool textarea{display:block;width:100%;margin-top:.15rem;
   padding:.42rem .5rem;border:1px solid var(--hair);background:white;color:var(--ink);font:inherit;font-size:.86rem}
@@ -364,7 +382,8 @@ details.reviewed>summary::before{content:'+';color:var(--accent-dk);font-weight:
 details[open].country-section>summary::before,details[open].party-section>summary::before,
 details[open].reviewed>summary::before{content:'−'}
 .country-content{padding:0 .2rem 1rem}
-details.party-section{border:1px solid var(--hair);margin:.65rem 0;background:var(--surface)}
+details.party-section{border:1px solid var(--hair);margin:.65rem 0;background:var(--surface);
+  border-radius:var(--radius);overflow:hidden}
 details.party-section>summary{padding:.65rem .75rem;font-weight:600}
 .party-content{padding:.1rem .85rem .9rem;background:var(--paper)}
 .party-content h4{margin:1rem 0 .1rem;font-size:.93rem}
@@ -405,6 +424,7 @@ table.idx th,table.rev th{text-align:left;font-size:11.5px;color:var(--muted);
   border-bottom:2px solid var(--ink);padding:.4rem .5rem .4rem 0}
 table.idx td,table.rev td{padding:.5rem .5rem .5rem 0;border-bottom:1px solid var(--hair);
   vertical-align:top}
+table.idx tbody tr:hover,table.rev tbody tr:hover{background:var(--surface)}
 table.rev{font-size:.9rem}
 table.idx td.n,table.rev td.n{font-size:13px;color:var(--muted);white-space:nowrap;
   font-variant-numeric:tabular-nums}
@@ -437,15 +457,16 @@ table.rev tr.filtered td{color:var(--muted)}
 .research-note .email{white-space:nowrap;color:var(--ink);font-weight:500}
 .front-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;
   max-width:35rem;margin:1.35rem 0 1.15rem}
-.front-stat{display:flex;align-items:baseline;gap:.65rem;padding:.8rem .95rem;
-  border:1px solid var(--hair);border-top:4px solid var(--accent);background:var(--surface)}
+.front-stat{display:flex;align-items:baseline;gap:.65rem;padding:.85rem 1rem;
+  border:1px solid var(--hair);border-top:3px solid var(--accent);background:var(--surface);
+  border-radius:var(--radius);box-shadow:var(--soft-shadow)}
 .front-stat .v{font-family:Georgia,'Times New Roman',serif;font-size:2.2rem;
   line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .front-stat .k{font-size:.78rem;color:var(--muted);text-transform:uppercase;
   letter-spacing:.04em}
 .site-release{display:inline-flex;align-items:center;gap:.35rem;margin:.15rem 0 .9rem;
   padding:.2rem .48rem;border:1px solid var(--hair);background:var(--surface);
-  color:var(--muted);font-size:.7rem;line-height:1.35}
+  color:var(--muted);font-size:.7rem;line-height:1.35;border-radius:999px}
 .quick-actions{display:flex;flex-wrap:wrap;gap:.45rem;margin:-.25rem 0 1.35rem}
 .quick-actions a{display:inline-flex;align-items:center;min-height:2.35rem;padding:.42rem .72rem;
   border:1px solid var(--hair);border-radius:3px;background:var(--paper);color:var(--ink);
@@ -463,7 +484,8 @@ table.rev tr.filtered td{color:var(--muted)}
   background:#EDF2F4}
 .map-legend i.watched{background:var(--accent);border-color:var(--accent-dk)}
 .map-shell{display:grid;grid-template-columns:minmax(0,2.25fr) minmax(240px,.75fr);
-  border:1px solid var(--hair);background:var(--surface)}
+  border:1px solid var(--hair);background:var(--surface);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--soft-shadow)}
 .map-visual{position:relative;min-width:0;overflow:hidden;background:#F4FAFC;
   border-right:1px solid var(--hair)}
 .map-svg{display:block;width:100%;height:auto;max-height:600px}
@@ -518,7 +540,7 @@ table.rev tr.filtered td{color:var(--muted)}
 input.q{font-size:14px;padding:.5rem .6rem;border:1px solid var(--hair);
   background:var(--surface);width:100%;max-width:340px;color:var(--ink);
   font-family:inherit}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);max-width:68rem}
+footer{margin-top:3.5rem;padding:1.15rem 0 1.5rem;border-top:1px solid var(--rule);max-width:68rem}
 @media(max-width:850px){.weekly-panels{grid-template-columns:1fr}.wrap{max-width:880px}
   .four-week-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .party-directory-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -527,7 +549,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);max-wid
 @media(max-width:650px){.timeline-tools input,.search-tools input{min-width:0;width:100%}
   .front-stats{gap:.5rem}.front-stat{display:block;padding:.65rem .7rem}
   .front-stat .k{display:block;margin-top:.2rem}.country-directory-grid{grid-template-columns:1fr}
-  .party-directory-tools,.party-directory-grid{grid-template-columns:1fr}
+  .party-directory-tools,.party-directory-list{grid-template-columns:1fr}
   .party-directory-status{justify-content:flex-start;padding-bottom:0}
   .map-section-head h2{min-width:100%}
   nav.top{align-items:flex-start;gap:.35rem .8rem}.brand-lockup{width:100%;margin-bottom:.25rem}
@@ -540,6 +562,110 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);max-wid
   details.country-section:not([open])>:not(summary),details.party-section:not([open])>:not(summary),
   details.reviewed:not([open])>:not(summary){display:block!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.map-country{transition:none}}
+
+/* Homepage editorial refresh, version 1.3.  This keeps RAPPORT's original
+   navy/cyan/pale-blue identity while making hierarchy and scanning clearer. */
+.brand-lockup{display:flex;flex-direction:row;align-items:center;gap:.65rem;line-height:1.05}
+.brand-mark{display:grid;place-items:center;width:2.15rem;height:2.15rem;flex:0 0 2.15rem;
+  background:var(--ink);color:white;font-family:Georgia,'Times New Roman',serif;
+  font-size:1.15rem;font-weight:700}
+.brand-copy{display:flex;flex-direction:column;min-width:0}
+.brand-copy .brand{font-family:Georgia,'Times New Roman',serif;letter-spacing:.1em}
+body.home .wrap{max-width:1280px}
+body.home nav.top{margin-bottom:0;padding:1rem .1rem}
+.home-page{padding-top:0}
+.home-status{display:flex;align-items:center;gap:.55rem 1.35rem;min-height:2.65rem;
+  margin:0 0 3rem;padding:.55rem 0;border-bottom:1px solid var(--hair);
+  color:var(--muted);font-size:.75rem;overflow-x:auto;white-space:nowrap}
+.home-status .status-dot{width:.42rem;height:.42rem;border-radius:50%;background:var(--accent);
+  flex:0 0 .42rem}.home-status strong{color:var(--ink)}
+.home-status a{margin-left:auto;font-weight:700;text-decoration:none;text-transform:uppercase;
+  letter-spacing:.05em}
+.home-hero{position:relative;padding:0 0 2rem}
+.home-kicker,.section-kicker{color:var(--accent-dk);font-size:.7rem;font-weight:750;
+  letter-spacing:.16em;text-transform:uppercase}
+.home-title{max-width:51rem;margin:.85rem 0 .9rem;font-size:clamp(2.8rem,6vw,5rem);
+  line-height:.96;letter-spacing:-.045em;color:var(--right)}
+.home-lede{max-width:60rem;margin:0;color:var(--ink);font-family:Georgia,'Times New Roman',serif;
+  font-size:clamp(1.08rem,2vw,1.4rem);line-height:1.48}
+.home-page .site-release{position:absolute;right:0;top:.2rem;margin:0;border-color:var(--rule);
+  border-radius:3px;background:#F2FAFC;color:var(--ink);font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase}
+.home-page .research-note{max-width:62rem;margin:1.35rem 0 0;padding:.15rem 0 .15rem .9rem;
+  border-left:3px solid var(--accent);background:transparent;color:var(--muted);font-size:.85rem}
+.front-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;max-width:none;
+  margin:1.5rem 0 3.5rem;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.front-stat{display:block;min-height:6.5rem;padding:1.15rem 1.25rem;border:0;border-radius:0;
+  background:transparent;box-shadow:none}.front-stat:first-child{padding-left:0}
+.front-stat+.front-stat{border-left:1px solid var(--hair)}
+.front-stat .v{display:block;font-size:2.25rem;color:var(--right)}
+.front-stat .k{display:block;margin-top:.45rem;text-transform:none;letter-spacing:0;font-size:.75rem}
+.map-section{margin:0 0 4rem}.map-section-head{align-items:end;margin:.4rem 0 1rem}
+.map-section-title h2{margin:.35rem 0 0;padding:0;border:0;color:var(--right);
+  font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.8rem,3.2vw,2.65rem);
+  font-weight:600;letter-spacing:-.03em}.map-section-title p{margin:.45rem 0 0;color:var(--muted);
+  font-size:.86rem}.map-legend{padding-bottom:.25rem}
+.map-shell{grid-template-columns:minmax(0,1.8fr) minmax(290px,.8fr);border-radius:0;
+  background:white;box-shadow:none}.map-visual{background:#F4FAFC}
+.map-detail{padding:1.4rem 1.35rem}.map-detail h3{font-family:Georgia,'Times New Roman',serif;
+  font-size:1.8rem;font-weight:600}.map-party{padding:.55rem 0;border:0;border-bottom:1px solid var(--hair);
+  background:transparent;font-size:.76rem}.map-party:hover{border-color:var(--accent)}
+.map-credit{margin:.5rem 0 0}.country-directory{margin-top:.8rem}
+.latest-section{margin:0 0 3.75rem}.latest-head{display:flex;align-items:end;
+  justify-content:space-between;gap:1rem;margin-bottom:1rem}
+.latest-head h2{margin:.35rem 0 0;padding:0;border:0;color:var(--right);
+  font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.8rem,3.2vw,2.65rem);
+  font-weight:600;letter-spacing:-.03em}.latest-head p{margin:0;color:var(--muted);font-size:.82rem}
+.latest-panel{display:grid;grid-template-columns:minmax(230px,.78fr) minmax(360px,1.45fr) minmax(250px,.78fr);
+  border:1px solid var(--hair);border-top:4px solid var(--accent);background:var(--surface)}
+.latest-panel>div{padding:1.35rem 1.45rem}.latest-panel>div+div{border-left:1px solid var(--hair)}
+.latest-label{display:block;color:var(--muted);font-size:.66rem;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase}.latest-week{display:block;margin:.55rem 0 .2rem;
+  color:var(--right);font-family:Georgia,'Times New Roman',serif;font-size:2rem;font-weight:600}
+.latest-range{color:var(--muted);font-size:.78rem}.latest-summary{margin:.8rem 0 0;font-size:.84rem;
+  line-height:1.5}.latest-numbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.9rem;margin-top:.75rem}.latest-number strong{display:block;color:var(--right);
+  font-family:Georgia,'Times New Roman',serif;font-size:1.75rem;font-weight:600}
+.latest-number span{display:block;color:var(--muted);font-size:.7rem;line-height:1.35}
+.latest-tools{display:grid;gap:.55rem;margin-top:.75rem}.latest-tools a{display:flex;
+  align-items:center;justify-content:space-between;min-height:2.45rem;padding:.45rem .7rem;
+  border:1px solid var(--rule);background:white;color:var(--ink);font-size:.72rem;
+  font-weight:700;text-decoration:none}.latest-tools a:hover{border-color:var(--accent-dk);
+  background:#F2FAFC}.latest-tools a.primary{border-color:var(--ink);background:var(--ink);
+  color:white}.latest-tools a.primary:hover{background:var(--accent-dk);border-color:var(--accent-dk)}
+.research-spine{margin:0 0 3.25rem;border-top:1px solid var(--hair)}
+.research-spine-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
+  padding:1.5rem 0 1rem}.research-spine-head h2{margin:0;padding:0;border:0;color:var(--right);
+  font-family:Georgia,'Times New Roman',serif;font-size:1.7rem;font-weight:600}
+.research-spine-head p{margin:0;color:var(--muted);font-size:.78rem}
+.research-spine-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.research-spine-links a{min-height:6.2rem;padding:1.1rem 1.25rem;color:var(--ink);
+  text-decoration:none}.research-spine-links a:first-child{padding-left:0}
+.research-spine-links a+a{border-left:1px solid var(--hair)}
+.research-spine-links strong{display:block;font-family:Georgia,'Times New Roman',serif;
+  font-size:1.08rem;font-weight:600}.research-spine-links span{display:block;margin-top:.5rem;
+  color:var(--muted);font-size:.7rem;line-height:1.4}.research-spine-links a:hover strong{color:var(--accent-dk)}
+.recent-section h2{font-family:Georgia,'Times New Roman',serif;font-size:1.65rem;font-weight:600}
+.recent-section .grid{border-top:1px solid var(--hair)}
+.recent-section .grow{padding:.6rem 0}.recent-more{margin-top:1.25rem}
+@media(max-width:900px){.latest-panel{grid-template-columns:1fr 1.25fr}
+  .latest-panel>div:nth-child(3){grid-column:1/-1;border-left:0;border-top:1px solid var(--hair)}
+  .map-shell{grid-template-columns:1fr}.front-stats{grid-template-columns:repeat(2,1fr)}
+  .front-stat:nth-child(3){border-left:0;border-top:1px solid var(--hair)}
+  .front-stat:nth-child(4){border-top:1px solid var(--hair)}}
+@media(max-width:650px){.brand-lockup{width:auto;margin:0}.brand-lockup small{display:none}
+  .home-status{margin-bottom:2rem}.home-status a{margin-left:0}.home-title{font-size:2.75rem}
+  .home-page .site-release{position:static;width:max-content;margin:1rem 0 0}
+  .latest-head,.research-spine-head{display:block}.latest-head p,.research-spine-head p{margin-top:.45rem}
+  .latest-panel{grid-template-columns:1fr}.latest-panel>div+div{border-left:0;border-top:1px solid var(--hair)}
+  .latest-panel>div:nth-child(3){grid-column:auto}.latest-numbers{grid-template-columns:repeat(3,1fr)}
+  .research-spine-links{grid-template-columns:1fr 1fr}.research-spine-links a:nth-child(3){border-left:0;border-top:1px solid var(--hair)}
+  .research-spine-links a:nth-child(4){border-top:1px solid var(--hair)}
+  .map-section-head{display:block}.map-legend{margin-top:.65rem}}
+@media(max-width:430px){.front-stats{grid-template-columns:1fr}.front-stat+.front-stat{border-left:0;border-top:1px solid var(--hair)}
+  .research-spine-links{grid-template-columns:1fr}.research-spine-links a+a{border-left:0;border-top:1px solid var(--hair)}
+  .latest-numbers{grid-template-columns:1fr}.latest-number{padding-bottom:.45rem}}
 """
 
 from reportbuilder import REPORT_CSS  # noqa: E402
@@ -557,18 +683,11 @@ def camp_label(value):
 
 
 def party_display_name(party):
-    """Consistent public name: English / original language (acronym).
-
-    English-language names are not pointlessly repeated on both sides of the
-    slash, but still carry their acronym when one is configured.
-    """
+    """Consistent public name: English / original language (acronym)."""
     english = str(party.get("name") or party.get("short") or party.get("id") or "")
     original = str(party.get("original_name") or "").strip()
     acronym = str(party.get("acronym") or "").strip()
-    if original and original.casefold() != english.casefold():
-        label = f"{english} / {original}"
-    else:
-        label = english
+    label = f"{english} / {original}" if original else english
     if acronym:
         label += f" ({acronym})"
     return label
@@ -577,6 +696,7 @@ def party_display_name(party):
 def layout(title, body, depth=0, subtitle=""):
     up = "../" * depth
     page_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
+    body_class = "home" if title == SITE_NAME else ""
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
@@ -587,10 +707,11 @@ def layout(title, body, depth=0, subtitle=""):
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://www.neilbar.com">
 <title>{e(page_title)}</title>
 <link rel="stylesheet" href="{up}assets/style.css">
-</head><body><a class="skip-link" href="#main-content">Skip to content</a><div class="wrap">
+</head><body class="{body_class}"><a class="skip-link" href="#main-content">Skip to content</a><div class="wrap">
 <nav class="top" aria-label="Primary navigation">
-  <span class="brand-lockup"><a class="brand" href="{up}index.html">{SITE_NAME}</a>
-    <small>{e(SITE_EXPANSION)}</small></span>
+  <span class="brand-lockup"><span class="brand-mark" aria-hidden="true">R</span>
+    <span class="brand-copy"><a class="brand" href="{up}index.html">{SITE_NAME}</a>
+      <small>{e(SITE_EXPANSION)}</small></span></span>
   <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
     <a href="{up}index.html#latest">Latest weekly report</a>
     <a href="{up}archive.html">Report archive</a>
@@ -616,8 +737,7 @@ def layout(title, body, depth=0, subtitle=""):
       <a href="{up}elections.html">Verified election series</a>
       <a href="{up}dataset.html">Dataset and exports</a>
       <a href="{up}tutorials.html">Usage tutorials</a>
-      <a href="{up}citation.html">Suggested citation</a>
-      <a href="{up}corrections.html">Submit a correction</a></div>
+      <a href="{up}citation.html">Suggested citation</a></div>
   </div></details>
   <a href="{up}search.html">Search</a>
   <span class="spacer"></span>
@@ -772,7 +892,6 @@ def provenance_card_html(item):
               f'{code.get("coded_date") or "date not recorded"}') if code else "Not human-coded"
     chips = "".join(f'<span class="confidence-chip"><strong>{e(k)}:</strong> {e(v)}</span>'
                     for k, v in confidence_dimensions(item).items())
-    correction = f'../corrections.html?record={e(item.get("id"))}'
     fields = [
         ("Record ID", item.get("id") or ""),
         ("Source domain", domain),
@@ -789,7 +908,6 @@ def provenance_card_html(item):
     return (f'<details class="provenance-card"><summary>Record provenance and confidence</summary>'
             f'<div class="provenance-grid">{rows}<div><strong>Confidence dimensions</strong>'
             f'<span class="confidence-row">{chips}</span></div>'
-            f'<div><strong>Correction</strong><a href="{correction}">Flag this record</a></div>'
             '</div></details>')
 
 
@@ -2412,45 +2530,10 @@ ideological intensity, or total political activity.</div>
 <div class="tutorial-step">Start with the replication notebook and preserve the dataset version,
 download date, filters, and stable record links.</div>
 <div class="tutorial-step">Use the teaching sample only for exercises. Its AI summaries are not
-independently human-validated unless the row explicitly says otherwise.</div></div>
-<h2>Report a problem</h2><p>Use the <a href="corrections.html">correction form</a> from a record’s
-provenance card. Include a source URL and explain whether the issue concerns attribution, date,
-translation, summary, duplication, or party inclusion.</p>'''
+independently human-validated unless the row explicitly says otherwise.</div></div>'''
     path = os.path.join(out_dir, "tutorials.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout("Usage tutorials", body, subtitle="how to use RAPPORT"))
-    return path
-
-
-def corrections_page(out_dir):
-    body = r'''<h1>Submit a correction</h1>
-<p class="lede">Prepare a precise correction request in your browser. RAPPORT is a static
-site, so this page does not transmit or store your entry. Copy the completed request and send
-it through <a href="https://www.neilbar.com" rel="me">www.neilbar.com</a>.</p>
-<div class="research-tool"><div class="tool-grid">
-<label>Record ID or stable URL<input id="correction-record"></label>
-<label>Issue type<select id="correction-type"><option>Factual summary</option><option>Quotation</option>
-<option>Translation</option><option>Date or attribution</option><option>Duplicate</option>
-<option>Party inclusion or source</option><option>Other</option></select></label>
-<label>Your name (optional)<input id="correction-name"></label>
-<label>Supporting source URL<input id="correction-source" type="url"></label></div>
-<label>What should change, and why?<textarea id="correction-detail" rows="6"></textarea></label>
-<div class="tool-actions"><button id="correction-build" type="button">Prepare request</button>
-<button id="correction-copy" type="button">Copy request</button>
-<a href="https://www.neilbar.com" rel="me">Open contact website</a></div>
-<div id="correction-preview" class="correction-preview" aria-live="polite">Complete the fields, then prepare the request.</div></div>
-<p class="meta">Please do not send sensitive personal data. Published corrections should retain
-the original record identifier, correction date, reason, and replacement evidence.</p>
-<script>
-const c=id=>document.getElementById(id);
-const params=new URLSearchParams(location.search);c('correction-record').value=params.get('record')||'';
-function correctionText(){return `RAPPORT correction request\n\nRecord: ${c('correction-record').value||'(not supplied)'}\nIssue: ${c('correction-type').value}\nSupporting source: ${c('correction-source').value||'(not supplied)'}\nSubmitted by: ${c('correction-name').value||'(not supplied)'}\n\nRequested change and reason:\n${c('correction-detail').value||'(not supplied)'}\n\nPrepared: ${new Date().toISOString()}`}
-c('correction-build').addEventListener('click',()=>c('correction-preview').textContent=correctionText());
-c('correction-copy').addEventListener('click',async()=>{const value=correctionText();c('correction-preview').textContent=value;try{await navigator.clipboard.writeText(value);c('correction-copy').textContent='Copied'}catch(_e){c('correction-copy').textContent='Select the text below'}});
-</script>'''
-    path = os.path.join(out_dir, "corrections.html")
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Submit a correction", body, subtitle="transparent correction workflow"))
     return path
 
 
@@ -2570,7 +2653,7 @@ def parties_page(parties, totals, country_names, out_dir, representation=None):
         for code in sorted({p.get("country") for p in parties if p.get("country")},
                            key=lambda code: country_names.get(code, code))
     )
-    cards = []
+    rows = []
     for party in ordered:
         country_code = party.get("country") or ""
         country = country_names.get(country_code, country_code)
@@ -2583,19 +2666,20 @@ def parties_page(parties, totals, country_names, out_dir, representation=None):
         power = (f'{seats} / {total} national seats' if verified
                  else 'national seat total pending')
         records = int(totals.get(party["id"], 0))
-        cards.append(
-            f'<article class="party-card {e(party.get("camp") or "right")}" '
+        rows.append(
+            f'<article class="party-row {e(party.get("camp") or "right")}" '
             f'data-name="{e(party_display_name(party).casefold())}" '
             f'data-country="{e(country_code)}" data-country-name="{e(country.casefold())}" '
             f'data-family="{e(party.get("camp") or "right")}" data-status="{status}" '
             f'data-records="{records}" data-seats="{seats}">'
-            f'<h2><a href="parties/{e(party["id"])}.html">'
-            f'{e(party_display_name(party))}</a></h2>'
+            '<span class="party-camp-mark" aria-hidden="true"></span>'
+            '<div class="party-row-main">'
+            f'<h2><a href="parties/{e(party["id"])}.html">{e(party_display_name(party))}</a></h2>'
             f'<div class="party-tags"><span class="party-tag">{e(country)}</span>'
             f'<span class="party-tag">{e(family)}</span>'
-            f'<span class="party-tag power">{e(power)}</span></div>'
-            f'<div class="party-card-foot"><span>{records} retained records</span>'
-            '<span>Open profile →</span></div></article>'
+            f'<span class="party-tag power">{e(power)}</span></div></div>'
+            f'<div class="party-row-records"><strong>{records}</strong>'
+            f'<span>{"record" if records == 1 else "records"}</span></div></article>'
         )
 
     body = f'''<h1>Parties</h1><p class="lede">{len(parties)} parties across
@@ -2614,12 +2698,12 @@ English / original language (acronym). Political-power figures are dated on each
   <option value="records">Most records</option><option value="seats">Most national seats</option></select></label>
  <div class="party-directory-status" id="party-count" aria-live="polite">{len(parties)} parties</div>
 </div>
-<div class="party-directory-grid" id="party-grid">{''.join(cards)}</div>
+<div class="party-directory-list" id="party-grid">{''.join(rows)}</div>
 <div class="party-directory-empty" id="party-empty" hidden>No parties match these filters.</div>
 <script>
 (() => {{
   const grid = document.getElementById('party-grid');
-  const cards = [...grid.querySelectorAll('.party-card')];
+  const cards = [...grid.querySelectorAll('.party-row')];
   const query = document.getElementById('party-query');
   const country = document.getElementById('party-country');
   const family = document.getElementById('party-family');
@@ -2725,7 +2809,7 @@ def _home_map(parties, country_names):
         plist = by_country[code]
         name = country_names.get(code, code)
         party_records = [{"id": p["id"],
-                          "name": p.get("short") or p.get("name") or p["id"],
+                          "name": party_display_name(p),
                           "camp": p.get("camp", "right"),
                           "label": camp_label(p.get("camp"))}
                          for p in plist]
@@ -2839,13 +2923,18 @@ def _home_map(parties, country_names):
       }
     });
   }
+  const initialCountry = records.DE ? 'DE' : Object.keys(records)[0];
+  if (initialCountry) showCountry(initialCountry);
 })();
 </script>""".replace("__MAP_DATA__", data)
 
     source = geometry.get("source") or "Natural Earth"
     source_url = geometry.get("source_url") or "https://www.naturalearthdata.com/"
     return f"""<section class="map-section" aria-labelledby="map-heading">
-<div class="map-section-head"><h2 id="map-heading">Where we are watching</h2>
+<div class="section-kicker">Explore the monitored field</div>
+<div class="map-section-head"><div class="map-section-title">
+<h2 id="map-heading">Parties, placed in context.</h2>
+<p>Select a country to see its monitored parties. Every party name opens a stable research dossier.</p></div>
 <div class="map-legend" aria-label="Map legend"><span><i class="watched"></i>Monitored</span>
 <span><i></i>Other country</span></div></div>
 <div class="map-shell">
@@ -2884,38 +2973,76 @@ def home_page(latest, index, parties, country_names, out_dir, research=None):
     except (TypeError, ValueError):
         release_label = release
     release_html = (f'<div class="site-release">Website version {e(version)}'
-                    f'{" · released " + e(release_label) if release_label else ""}</div>')
-    latest_action = (f'<a class="primary" href="issues/{e(latest["week"])}.html">'
-                     'Read latest report</a>' if latest else
-                     '<a class="primary" href="archive.html">Browse reports</a>')
-    intro = f"""<p class="meta">{e(SITE_EXPANSION)}</p><h1>{SITE_NAME}</h1>
-<p class="lede">{e(SITE_DESCRIPTION)}</p>{release_html}
-<p class="research-note">This is an automated AI system powered by the Claude API,
+                    f'{" · " + e(release_label) if release_label else ""}</div>')
+    total_records = sum(int(row.get("items") or 0) for row in index)
+    latest_label = e(latest.get("week")) if latest else "No issue yet"
+    status = f"""<div class="home-status" aria-label="Publication status">
+<span class="status-dot" aria-hidden="true"></span>
+<span><strong>Latest issue:</strong> {latest_label}</span>
+<span><strong>Dataset:</strong> version {e(version)}</span>
+<span><strong>Release:</strong> {e(release_label or 'not dated')}</span>
+<a href="citation.html">How to cite RAPPORT</a></div>"""
+    hero = f"""<header class="home-hero">
+<div class="home-kicker">Automated academic research infrastructure</div>
+<h1 class="home-title">A clearer weekly record of party activity.</h1>
+<p class="home-lede">{e(SITE_DESCRIPTION)}</p>{release_html}
+<p class="research-note">RAPPORT is an automated AI system powered by the Claude API,
 created by <strong>Dr. Neil Bar</strong> solely for academic research into contemporary
-far-right and far-left parties. Project information and contact:
+far-right and far-left parties. Project information:
 <a class="email" href="https://www.neilbar.com" rel="me">www.neilbar.com</a>.
-AI-generated material may contain errors; consult the cited primary sources.</p>
-<div class="front-stats" aria-label="Monitoring overview">
- <div class="front-stat"><span class="v">{country_count}</span><span class="k">countries tracked</span></div>
- <div class="front-stat"><span class="v">{len(parties)}</span><span class="k">parties tracked</span></div>
-</div><nav class="quick-actions" aria-label="Quick actions">{latest_action}
- <a href="compare.html">Compare parties</a><a href="search.html">Search archive</a>
- <a href="dataset.html">Download data</a></nav>{_home_map(parties, country_names)}"""
+AI-generated material may contain errors; consult the cited primary sources.</p></header>
+<section class="front-stats" aria-label="Monitoring overview">
+ <div class="front-stat"><span class="v">{country_count}</span><span class="k">countries monitored</span></div>
+ <div class="front-stat"><span class="v">{len(parties)}</span><span class="k">active parties tracked</span></div>
+ <div class="front-stat"><span class="v">{total_records}</span><span class="k">retained records in published reports</span></div>
+ <div class="front-stat"><span class="v">Weekly</span><span class="k">collection and publication cycle</span></div>
+</section>"""
+    map_html = _home_map(parties, country_names)
+    research_spine = """<section class="research-spine" aria-labelledby="research-spine-heading">
+<div class="research-spine-head"><h2 id="research-spine-heading">The research spine</h2>
+<p>Transparent methods, reusable records and stable references.</p></div>
+<div class="research-spine-links">
+ <a href="methodology.html"><strong>Methodology →</strong><span>Scope, inclusion rules, source hierarchy and AI-assisted workflow.</span></a>
+ <a href="dataset.html"><strong>Dataset &amp; exports →</strong><span>Weekly CSV, JSON and citation-manager formats.</span></a>
+ <a href="citation.html"><strong>Suggested citation →</strong><span>Stable references for the platform, issues and records.</span></a>
+ <a href="quality.html"><strong>Quality &amp; validation →</strong><span>Coverage, review status and validation limits.</span></a>
+</div></section>"""
     if not latest:
-        body = (intro + '<div class="box dashed"><p>No issues yet.</p>'
-                '<p class="meta">Run <code>python run.py weekly</code> to build the first one.</p></div>')
+        latest_html = """<section class="latest-section" id="latest">
+<div class="latest-head"><div><div class="section-kicker">Latest report</div>
+<h2>The week, distilled.</h2></div></div>
+<div class="box dashed"><p>No issues yet.</p>
+<p class="meta">Run <code>python run.py weekly</code> to build the first one.</p></div></section>"""
+        recent_html = ""
     else:
+        latest_html = f"""<section class="latest-section" id="latest" aria-labelledby="latest-heading">
+<div class="latest-head"><div><div class="section-kicker">Latest report</div>
+<h2 id="latest-heading">The week, distilled.</h2></div>
+<p>Read the report, inspect every record, or export the issue.</p></div>
+<div class="latest-panel"><div>
+ <span class="latest-label">Issue</span><span class="latest-week">{e(latest['week'])}</span>
+ <span class="latest-range">{e(latest.get('range'))}</span>
+ <p class="latest-summary">{e(latest.get('headline'))}</p></div>
+<div><span class="latest-label">At a glance</span><div class="latest-numbers">
+ <div class="latest-number"><strong>{int(latest.get('items') or 0)}</strong><span>retained records</span></div>
+ <div class="latest-number"><strong>{int(latest.get('parties') or 0)}</strong><span>parties represented</span></div>
+ <div class="latest-number"><strong>Published</strong><span>issue status</span></div>
+</div></div>
+<div><span class="latest-label">Issue tools</span><div class="latest-tools">
+ <a class="primary" href="issues/{e(latest['week'])}.html"><span>Read report</span><span>↗</span></a>
+ <a href="data/{e(latest['week'])}.csv" download><span>Download dataset</span><span>CSV ↓</span></a>
+ <a href="archive.html"><span>View all reports</span><span>{len(index)} ↗</span></a>
+</div></div></div></section>"""
         recent = "".join(
             f'<div class="grow"><span><a href="issues/{e(r["week"])}.html">{e(r["week"])}</a> '
             f'<span class="meta">{e(r["range"])}</span></span>'
-            f'<span class="meta">{r["items"]}</span></div>' for r in index[:8])
-        body = intro + f"""<div class="box" id="latest"><h4>Latest issue · week {e(latest['week'])}</h4>
-<p>{e(latest['headline'])}</p>
-<p><a href="issues/{e(latest['week'])}.html">Read week {e(latest['week'])}</a>
- · <a href="data/{e(latest['week'])}.csv">coding rows (CSV)</a></p></div>
-<h2>Recent</h2><div class="grid">{recent}</div>
-<p style="margin-top:1.4rem"><a href="archive.html">All {len(index)} issues</a>
- · <a href="parties.html">Party pages</a></p>"""
+            f'<span class="meta">{r["items"]} records</span></div>' for r in index[1:9])
+        recent_html = (f'<section class="recent-section"><h2>Previous reports</h2>'
+                       f'<div class="grid">{recent}</div><p class="recent-more">'
+                       f'<a href="archive.html">Browse all {len(index)} reports</a> · '
+                       '<a href="parties.html">Explore party dossiers</a></p></section>') if recent else ""
+    body = (f'<div class="home-page">{status}{hero}{map_html}{latest_html}'
+            f'{research_spine}{recent_html}</div>')
     path = os.path.join(out_dir, "index.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write(layout(SITE_NAME, body,
