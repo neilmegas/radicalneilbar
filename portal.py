@@ -16,7 +16,7 @@ import json
 import os
 import shutil
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from urllib.parse import urlparse
 
 from evidence import PROVENANCE
@@ -1676,7 +1676,11 @@ def _seat_card(label, row, fallback_source=None):
     seats, total = int(row.get("seats", 0)), int(row.get("total", 0))
     width = min(100, max(0, 100 * seats / total)) if total else 0
     source = row.get("source") or (fallback_source or {}).get("url")
-    source_link = (f'<a href="{e(source)}" rel="noreferrer">source</a>' if source else "")
+    source_host = (urlparse(source).hostname or "").lower() if source else ""
+    source_label = ("Wikipedia source" if source_host.endswith("wikipedia.org")
+                    else "official parliamentary source")
+    source_link = (f'<a href="{e(source)}" rel="noreferrer">{source_label}</a>'
+                   if source else "")
     basis = row.get("basis") or ""
     note = row.get("note") or ""
     context = " · ".join(v for v in (str(row.get("as_of") or "current verified total"),
@@ -1716,15 +1720,27 @@ def representation_html(party, representation):
                       election_source["url"]))
 
     parts = ['<section aria-labelledby="representation-heading"><h2 id="representation-heading">'
-             'Representation</h2><p class="meta">Current representation is kept separate '
-             'from election-result seats. Figures appear only after source verification.</p>',
+             'Representation</h2><p class="meta">National cards show officially attributed '
+             'seats in the sitting chamber. An incoming card appears only after a concluded '
+             'election and before the new legislature takes office. European cards show the '
+             '2024 election allocation. Every number links to an official parliamentary '
+             'website or Wikipedia.</p>',
              '<div class="profile-links">']
     parts.extend(f'<a href="{e(url)}" rel="noreferrer">{e(label)}</a>'
                  for label, url in links)
     parts.append('</div><div class="representation-grid">')
     current = profile.get("current") or {}
-    parts.append(_seat_card("National parliament", current.get("national"),
-                            country.get("parliament")))
+    national = current.get("national")
+    incoming = current.get("incoming_national")
+    # An election can be final while the outgoing chamber is still legally in
+    # office. Static rebuilds switch the card on the published effective date.
+    if (incoming and incoming.get("effective_from") and
+            str(incoming["effective_from"]) <= date.today().isoformat()):
+        national, incoming = incoming, None
+    parts.append(_seat_card("National parliament", national, country.get("parliament")))
+    if incoming:
+        parts.append(_seat_card("Incoming national parliament", incoming,
+                                country.get("parliament")))
     if country.get("eu_member") or current.get("european"):
         parts.append(_seat_card("European Parliament", current.get("european"),
                                 representation.get("european_parliament")))

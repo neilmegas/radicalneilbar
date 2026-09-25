@@ -1,9 +1,9 @@
-# Official institutional sources used on party pages.  Party-specific seat
-# figures belong under `parties:` only after they have been checked against
-# the linked parliament or election authority.  The site deliberately shows
-# an explicit verification-pending state instead of guessing or carrying a
-# stale number forward.
-checked_on: "2026-09-24"
+# Parliamentary and Wikipedia sources used on party pages. Party-specific
+# seat figures belong under `parties:` only after they have been checked
+# against an official parliamentary website or Wikipedia. The site
+# deliberately shows an explicit verification-pending state instead of
+# guessing or carrying a stale number forward.
+checked_on: "2026-09-25"
 european_parliament:
   label: European Parliament members
   url: "https://www.europarl.europa.eu/meps/en/search/advanced"
@@ -14,25 +14,26 @@ european_parliament:
 # chamber so figures remain comparable and unambiguous.
 seat_templates:
   gr: &gr_current {total: 300, as_of: "2026-09-24", basis: "current parliamentary groups and affiliations", source: "https://www.hellenicparliament.gr/vouleftes/ana-koinovouleftiki-omada/"}
-  de: &de_current {total: 630, as_of: "2026-09-24", basis: "21st Bundestag", source: "https://www.bundestag.de/en/parliament/plenary/distributionofseats"}
-  fr: &fr_current {total: 577, as_of: "2026-09-24", basis: "current National Assembly groups or party affiliation", source: "https://www2.assemblee-nationale.fr/deputes/liste/groupe-politique"}
-  at: &at_current {total: 183, as_of: "2026-09-24", basis: "current National Council", source: "https://www.parlament.gv.at/en/explore/members-and-parties/"}
-  nl: &nl_current {total: 150, as_of: "2026-09-24", basis: "current House of Representatives groups", source: "https://www.houseofrepresentatives.nl/members_of_parliament/parliamentary_parties"}
-  be: &be_current {total: 150, as_of: "2026-09-24", basis: "current Chamber of Representatives groups", source: "https://www.dekamer.be/kvvcr/showpage.cfm?section=/depute&language=en&cfm=cvlist54.cfm"}
-  se: &se_current {total: 349, as_of: "2026-09-19", basis: "final 2026 election seat allocation", source: "https://www.val.se/english/election-results/elections-to-the-riksdag-and-regional-and-municipal-councils/election-results-2026", note: "The 2026–2030 Riksdag convenes for roll-call on 28 September 2026."}
-  fi: &fi_current {total: 200, as_of: "2026-09-24", basis: "current parliamentary groups", source: "https://www.eduskunta.fi/fi/kansanedustajat-ja-toimielimet/eduskuntaryhmat"}
-  it: &it_current {label: "Chamber of Deputies", total: 400, as_of: "2026-09-24", basis: "current lower-house groups", source: "https://www.camera.it/leg19/217"}
-  es: &es_current {label: "Congress of Deputies", total: 350, as_of: "2026-09-24", basis: "current lower-house groups and party affiliation", source: "https://www.congreso.es/en/grupos/composicion-en-la-legislatura"}
-  gb: &gb_current {label: "House of Commons", total: 650, as_of: "2026-09-24", basis: "current party affiliation", source: "https://members.parliament.uk/parties/Commons"}
+  de: &de_current {total: 630, as_of: "2026-09-25", basis: "current 21st Bundestag party affiliation", source: "https://www.bundestag.de/en/parliament/plenary/distributionofseats"}
+  fr: &fr_current {total: 577, as_of: "2026-09-25", basis: "current National Assembly groups or party affiliation", source: "https://www2.assemblee-nationale.fr/deputes/liste/groupe-politique"}
+  at: &at_current {total: 183, as_of: "2026-09-25", basis: "current National Council", source: "https://www.parlament.gv.at/recherchieren/personen/nationalrat/sitzplan/index.html"}
+  nl: &nl_current {total: 150, as_of: "2026-01-31", basis: "House of Representatives seat distribution published January 2026", source: "https://www.houseofrepresentatives.nl/sites/default/files/2026-02/202602_distributionofseats.pdf"}
+  be: &be_current {total: 150, as_of: "2026-09-25", basis: "current Chamber of Representatives groups", source: "https://www.dekamer.be/kvvcr/showpage.cfm?section=/depute&language=en&cfm=cvlist54.cfm"}
+  se: &se_current {total: 349, as_of: "2026-09-25", basis: "sitting 2022–2026 Riksdag; remains in office until 28 September 2026", source: "https://www.riksdagen.se/en/members-and-parties/"}
+  se_incoming: &se_incoming {label: "Incoming Riksdag", total: 349, as_of: "2026-09-21", effective_from: "2026-09-28", basis: "final 2026 allocation; takes office 28 September 2026", source: "https://www.riksdagen.se/en/news/articles/2026/sep/19/the-new-riksdag-after-the-elections_cmsad780a37-f1ae-4d47-a4a7-b6ea2a69a21een/"}
+  fi: &fi_current {total: 200, as_of: "2026-09-25", basis: "current parliamentary groups", source: "https://www.eduskunta.fi/en/members-and-parliamentary-bodies/parliamentary-groups"}
+  it: &it_current {label: "Chamber of Deputies", total: 400, as_of: "2026-09-25", basis: "current lower-house parliamentary groups", source: "https://it.wikipedia.org/wiki/Deputati_della_XIX_legislatura_della_Repubblica_Italiana"}
+  es: &es_current {label: "Congress of Deputies", total: 350, as_of: "2026-09-25", basis: "current lower-house groups and party affiliation", source: "https://www.congreso.es/es/grupos/composicion-en-la-legislatura"}
+  gb: &gb_current {label: "House of Commons", total: 650, as_of: "2026-09-25", basis: "current party affiliation", source: "https://members.parliament.uk/parties/Commons"}
   cy: &cy_current {total: 56, as_of: "2026-05-24", basis: "2026 election allocation; occupied Greek-Cypriot seats", source: "https://www.parliament.cy/el/general-information/%CE%B2%CE%BF%CF%85%CE%BB%CE%B5%CF%85%CF%84%CE%B9%CE%BA%CE%AD%CF%82-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CE%AD%CF%82/%CE%B2%CE%BF%CF%85%CE%BB%CE%B5%CF%85%CF%84%CE%B9%CE%BA%CE%AD%CF%82-%CE%B5%CE%BA%CE%BB%CE%BF%CE%B3%CE%AD%CF%82-24%CE%B7%CF%82-%CE%BC%CE%B1%CE%90%CE%BF%CF%85-2026"}
-  pt: &pt_current {total: 230, as_of: "2026-09-24", basis: "current Assembly of the Republic", source: "https://www.parlamento.pt/DeputadoGP/Paginas/GruposParlamentaresI.aspx"}
-  no: &no_current {total: 169, as_of: "2026-09-24", basis: "current Storting groups", source: "https://www.stortinget.no/en/In-English/Members-of-the-Storting/current-members-of-parliament/"}
-  dk: &dk_current {total: 179, as_of: "2026-09-24", basis: "current Folketing groups", source: "https://www.thedanishparliament.dk/en/members"}
-  ie: &ie_current {label: "Dáil Éireann", total: 174, as_of: "2026-09-24", basis: "current lower-house party affiliation", source: "https://www.oireachtas.ie/en/members/"}
-  lu: &lu_current {total: 60, as_of: "2026-09-24", basis: "current Chamber of Deputies", source: "https://www.chd.lu/en/deputies"}
-  ch: &ch_current {label: "National Council", total: 200, as_of: "2026-09-24", basis: "current lower-house party affiliation", source: "https://www.parlament.ch/en/ratsmitglieder"}
-  is: &is_current {total: 63, as_of: "2026-09-24", basis: "current Althingi party affiliation", source: "https://www.althingi.is/altext/cv/en/"}
-  il: &il_current {total: 120, as_of: "2026-09-24", basis: "25th Knesset party/faction affiliation", source: "https://main.knesset.gov.il/en/mk/apps/faction/faction-lobby"}
+  pt: &pt_current {total: 230, as_of: "2026-09-25", basis: "current Assembly of the Republic", source: "https://www.parlamento.pt/DeputadoGP/Paginas/GruposParlamentaresI.aspx"}
+  no: &no_current {total: 169, as_of: "2026-09-25", basis: "current Storting groups", source: "https://www.stortinget.no/en/In-English/Members-of-the-Storting/current-members-of-parliament/"}
+  dk: &dk_current {total: 179, as_of: "2026-09-25", basis: "current Folketing groups", source: "https://www.thedanishparliament.dk/en/members"}
+  ie: &ie_current {label: "Dáil Éireann", total: 174, as_of: "2026-09-25", basis: "current lower-house party affiliation", source: "https://www.oireachtas.ie/en/members/"}
+  lu: &lu_current {total: 60, as_of: "2026-09-25", basis: "current Chamber of Deputies", source: "https://www.chd.lu/en/deputies"}
+  ch: &ch_current {label: "National Council", total: 200, as_of: "2026-09-25", basis: "current lower-house party affiliation", source: "https://www.parlament.ch/en/organe/national-council"}
+  is: &is_current {total: 63, as_of: "2026-09-25", basis: "current Althingi party affiliation", source: "https://www.althingi.is/altext/cv/en/"}
+  il: &il_current {total: 120, as_of: "2026-09-25", basis: "25th Knesset party/faction affiliation", source: "https://main.knesset.gov.il/en/mk/apps/faction"}
   eu_2024: &eu_2024 {label: "European Parliament (2024 result)", total: 720, as_of: "2024-07-16", basis: "seats won at the 2024 European election; not a live affiliation count", source: "https://results.elections.europa.eu/en/"}
 
 country_sources:
@@ -125,67 +126,95 @@ parties:
   niki: {current: {national: {<<: *gr_current, seats: 8}, european: {<<: *eu_2024, seats: 1}}}
   spartiates: {current: {national: {<<: *gr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   symmachiaellinon:
-    links:
-      domestic: {label: Parliamentary work and affiliated MPs, url: "https://symmaxia.net/koinovoyleytiko-ergo/"}
     current:
-      national: {<<: *gr_current, label: "Party-identified MPs", seats: 3, source: "https://symmaxia.net/category/syntaktiki-omada/", note: "The party identifies three sitting MPs; the Hellenic Parliament lists them formally among the independents rather than as a recognized parliamentary group."}
+      national: {<<: *gr_current, label: "Officially attributed seats", seats: 0, note: "The Hellenic Parliament lists the party's associated MPs as independents, so RAPPORT does not count them as party seats."}
       european: {<<: *eu_2024, seats: 0}
   fonilogikis: {current: {national: {<<: *gr_current, seats: 0}, european: {<<: *eu_2024, seats: 1}}}
   mera25: {current: {national: {<<: *gr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   syriza: {current: {national: {<<: *gr_current, seats: 10}, european: {<<: *eu_2024, seats: 4}}}
   kke: {current: {national: {<<: *gr_current, seats: 21}, european: {<<: *eu_2024, seats: 2}}}
+  antarsya: {current: {national: {<<: *gr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
-  afd: {current: {national: {<<: *de_current, seats: 152}, european: {<<: *eu_2024, seats: 15}}}
+  afd: {current: {national: {<<: *de_current, seats: 151, note: "The AfD won 152 seats in 2025; one member subsequently left the parliamentary group."}, european: {<<: *eu_2024, seats: 15}}}
   dritteweg: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   heimat: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 1}}}
   bsw: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 6}}}
   dielinke: {current: {national: {<<: *de_current, seats: 64}, european: {<<: *eu_2024, seats: 3}}}
+  mlpd: {current: {national: {<<: *de_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   rn: {current: {national: {<<: *fr_current, seats: 122}, european: {<<: *eu_2024, seats: 30}}}
   lfi: {current: {national: {<<: *fr_current, seats: 71}, european: {<<: *eu_2024, seats: 9}}}
   pcf:
     current:
-      national: {<<: *fr_current, label: "PCF-affiliated deputies", seats: 9, note: "Party-affiliated deputies are shown, not the full 17-member GDR parliamentary group."}
+      national: {<<: *fr_current, label: "PCF-affiliated deputies", seats: 8, source: "https://en.wikipedia.org/wiki/French_Communist_Party", note: "Party-affiliated deputies are shown, not the full 17-member GDR parliamentary group."}
       european: {<<: *eu_2024, seats: 0}
   reconquete: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 5}}}
+  lo: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  npaa: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  npar: {current: {national: {<<: *fr_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   fpo: {current: {national: {<<: *at_current, seats: 57}, european: {<<: *eu_2024, seats: 6}}}
   kpoe: {current: {national: {<<: *at_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
-  pvv: {current: {national: {<<: *nl_current, seats: 19}, european: {<<: *eu_2024, seats: 6}}}
+  pvv: {current: {national: {<<: *nl_current, seats: 26}, european: {<<: *eu_2024, seats: 6}}}
   fvd: {current: {national: {<<: *nl_current, seats: 7}, european: {<<: *eu_2024, seats: 0}}}
   pvdd: {current: {national: {<<: *nl_current, seats: 3}, european: {<<: *eu_2024, seats: 1}}}
   denk: {current: {national: {<<: *nl_current, seats: 3}, european: {<<: *eu_2024, seats: 0}}}
   ja21: {current: {national: {<<: *nl_current, seats: 9}, european: {<<: *eu_2024, seats: 0}}}
   spnl: {current: {national: {<<: *nl_current, seats: 3}, european: {<<: *eu_2024, seats: 0}}}
+  bij1: {current: {national: {<<: *nl_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   vlaamsbelang: {current: {national: {<<: *be_current, seats: 20}, european: {<<: *eu_2024, seats: 3}}}
   ptb: {current: {national: {<<: *be_current, seats: 15}, european: {<<: *eu_2024, seats: 2}}}
 
-  sd: {current: {national: {<<: *se_current, seats: 62}, european: {<<: *eu_2024, seats: 3}}}
+  sd:
+    current:
+      national: {<<: *se_current, seats: 70}
+      incoming_national: {<<: *se_incoming, seats: 62}
+      european: {<<: *eu_2024, seats: 3}
   nmr: {current: {national: {<<: *se_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
-  vansterpartiet: {current: {national: {<<: *se_current, seats: 30}, european: {<<: *eu_2024, seats: 2}}}
+  vansterpartiet:
+    current:
+      national: {<<: *se_current, seats: 22}
+      incoming_national: {<<: *se_incoming, seats: 30}
+      european: {<<: *eu_2024, seats: 2}
+  afs: {current: {national: {<<: *se_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   finns: {current: {national: {<<: *fi_current, seats: 45}, european: {<<: *eu_2024, seats: 1}}}
   vasemmistoliitto: {current: {national: {<<: *fi_current, seats: 11}, european: {<<: *eu_2024, seats: 3}}}
+  skp: {current: {national: {<<: *fi_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   fdi:
     links:
       domestic: {label: Fratelli d’Italia parliamentary group, url: "https://www.camera.it/leg19/217?idlegislatura=19&shadow_gruppi_misti=&shadow_gruppi_parlamentari=4133&tipoVis="}
-    current: {national: {<<: *it_current, seats: 118}, european: {<<: *eu_2024, seats: 24}}
+    current: {national: {<<: *it_current, seats: 117}, european: {<<: *eu_2024, seats: 24}}
   casapound: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
-  lega: {current: {national: {<<: *it_current, seats: 56}, european: {<<: *eu_2024, seats: 8}}}
+  lega: {current: {national: {<<: *it_current, seats: 61}, european: {<<: *eu_2024, seats: 8}}}
   forzanuova: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   poterealpopolo: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
   rifondazione: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  pci: {current: {national: {<<: *it_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   vox: {current: {national: {<<: *es_current, seats: 32}, european: {<<: *eu_2024, seats: 6}}}
   podemos: {current: {national: {<<: *es_current, seats: 4}, european: {<<: *eu_2024, seats: 2}}}
+  pce:
+    links:
+      domestic: {label: Enrique Santiago · Congress of Deputies, url: "https://www.congreso.es/es/busqueda-de-diputados?_diputadomodule_mostrarFicha=true&codParlamentario=125&idLegislatura=XV"}
+    current:
+      national: {<<: *es_current, label: "PCE-affiliated deputies", seats: 1, source: "https://www.congreso.es/es/busqueda-de-diputados?_diputadomodule_mostrarFicha=true&codParlamentario=125&idLegislatura=XV", note: "The party's secretary-general, Enrique Santiago, sits within the Sumar parliamentary group."}
+      european: {<<: *eu_2024, seats: 0}
+  fejons: {current: {national: {<<: *es_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   reformuk: {current: {national: {<<: *gb_current, seats: 8}}}
   restorebritain: {current: {national: {<<: *gb_current, seats: 1}}}
   wpb: {current: {national: {<<: *gb_current, seats: 0}}}
   greenparty: {current: {national: {<<: *gb_current, seats: 5}}}
+  cpb: {current: {national: {<<: *gb_current, seats: 0}}}
+  yourparty:
+    links:
+      domestic: {label: Your Party in the House of Commons, url: "https://members.parliament.uk/parties/commons"}
+    current:
+      national: {<<: *gb_current, seats: 2}
 
   akel: {current: {national: {<<: *cy_current, seats: 15}, european: {<<: *eu_2024, seats: 1}}}
   elam: {current: {national: {<<: *cy_current, seats: 8}, european: {<<: *eu_2024, seats: 1}}}
@@ -197,6 +226,8 @@ parties:
   roedt: {current: {national: {<<: *no_current, seats: 9}}}
   svno: {current: {national: {<<: *no_current, seats: 9}}}
   frp: {current: {national: {<<: *no_current, seats: 47}}}
+  norgesdemokratene: {current: {national: {<<: *no_current, seats: 0}}}
+  nkp: {current: {national: {<<: *no_current, seats: 0}}}
 
   enhedslisten: {current: {national: {<<: *dk_current, seats: 11}, european: {<<: *eu_2024, seats: 1}}}
   danmarksdemokraterne: {current: {national: {<<: *dk_current, seats: 10}, european: {<<: *eu_2024, seats: 0}}}
@@ -204,24 +235,34 @@ parties:
 
   pbp:
     current:
-      national: {<<: *ie_current, seats: 2, note: "People Before Profit has two TDs; the wider People Before Profit–Solidarity technical group has three."}
+      national: {<<: *ie_current, seats: 2, source: "https://en.wikipedia.org/wiki/People_Before_Profit", note: "People Before Profit has two TDs; the wider People Before Profit–Solidarity technical group has three."}
       european: {<<: *eu_2024, seats: 0}
+  nationalpartyie: {current: {national: {<<: *ie_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  irishfreedom: {current: {national: {<<: *ie_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
+  workerspartyie: {current: {national: {<<: *ie_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   deilenk: {current: {national: {<<: *lu_current, seats: 2}, european: {<<: *eu_2024, seats: 0}}}
   adr: {current: {national: {<<: *lu_current, seats: 5}, european: {<<: *eu_2024, seats: 0}}}
+  kpl: {current: {national: {<<: *lu_current, seats: 0}, european: {<<: *eu_2024, seats: 0}}}
 
   svp: {current: {national: {<<: *ch_current, seats: 62}}}
   solidarites: {current: {national: {<<: *ch_current, seats: 0}}}
   legaticinesi: {current: {national: {<<: *ch_current, seats: 1}}}
   mcg: {current: {national: {<<: *ch_current, seats: 2}}}
+  pda: {current: {national: {<<: *ch_current, seats: 0}}}
 
   socialistiskflokk: {current: {national: {<<: *is_current, seats: 0}}}
 
   otzma: {current: {national: {<<: *il_current, seats: 6}}}
   noam: {current: {national: {<<: *il_current, seats: 1}}}
   zehut: {current: {national: {<<: *il_current, seats: 0}}}
+  religiouszionism:
+    links:
+      domestic: {label: Knesset parliamentary-group split record, url: "https://main.knesset.gov.il/en/mk/apps/faction/general/split-merge"}
+    current:
+      national: {<<: *il_current, seats: 7, source: "https://main.knesset.gov.il/en/mk/apps/faction/general/split-merge", note: "The Knesset records seven members in the Religious Zionism parliamentary group after the 2022 list split."}
   hadash:
     current:
-      national: {<<: *il_current, label: "Hadash-affiliated MKs", seats: 3, note: "Hadash-affiliated members are shown; the joint Hadash–Ta’al faction has five seats."}
+      national: {<<: *il_current, label: "Hadash-affiliated MKs", seats: 3, source: "https://en.wikipedia.org/wiki/Hadash", note: "Hadash-affiliated members are shown; the joint Hadash–Ta’al faction has five seats."}
   balad: {current: {national: {<<: *il_current, seats: 0}}}
   daam: {current: {national: {<<: *il_current, seats: 0}}}

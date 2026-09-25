@@ -32,6 +32,7 @@ import os
 import shutil
 import sys
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlparse
 
 import yaml
 
@@ -109,6 +110,90 @@ def load_representation():
             return yaml.safe_load(f) or {}
     except FileNotFoundError:
         return {}
+
+
+# Seat figures may be published only from a legislature-controlled website or
+# Wikipedia. Election authorities remain useful elsewhere on the site, but
+# they are deliberately excluded from representation cards so the provenance
+# rule is simple, visible, and mechanically enforceable.
+REPRESENTATION_SOURCE_HOSTS = (
+    "wikipedia.org",
+    "europarl.europa.eu",
+    "elections.europa.eu",
+    "hellenicparliament.gr",
+    "bundestag.de",
+    "assemblee-nationale.fr",
+    "parlament.gv.at",
+    "houseofrepresentatives.nl",
+    "dekamer.be",
+    "riksdagen.se",
+    "eduskunta.fi",
+    "camera.it",
+    "congreso.es",
+    "parliament.uk",
+    "parliament.cy",
+    "parlamento.pt",
+    "stortinget.no",
+    "thedanishparliament.dk",
+    "oireachtas.ie",
+    "chd.lu",
+    "parlament.ch",
+    "althingi.is",
+    "knesset.gov.il",
+)
+
+
+def _approved_representation_source(url):
+    try:
+        host = (urlparse(str(url or "")).hostname or "").lower()
+    except ValueError:
+        return False
+    return any(host == allowed or host.endswith("." + allowed)
+               for allowed in REPRESENTATION_SOURCE_HOSTS)
+
+
+def validate_representation(cfg, representation):
+    """Reject missing, impossible, or improperly sourced seat figures."""
+    errors = []
+    roster_ids = {p.get("id") for p in cfg.get("parties", []) if p.get("id")}
+    profiles = (representation or {}).get("parties") or {}
+    profile_ids = set(profiles)
+    for party_id in sorted(roster_ids - profile_ids):
+        errors.append(f"{party_id}: missing representation record")
+    for party_id in sorted(profile_ids - roster_ids):
+        errors.append(f"{party_id}: representation record is not in the party roster")
+
+    for party_id in sorted(roster_ids & profile_ids):
+        current = (profiles.get(party_id) or {}).get("current") or {}
+        rows = []
+        if not current.get("national"):
+            errors.append(f"{party_id}: missing current national representation")
+        for kind in ("national", "incoming_national", "european"):
+            if current.get(kind):
+                rows.append((kind, current[kind]))
+        for index, row in enumerate(current.get("regional") or [], start=1):
+            rows.append((f"regional[{index}]", row))
+
+        for kind, row in rows:
+            seats, total = row.get("seats"), row.get("total")
+            if (isinstance(seats, bool) or not isinstance(seats, int) or
+                    isinstance(total, bool) or not isinstance(total, int)):
+                errors.append(f"{party_id}.{kind}: seats and total must be integers")
+            elif total <= 0 or seats < 0 or seats > total:
+                errors.append(f"{party_id}.{kind}: impossible value {seats}/{total}")
+            source = row.get("source")
+            if not _approved_representation_source(source):
+                errors.append(
+                    f"{party_id}.{kind}: source must be an official parliament "
+                    f"website or Wikipedia ({source or 'missing'})")
+            if not row.get("as_of"):
+                errors.append(f"{party_id}.{kind}: missing as_of date")
+            if not row.get("basis"):
+                errors.append(f"{party_id}.{kind}: missing count basis")
+
+    if errors:
+        raise SystemExit("Representation validation failed:\n  - " +
+                         "\n  - ".join(errors))
 
 
 def load_research():
@@ -846,6 +931,7 @@ def cmd_site(cfg, args):
     countries = load_countries()
     names = country_names(countries)
     representation = load_representation()
+    validate_representation(cfg, representation)
     research = load_research()
     prompt_archive = load_prompts()
     party_lookup = {p["id"]: p for p in cfg["parties"]}

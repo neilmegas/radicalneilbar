@@ -1,5 +1,20 @@
 revisions:
   - date: "2026-09-25"
+    title: "Representation-source correction (website 1.4)"
+    changes:
+      - "Re-audited every published seat card and restricted representation figures to official parliamentary websites or Wikipedia."
+      - "Corrected current figures including PVV, AfD, PCF, Fratelli d'Italia, and Lega, and distinguished Sweden's sitting Riksdag from the legislature taking office on 28 September 2026."
+      - "Added a build-time integrity check that rejects missing records, impossible values, absent count-basis metadata, or unapproved sources before the public site is generated."
+      - "Changed seat-card source labels so readers can immediately distinguish Wikipedia from official parliamentary provenance."
+  - date: "2026-09-25"
+    title: "Last-election roster expansion (website 1.4)"
+    changes:
+      - "Expanded the monitored roster from 69 to 90 parties while retaining the same 20-country scope."
+      - "Added twenty parties that participated in the latest completed domestic parliamentary election in their respective countries, with official sites, local-language discovery terms, and current representation records."
+      - "Added Your Party as a transparent prospective-election exception: it formed after the 2024 UK general election and is not presented as a contestant in that election."
+      - "Added party dossiers and explicit current national-seat figures for every new entry, including source notes for the PCE, Religious Zionist Party, and Your Party."
+      - "Recorded the Irish Freedom Party's 2026 registration cancellation as a review flag while preserving its last-election monitoring record and active official source."
+  - date: "2026-09-25"
     title: "Map-first editorial homepage release (website 1.3)"
     changes:
       - "Reworked the homepage hierarchy around an editorial introduction, a four-part monitoring overview, the geographic party explorer, and a clearer latest-report panel."
