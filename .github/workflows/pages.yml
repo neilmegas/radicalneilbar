@@ -53,18 +53,22 @@ jobs:
               "daam", "zehut", "fvd", "pvdd", "denk", "akel", "elam",
               "bsw", "dielinke", "greenparty", "reformuk", "lega", "syriza",
               "podemos", "bloco", "roedt", "enhedslisten", "pbp",
+              "antarsya", "mlpd", "lo", "npaa", "npar", "bij1", "afs",
+              "skp", "pci", "pce", "fejons", "cpb", "religiouszionism",
+              "norgesdemokratene", "nkp", "nationalpartyie", "irishfreedom",
+              "workerspartyie", "kpl", "pda", "yourparty",
           }
           missing = sorted(required - party_ids)
-          if len(parties) != 69 or missing:
+          if len(parties) != 90 or missing:
               raise SystemExit(
-                  "Incomplete config upload: expected 69 parties; "
+                  "Incomplete config upload: expected 90 parties; "
                   f"found {len(parties)}. Missing required IDs: {missing}"
               )
           if "research" not in inspect.signature(issue_page).parameters:
               raise SystemExit(
                   "Incomplete src upload: src/portal.py is from an older release."
               )
-          print("Consistency check passed: 69 parties and matching report generator.")
+          print("Consistency check passed: 90 parties and matching report generator.")
           PY
 
       - name: Build website
