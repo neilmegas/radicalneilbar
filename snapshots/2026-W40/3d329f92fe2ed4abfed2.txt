@@ -1,0 +1,1 @@
+Search by Traffic Citation (District Court Only) Search by the citation number that appears on the ticket. This does not search for municipal citations.
