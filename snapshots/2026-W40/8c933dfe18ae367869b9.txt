@@ -1,0 +1,1 @@
+In a RGB color space, hex #ff0000 (also known as Red) is composed of 100% red, 0% green and 0% blue. Whereas in a CMYK color space, it is composed of 0% cyan, 100% magenta, 100% yellow and 0% black.

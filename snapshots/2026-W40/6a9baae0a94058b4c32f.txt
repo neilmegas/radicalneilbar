@@ -1,0 +1,1 @@
+A discussion forum is hierarchical or tree-like in structure; a forum can contain a number of sub-forums, each of which may have several topics. Depending on the forum's settings, users can be anonymous or have to register with the forum and then subsequently log in to post messages.

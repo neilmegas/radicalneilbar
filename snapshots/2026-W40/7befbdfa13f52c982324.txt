@@ -1,0 +1,1 @@
+LEFT returns the first character or characters in a text string, based on the number of characters you specify.

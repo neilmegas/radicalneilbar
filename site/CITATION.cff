@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use RAPPORT, please cite the platform and the exact evidence records."
+title: "RAPPORT: Radicalism and Party Politics: Observation, Reporting and Tracking"
+type: dataset
+authors:
+  - family-names: Bar
+    given-names: Neil
+version: "1.4"
+date-released: "2026-09-25"
+url: "https://neilmegas.github.io/radicalneilbar/"

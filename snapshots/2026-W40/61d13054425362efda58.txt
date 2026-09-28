@@ -1,0 +1,1 @@
+Generate voice from text and play or download the resulting audio file. It's all online, and completely free! This text-to-speech generator even works offline!
