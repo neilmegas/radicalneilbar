@@ -1,0 +1,15 @@
+title: Suggested citation
+subtitle: how to cite RAPPORT
+lede: >-
+  Cite the narrowest stable object that supports the claim: an individual
+  evidence record where possible, otherwise its weekly report, dataset
+  version, or the platform.
+platform_heading: Platform
+report_heading: Weekly report
+dataset_heading: Dataset
+stable_heading: Stable-link hierarchy
+report_note: >-
+  Every report has a permanent APA 7 citation and URL. Use the ISO week as the
+  report number so the citation remains stable even when historical reports
+  are added later.
+

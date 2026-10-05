@@ -1,0 +1,60 @@
+title: Methodology and revision log
+subtitle: method and changes
+lede: >-
+  RAPPORT is an evidence-led, automated AI monitoring archive powered by the
+  Claude API. It records what the listed parties did and published; absence
+  from the archive must not be interpreted as political inactivity.
+weekly_heading: How one weekly report is made
+steps:
+  - title: Collect
+    text: Check configured party sites and feeds, official parliamentary records, and configured discovery searches.
+  - title: Preserve
+    text: Store the source URL and a local text snapshot so later deletion or editing does not erase the record.
+  - title: Screen
+    text: Retain dated, substantive material about a monitored party; keep rejected rows visible in the review audit.
+  - title: Describe
+    text: Extract a factual summary, named actors, verbatim quotations, and an observable action type.
+  - title: Present
+    text: Give direct party documents full evidence cards; present outside reporting as linked context.
+  - title: Compare
+    text: Compare retained action types and direct-document volume with the preceding archived week.
+labels_heading: What the labels mean
+labels_text: >-
+  Direct record means a party-controlled source, a named leader’s direct
+  channel, or an official parliamentary record. Outside reporting means
+  journalism or another contextual source. Action labels describe the form of
+  an observable act, such as a parliamentary intervention or mobilisation;
+  they are not ideological topic labels. Far-left and far-right are the two
+  operational roster buckets used throughout this project. They are not
+  claims of academic consensus or party self-identification.
+coverage_heading: Coverage and limits
+coverage_text: >-
+  Collection coverage is reported party by party. “No dated activity retained”
+  means the configured source was checked but produced no qualifying dated
+  record. “Official source inaccessible” means the check failed. “No archived
+  check” means this database contains no collection log for that party and
+  week. Search fallback use is shown separately. Automated collection can
+  still miss posts, dynamic pages, deleted content, and material on
+  unconfigured platforms.
+coverage_caution: >-
+  Translations and model-written interpretations can contain errors. Original
+  text, source links, prompt-version records, confidence labels, and the audit
+  trail exist so a reader can verify the evidence. Week-over-week change
+  describes the retained archive, not the totality of a party’s behaviour.
+negative_heading: Negative-evidence protocol
+negative_intro: >-
+  A missing item is not a negative finding. The following rules govern any
+  statement about silence or non-observation:
+ai_heading: AI-output labelling
+ai_text: >-
+  Every full evidence card distinguishes source metadata and source quotations
+  from AI-assisted screening, summary, translation, translation audit, and
+  interpretation. A separate human-coded label appears only where a researcher
+  code is stored. No unlabelled model output should be read as source evidence.
+roster_heading: Monitored roster
+roster_note: >-
+  parties are configured. Inclusion is a research-roster decision, not an
+  endorsement or a claim that every party is equivalent.
+versions_heading: Analysis versions in this archive
+revisions_heading: Revision log
+

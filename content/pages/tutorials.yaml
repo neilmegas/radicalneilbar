@@ -1,0 +1,23 @@
+title: Usage tutorials
+subtitle: how to use RAPPORT
+lede: >-
+  Short workflows for reading RAPPORT as evidence rather than as an
+  authoritative summary of everything a party did.
+sections:
+  - title: Read one weekly report
+    steps:
+      - "Begin with the Research Passport. Check how many parties had an archived collection attempt and how many records were screened and retained."
+      - "Read The week in one minute. Follow each point to its stable evidence record instead of citing the overview alone."
+      - "Open Collection coverage. Distinguish a checked zero from an inaccessible source or a missing run."
+      - "Inspect provenance. Use the original URL, captured date, source class, model and prompt version, translation status, and human-review label."
+  - title: Compare parties or periods
+    steps:
+      - "Open Compare, choose a date range and party, country, evidence, or document-type filters."
+      - "Treat chart counts as retained-document counts, not public support, ideological intensity, or total political activity."
+      - "Download the figure and the exact filtered CSV or JSON used to make it."
+  - title: Reuse data in research or teaching
+    steps:
+      - "Download annual corpus shards or weekly CSV files from the dataset page."
+      - "Start with the replication notebook and preserve the dataset version, download date, filters, and stable record links."
+      - "Use the teaching sample only for exercises. Its AI summaries are not independently human-validated unless the row explicitly says otherwise."
+

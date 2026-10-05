@@ -1,0 +1,14 @@
+# RAPPORT private content editor
+# Copy these names into your terminal or private hosting settings.
+# Never put real passwords or tokens in a GitHub file.
+
+RAPPORT_ADMIN_PASSWORD=replace-with-a-long-unique-password
+RAPPORT_ADMIN_SECRET=replace-with-at-least-32-random-characters
+
+# Optional hosted-editor settings. The token must be a fine-grained GitHub
+# token restricted to neilmegas/radicalneilbar with Contents: write.
+RAPPORT_GITHUB_TOKEN=
+RAPPORT_GITHUB_REPOSITORY=neilmegas/radicalneilbar
+RAPPORT_GITHUB_BRANCH=main
+RAPPORT_PUBLIC_SITE=https://neilmegas.github.io/radicalneilbar/
+RAPPORT_ADMIN_SECURE_COOKIE=1

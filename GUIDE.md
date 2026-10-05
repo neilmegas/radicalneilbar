@@ -143,7 +143,7 @@ was not changed to **GitHub Actions**.
 
 ## Step 6 — check the project configuration
 
-The starter list contains 69 parties. Websites and leader names change, so do
+The starter list contains 90 parties. Websites and leader names change, so do
 not assume every address is correct.
 
 1. Go to **Actions**.

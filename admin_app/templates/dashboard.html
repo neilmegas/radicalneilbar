@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Content management</p>
+  <h1>Edit RAPPORT without touching HTML</h1>
+  <p>Generated reports and research data remain protected. These editors change only the human-written source copy.</p>
+  <div class="mode"><span></span>{{ "GitHub publishing mode" if remote else "Local editing mode" }}</div>
+</section>
+<section class="page-grid">
+{% for slug, page in pages.items() %}
+  <article class="page-card">
+    <p class="eyebrow">Editable page</p>
+    <h2>{{ page.label }}</h2>
+    <p>{{ page.description }}</p>
+    <div class="card-actions">
+      <a class="button" href="{{ url_for('edit', slug=slug) }}">Edit</a>
+      <a href="{{ url_for('history', slug=slug) }}">History</a>
+    </div>
+  </article>
+{% endfor %}
+</section>
+<section class="publish-panel">
+  <div><p class="eyebrow">Website</p><h2>Preview and publish</h2>
+  <p>{% if remote %}Saving an editor form commits it to GitHub and starts the existing Pages deployment.{% else %}Rebuild a local preview, then publish all saved content changes when ready.{% endif %}</p></div>
+  <div class="publish-actions">
+    {% if remote %}
+      <a class="button" href="{{ public_site }}" target="_blank" rel="noreferrer">Open public site</a>
+    {% else %}
+      <form method="post" action="{{ url_for('rebuild') }}"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit">Rebuild preview</button></form>
+      <a class="button secondary" href="{{ url_for('preview_file', filename='index.html') }}" target="_blank">Open preview</a>
+      <form method="post" action="{{ url_for('publish_local') }}" class="publish-form">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <input name="message" value="Update RAPPORT website content" aria-label="Commit message">
+        <button type="submit">Publish to GitHub</button>
+      </form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+

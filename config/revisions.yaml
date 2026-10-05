@@ -1,4 +1,19 @@
 revisions:
+  - date: "2026-10-05"
+    title: "Editorial content and responsive-access release (website 1.5)"
+    changes:
+      - "Separated human-written website copy from generated research output and added a password-protected editor for the homepage, navigation, methodology, dataset, citation, and tutorials pages."
+      - "Added desktop, tablet, and phone layouts with a compact mobile menu, touch-sized controls, stacked report sections, and horizontally scrollable data tables."
+      - "Gave every weekly report a stable APA 7 citation using its ISO week as the permanent report number and its own issue URL."
+      - "Updated the homepage title and research statement to identify Neil Bar, the School of Political Science at the University of Haifa, Ayelet Banai, the Claude API, the academic-only purpose, project contact, and the need to verify AI-generated material against primary sources."
+      - "Kept the public GitHub Pages site fully static: visitors cannot access the private editor, trigger Claude, or spend API tokens."
+  - date: "2026-09-25"
+    title: "Representation-source correction (website 1.4)"
+    changes:
+      - "Re-audited every published seat card and restricted representation figures to official parliamentary websites or Wikipedia."
+      - "Corrected current figures including PVV, AfD, PCF, Fratelli d'Italia, and Lega, and distinguished Sweden's sitting Riksdag from the legislature taking office on 28 September 2026."
+      - "Added a build-time integrity check that rejects missing records, impossible values, absent count-basis metadata, or unapproved sources before the public site is generated."
+      - "Changed seat-card source labels so readers can immediately distinguish Wikipedia from official parliamentary provenance."
   - date: "2026-09-25"
     title: "Last-election roster expansion (website 1.4)"
     changes:

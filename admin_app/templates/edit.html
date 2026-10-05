@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ entry.label }} · RAPPORT Admin{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="{{ url_for('dashboard') }}">Admin</a><span>/</span><span>{{ entry.label }}</span></nav>
+<section class="editor-head">
+  <div><p class="eyebrow">Editing</p><h1>{{ entry.label }}</h1><p>{{ entry.description }}</p></div>
+  <a href="{{ url_for('history', slug=slug) }}">View history</a>
+</section>
+<form method="post" class="editor-form" data-draft-key="rapport-draft-{{ slug }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  {% set namespace = namespace(section='') %}
+  {% for field in fields %}
+    {% set section = field.path.split('.')[0] %}
+    {% if section != namespace.section %}
+      {% if namespace.section %}</section>{% endif %}
+      <section class="field-section"><h2>{{ section.replace('_',' ')|title }}</h2>
+      {% set namespace.section = section %}
+    {% endif %}
+    <label class="field">
+      <span>{{ field.label }}</span><small>{{ field.path }}</small>
+      {% if field.kind == 'textarea' %}
+        <textarea name="field__{{ field.path }}" rows="5">{{ field.value }}</textarea>
+      {% else %}
+        <input type="{{ field.kind }}" name="field__{{ field.path }}" value="{{ field.value }}">
+      {% endif %}
+    </label>
+  {% endfor %}
+  {% if namespace.section %}</section>{% endif %}
+  <div class="editor-actions">
+    <button type="submit">{{ "Publish changes" if remote else "Save changes" }}</button>
+    <button type="button" class="secondary" data-save-draft>Save browser draft</button>
+    <button type="button" class="quiet" data-clear-draft>Clear draft</button>
+  </div>
+</form>
+<script>
+(() => {
+  const form = document.querySelector('.editor-form');
+  const key = form.dataset.draftKey;
+  const controls = [...form.querySelectorAll('input[name^="field__"],textarea[name^="field__"]')];
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    try {
+      const values = JSON.parse(saved);
+      if (confirm('A browser draft exists for this page. Restore it?')) {
+        controls.forEach(control => { if (control.name in values) control.value = values[control.name]; });
+      }
+    } catch (_error) {}
+  }
+  document.querySelector('[data-save-draft]').addEventListener('click', () => {
+    const values = Object.fromEntries(controls.map(control => [control.name, control.value]));
+    localStorage.setItem(key, JSON.stringify(values));
+    alert('Draft saved in this browser. It has not been published.');
+  });
+  document.querySelector('[data-clear-draft]').addEventListener('click', () => {
+    localStorage.removeItem(key); alert('Browser draft cleared.');
+  });
+  form.addEventListener('submit', () => localStorage.removeItem(key));
+})();
+</script>
+{% endblock %}
+

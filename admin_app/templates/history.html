@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ entry.label }} history · RAPPORT Admin{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="{{ url_for('dashboard') }}">Admin</a><span>/</span><a href="{{ url_for('edit', slug=slug) }}">{{ entry.label }}</a><span>/</span><span>History</span></nav>
+<section class="editor-head"><div><p class="eyebrow">Version history</p><h1>{{ entry.label }}</h1><p>Restoring creates a new version; it does not erase the audit trail.</p></div></section>
+<div class="history-list">
+{% for row in rows %}
+  <article><div><strong>{{ row.message }}</strong><span>{{ row.date }}</span><code>{{ row.sha[:10] }}</code></div>
+    <form method="post" action="{{ url_for('rollback', slug=slug, sha=row.sha) }}" onsubmit="return confirm('Restore this version?')">
+      <input type="hidden" name="csrf" value="{{ csrf_token() }}"><button class="secondary" type="submit">Restore</button>
+    </form>
+  </article>
+{% else %}<p>No recorded versions were found.</p>{% endfor %}
+</div>
+{% endblock %}
+

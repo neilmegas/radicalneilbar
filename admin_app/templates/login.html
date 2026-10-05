@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Sign in · RAPPORT Admin{% endblock %}
+{% block content %}
+<section class="login-card">
+  <p class="eyebrow">Private editor</p>
+  <h1>Sign in to RAPPORT</h1>
+  <p>Edit the source content used to rebuild the public research website.</p>
+  {% if missing %}<div class="flash error">The server owner must set RAPPORT_ADMIN_PASSWORD.</div>{% endif %}
+  <form method="post" class="login-form">
+    <label>Password<input type="password" name="password" autocomplete="current-password" required autofocus></label>
+    <button type="submit" {% if missing %}disabled{% endif %}>Sign in</button>
+  </form>
+</section>
+{% endblock %}
+

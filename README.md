@@ -6,6 +6,10 @@ A Python program that collects public political-party material, stores a
 longitudinal record in SQLite, and generates a plain static website suitable
 for GitHub Pages.
 
+The public site remains static and inexpensive to host. Human-written page
+copy lives separately under `content/`, and the optional password-protected
+RAPPORT Admin editor changes that copy without requiring anyone to edit HTML.
+
 The generated site includes an interactive monitoring map, concise weekly
 summaries, evidence-linked changes from the preceding week, action-type labels,
 collection coverage, follow-up watchpoints, party timelines, archive search,
@@ -37,7 +41,9 @@ make network requests and does not need an API key.
 
 ```text
 .github/workflows/   GitHub Pages and scheduled jobs
+admin_app/            private editor for human-written static-page copy
 config/              party roster and research settings
+content/              editable website, navigation, and research-page copy
 src/                 collection, analysis, storage, and site-generator modules
 run.py               command-line entry point
 site/                 generated website (created by a run)
@@ -59,6 +65,27 @@ python run.py checklinks  re-check previously collected source pages
 
 Run `python run.py --help` for the complete list.
 
+## Edit static pages without editing code
+
+The private content editor covers the homepage and footer, navigation,
+methodology, dataset, citation, and tutorials pages. It deliberately does not
+edit generated reports, collected evidence, party records, or the database.
+
+```bash
+python3 -m venv .admin-venv
+source .admin-venv/bin/activate
+pip install -r requirements-admin.txt
+export RAPPORT_ADMIN_PASSWORD='choose-a-long-unique-password'
+export RAPPORT_ADMIN_SECRET='choose-another-long-random-string'
+python -m admin_app.app
+```
+
+Open <http://127.0.0.1:5050>, edit a page, rebuild the preview, and publish the
+saved content when ready. See **[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** for the
+beginner guide and the optional separately hosted mode. GitHub Pages itself
+cannot run a private Python admin service; it continues to host only the safe,
+generated public site.
+
 ## Configuration
 
 - `config/sources.yaml`: the party roster, official sites, press-search terms,
@@ -78,6 +105,10 @@ Run `python run.py --help` for the complete list.
   and election-history records. Unverified figures are deliberately left blank.
 - `config/map_geometry.json`: bundled Natural Earth country outlines used by
   the no-dependency front-page map.
+- `content/site.yaml`: homepage, institutional statement, footer, and citation
+  defaults.
+- `content/navigation.yaml`: shared desktop and mobile menu structure.
+- `content/pages/*.yaml`: editable prose for the public research pages.
 
 The supplied source roster is a starting point. Every weekly run tries each
 party's direct channels, then searches the official domain when a website

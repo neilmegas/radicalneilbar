@@ -21,12 +21,13 @@ from urllib.parse import urlparse
 
 from evidence import PROVENANCE
 import trends as trend_utils
+from sitecontent import navigation_content, page_content, site_content
 
-SITE_NAME = "RAPPORT"
-SITE_EXPANSION = "Radicalism and Party Politics: Observation, Reporting and Tracking"
-SITE_DESCRIPTION = ("A weekly record of what monitored European and Israeli far-left "
-                    "and far-right parties did and said.")
-PUBLIC_URL = "https://neilmegas.github.io/radicalneilbar/"
+SITE_COPY = site_content()
+SITE_NAME = SITE_COPY["name"]
+SITE_EXPANSION = SITE_COPY["expansion"]
+SITE_DESCRIPTION = SITE_COPY["description"]
+PUBLIC_URL = str(SITE_COPY["public_url"]).rstrip("/") + "/"
 
 CSS = """
 :root{
@@ -671,6 +672,114 @@ body.home nav.top{margin-bottom:0;padding:1rem .1rem}
 from reportbuilder import REPORT_CSS  # noqa: E402
 CSS = CSS + REPORT_CSS
 
+# Desktop remains the primary reading surface, but every research tool and
+# report section must remain usable on tablets and phones.  These rules come
+# last so they can safely correct older fixed-grid assumptions.
+CSS += r"""
+.desktop-nav{display:flex;align-items:center;gap:.4rem 1rem}
+.desktop-nav>.nav-direct{font-size:13px;color:var(--muted);text-decoration:none}
+.mobile-nav{display:none}
+img,svg,video{max-width:100%}
+main,section,article,aside,div{min-width:0}
+.citation-text,.lede,p,li,td,th{overflow-wrap:anywhere}
+
+@media(max-width:760px){
+  html{scroll-padding-top:4.5rem}
+  body{font-size:15px;line-height:1.58}
+  .wrap,body.home .wrap{width:100%;max-width:none;padding:0 .85rem 3rem}
+  nav.top{display:flex;align-items:center;gap:.5rem;margin-bottom:1.35rem;padding:.65rem 0;
+    position:sticky;top:0}
+  nav.top .desktop-nav,nav.top>.spacer,nav.top>.meta{display:none}
+  .brand-lockup{width:auto;max-width:calc(100% - 5rem);margin:0}
+  .brand-mark{width:1.9rem;height:1.9rem;flex-basis:1.9rem}
+  .brand-copy small{display:none}
+  .mobile-nav{display:block;margin-left:auto;position:relative}
+  .mobile-nav>summary{list-style:none;cursor:pointer;min-height:2.75rem;display:grid;
+    place-items:center;padding:.45rem .7rem;border:1px solid var(--hair);background:white;
+    color:var(--ink);font-size:.78rem;font-weight:750;text-transform:uppercase;
+    letter-spacing:.08em}
+  .mobile-nav>summary::-webkit-details-marker{display:none}
+  .mobile-nav[open]>summary{background:var(--ink);border-color:var(--ink);color:white}
+  .mobile-nav-panel{position:fixed;left:.6rem;right:.6rem;top:3.85rem;max-height:calc(100vh - 4.5rem);
+    overflow:auto;padding:.5rem .8rem 1rem;background:var(--paper);border:1px solid var(--hair);
+    box-shadow:var(--shadow)}
+  .mobile-nav .nav-menu{position:static;border-bottom:1px solid var(--hair)}
+  .mobile-nav .nav-menu>summary,.mobile-nav .nav-direct{display:flex;align-items:center;
+    min-height:2.75rem;padding:.55rem .15rem;color:var(--ink);font-size:.88rem;font-weight:650;
+    text-decoration:none}
+  .mobile-nav .nav-dropdown,.mobile-nav .nav-dropdown-wide{position:static;display:grid;
+    grid-template-columns:1fr;min-width:0;padding:.1rem 0 .65rem .65rem;border:0;
+    border-left:2px solid var(--rule);box-shadow:none;background:transparent}
+  .mobile-nav .nav-dropdown a{display:flex;align-items:center;min-height:2.55rem;
+    padding:.4rem .55rem;white-space:normal;font-size:.84rem}
+  .mobile-nav .nav-label{padding:.65rem .55rem .2rem}
+
+  h1{font-size:clamp(2rem,10vw,2.65rem);line-height:1.02}
+  h2{font-size:1.18rem;margin-top:2rem}
+  .home-status{margin-bottom:1.6rem;min-height:0;padding:.65rem 0;white-space:normal;
+    overflow:visible;flex-wrap:wrap;gap:.35rem .8rem}
+  .home-status a{margin-left:0;width:100%}
+  .home-hero{padding-bottom:1.25rem}
+  .home-title{font-size:clamp(2.3rem,12vw,3.25rem);line-height:.98;margin-top:.7rem}
+  .home-lede{font-size:1.05rem}
+  .home-page .research-note{font-size:.82rem;padding-left:.7rem}
+  .front-stats{margin:1.4rem 0 2.4rem}
+  .front-stat{min-height:5.25rem;padding:.85rem}.front-stat:first-child{padding-left:.85rem}
+  .front-stat .v{font-size:1.8rem}
+  .map-section{margin-bottom:2.75rem}.map-shell{display:block}
+  .map-visual{min-height:0}.map-svg{max-height:none}
+  .map-detail{padding:1rem}.map-detail h3{font-size:1.45rem}
+  .map-tooltip{display:none}
+  .latest-panel{display:block}.latest-panel>div,.latest-panel>div:nth-child(3){padding:1rem;
+    border-left:0;border-top:1px solid var(--hair)}.latest-panel>div:first-child{border-top:0}
+  .latest-numbers{grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem}
+  .latest-number strong{font-size:1.35rem}
+  .research-spine-links{display:block}.research-spine-links a,.research-spine-links a:first-child{
+    display:block;min-height:0;padding:.9rem 0;border-left:0;border-top:1px solid var(--hair)}
+  .research-spine-links a:first-child{border-top:0}
+
+  .item{display:block;padding:1rem 0}.rail{display:flex;flex-wrap:wrap;align-items:center;
+    gap:.25rem .65rem;margin-bottom:.6rem;padding:.25rem 0 .25rem .55rem}
+  .rail span{display:inline}.rail .anchor{margin:0 0 0 auto}
+  .item:target{outline-offset:2px}
+  .weekly-panels,.representation-grid,.research-pages,.four-week-grid,.passport-grid,
+  .tool-grid,.provenance-grid,.party-directory-tools,.party-directory-list{grid-template-columns:1fr}
+  .party-directory-tools{padding:.7rem}.party-directory-status{justify-content:flex-start}
+  .party-row{grid-template-columns:auto minmax(0,1fr)}
+  .party-row-records{grid-column:2;text-align:left;display:flex;gap:.3rem;align-items:baseline}
+  .party-row-records strong{display:inline}
+  .report-tools{align-items:stretch}.report-tools .citation-text{flex-basis:100%;font-size:.76rem}
+  .report-tools a,.report-tools button,.tool-actions a,.tool-actions button,.download-button{
+    min-height:2.75rem;display:inline-flex;align-items:center;justify-content:center}
+  .quote-tools{align-items:flex-start}.quote-tools>span{width:100%}
+  .timeline-tools label,.search-tools label,.compare-box label{width:100%}
+  .timeline-tools input,.timeline-tools select,.search-tools input,.search-tools select,
+  .compare-box select{width:100%;min-width:0;min-height:2.75rem}
+  details.country-section>summary,details.party-section>summary,details.reviewed>summary,
+  details.timeline-period>summary{align-items:flex-start;flex-wrap:wrap;gap:.3rem .55rem}
+  .summary-count{width:calc(100% - 1.6rem);margin-left:1.6rem}
+  .party-content{padding:.1rem .65rem .8rem}
+  table.idx,table.rev{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.idx th,table.idx td,table.rev th,table.rev td{min-width:7.5rem}
+  .coverage-table{margin-left:-.15rem;margin-right:-.15rem}
+  .funnel-row{grid-template-columns:6.5rem minmax(0,1fr) 3rem}
+  .chart-shell{margin-left:-.25rem;margin-right:-.25rem}
+  footer{margin-top:2.5rem;padding-bottom:1rem}
+}
+
+@media(max-width:480px){
+  .wrap,body.home .wrap{padding-left:.65rem;padding-right:.65rem}
+  .brand-mark{display:none}.brand-copy .brand{font-size:1.05rem}
+  .home-title{font-size:2.25rem}
+  .front-stats{grid-template-columns:1fr}.front-stat+.front-stat{border-left:0;border-top:1px solid var(--hair)}
+  .latest-numbers{grid-template-columns:1fr}.latest-number{padding:.3rem 0}
+  .report-tools a,.report-tools button{flex:1 1 calc(50% - .5rem)}
+  .profile-links a{flex:1 1 100%}
+  .election-comparison{gap:.25rem;overflow-x:auto}.election-result{min-width:60px}
+  .funnel-row{grid-template-columns:1fr}.funnel-row>*{grid-column:1}
+}
+"""
+
 
 
 def e(s):
@@ -693,6 +802,47 @@ def party_display_name(party):
     return label
 
 
+def _site_link(up, url):
+    value = str(url or "")
+    if value.startswith(("http://", "https://", "mailto:", "#")):
+        return value
+    return up + value
+
+
+def _navigation_html(up, mobile=False):
+    """Render desktop and mobile navigation from editor-managed YAML."""
+    nav = navigation_content()
+    chunks = []
+    for menu in nav.get("menus") or []:
+        label = e(menu.get("label"))
+        columns = menu.get("columns") or []
+        if not columns:
+            columns = [{"label": "", "items": menu.get("items") or []}]
+        column_html = []
+        for column in columns:
+            items = "".join(
+                f'<a href="{e(_site_link(up, item.get("url")))}">{e(item.get("label"))}</a>'
+                for item in column.get("items") or []
+            )
+            column_label = (f'<span class="nav-label">{e(column.get("label"))}</span>'
+                            if column.get("label") else "")
+            column_html.append(f'<div class="nav-column">{column_label}{items}</div>')
+        wide = " nav-dropdown-wide" if len(columns) > 1 else ""
+        chunks.append(
+            f'<details class="nav-menu"><summary>{label}</summary>'
+            f'<div class="nav-dropdown{wide}">{"".join(column_html)}</div></details>'
+        )
+    chunks.extend(
+        f'<a class="nav-direct" href="{e(_site_link(up, item.get("url")))}">'
+        f'{e(item.get("label"))}</a>' for item in nav.get("links") or []
+    )
+    inner = "".join(chunks)
+    if mobile:
+        return (f'<details class="mobile-nav"><summary aria-label="Open navigation">Menu</summary>'
+                f'<div class="mobile-nav-panel">{inner}</div></details>')
+    return f'<div class="desktop-nav">{inner}</div>'
+
+
 def layout(title, body, depth=0, subtitle=""):
     up = "../" * depth
     page_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
@@ -712,42 +862,17 @@ def layout(title, body, depth=0, subtitle=""):
   <span class="brand-lockup"><span class="brand-mark" aria-hidden="true">R</span>
     <span class="brand-copy"><a class="brand" href="{up}index.html">{SITE_NAME}</a>
       <small>{e(SITE_EXPANSION)}</small></span></span>
-  <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
-    <a href="{up}index.html#latest">Latest weekly report</a>
-    <a href="{up}archive.html">Report archive</a>
-    <a href="{up}report.html">Build custom report</a>
-  </div></details>
-  <details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown">
-    <a href="{up}parties.html">Countries and parties</a>
-    <a href="{up}compare.html">Compare parties and periods</a>
-    <a href="{up}quotes.html">Quotation explorer</a>
-    <a href="{up}events.html">Cross-party events</a>
-    <a href="{up}speakers.html">Speakers</a>
-    <a href="{up}network.html">Party network</a>
-  </div></details>
-  <details class="nav-menu"><summary>Research</summary><div class="nav-dropdown nav-dropdown-wide">
-    <div class="nav-column"><span class="nav-label">Method and audit</span>
-      <a href="{up}methodology.html">Methodology</a>
-      <a href="{up}quality.html">Quality and validation</a>
-      <a href="{up}sources.html">Source registry</a>
-      <a href="{up}inclusion.html">Party-inclusion dossiers</a>
-      <a href="{up}prompts.html">Prompt archive</a>
-      <a href="{up}health.html">Collection status</a></div>
-    <div class="nav-column"><span class="nav-label">Data and reuse</span>
-      <a href="{up}elections.html">Verified election series</a>
-      <a href="{up}dataset.html">Dataset and exports</a>
-      <a href="{up}tutorials.html">Usage tutorials</a>
-      <a href="{up}citation.html">Suggested citation</a></div>
-  </div></details>
-  <a href="{up}search.html">Search</a>
+  {_navigation_html(up)}
   <span class="spacer"></span>
   <span class="meta">{e(subtitle)}</span>
+  {_navigation_html(up, mobile=True)}
 </nav>
 <main id="main-content" tabindex="-1">{body}</main>
 <footer class="meta">
-<strong>{SITE_NAME}</strong> — {e(SITE_EXPANSION)}. Automated research monitoring
-powered by the Claude API. AI-generated material may contain errors; consult the
-cited primary sources. <a href="https://www.neilbar.com" rel="me">Dr. Neil Bar</a>.
+<strong>{SITE_NAME}</strong> — {e(SITE_EXPANSION)}.
+{e((SITE_COPY.get("footer") or {}).get("description"))}
+{e((SITE_COPY.get("footer") or {}).get("disclaimer"))}
+<a href="{e((SITE_COPY.get("footer") or {}).get("creator_url"))}" rel="me">{e((SITE_COPY.get("footer") or {}).get("creator_label"))}</a>.
 </footer>
 </div><script>
 const navMenus=[...document.querySelectorAll('.nav-menu')];
@@ -1182,11 +1307,26 @@ def four_week_timeline_html(periods):
             f'<div class="four-week-grid">{"".join(cards)}</div></section>')
 
 
+def report_citation(week, week_range):
+    """Stable APA 7 report citation using the ISO week as report number."""
+    citation_copy = SITE_COPY.get("citation") or {}
+    author = citation_copy.get("author") or "Bar, N."
+    title = citation_copy.get("report_title") or "Neil’s Parties Report"
+    publisher = citation_copy.get("publisher") or SITE_NAME
+    year = str(week).split("-")[0]
+    report_title = f"{title}: {week_range}"
+    url = f"{PUBLIC_URL}issues/{week}.html"
+    plain = f"{author} ({year}). {report_title} (Report No. {week}). {publisher}. {url}"
+    html_citation = (f'{e(author)} ({e(year)}). <em>{e(report_title)}</em> '
+                     f'(Report No. {e(week)}). {e(publisher)}. '
+                     f'<a href="{e(url)}">{e(url)}</a>')
+    return plain, html_citation
+
+
 def issue_tools_html(week, week_range):
-    citation = (f'Bar, Neil. “RAPPORT: Week {week} ({week_range}).” '
-                'Radicalism and Party Politics: Observation, Reporting and Tracking.')
+    citation, citation_html = report_citation(week, week_range)
     return (f'<aside class="report-tools" aria-label="Citation and export">'
-            f'<span class="citation-text"><strong>Cite this report:</strong> {e(citation)}</span>'
+            f'<span class="citation-text"><strong>Cite this report:</strong> {citation_html}</span>'
             f'<button type="button" data-copy-text="{e(citation)}">Copy citation</button>'
             '<button type="button" data-copy-link>Copy stable link</button>'
             f'<a href="../data/{e(week)}.csv" download>CSV</a>'
@@ -1323,8 +1463,12 @@ def issue_page(week, items, overview, briefings, country_names, parties,
     flagged = sum(1 for i in relevant
                   if (i.get("interpretation") or {}).get("significance") in ("notable", "unusual"))
 
-    body = [f'<h1>Week {e(week)}</h1>',
-            f'<p class="meta">{e(week_range)} · {len(relevant)} items · '
+    report_name = ((SITE_COPY.get("citation") or {}).get("report_title")
+                   or "Neil’s Parties Report")
+    visible_title = f"{report_name}: {week_range or week}"
+    body = [f'<div class="section-kicker">Report No. {e(week)}</div>',
+            f'<h1>{e(visible_title)}</h1>',
+            f'<p class="meta">{e(week)} · {len(relevant)} items · '
             f'{len({i["party_id"] for i in relevant})} of {len(parties)} parties · '
             f'{flagged} flagged · {len(all_items)} reviewed · '
             f'<a href="../data/{e(week)}.csv">coding rows (CSV)</a></p>']
@@ -1496,7 +1640,7 @@ document.querySelectorAll('[data-copy-link]').forEach(button=>button.addEventLis
     os.makedirs(os.path.join(out_dir, "issues"), exist_ok=True)
     path = os.path.join(out_dir, "issues", f"{week}.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout(f"Week {week}", "".join(body), depth=1, subtitle=week))
+        f.write(layout(visible_title, "".join(body), depth=1, subtitle=week))
     return path
 
 
@@ -1935,23 +2079,15 @@ loadSearch();
 
 def methodology_page(parties, prompt_versions, revisions, out_dir, research=None):
     """Plain-language method, limitations, and a visible revision history."""
-    body = ['<h1>Methodology and revision log</h1>',
-            f'<p class="lede">{SITE_NAME} is an evidence-led, automated AI monitoring '
-            'archive powered by the Claude API. It records what '
-            'the listed parties did and published; it does not infer that absence from the '
-            'archive means political inactivity.</p>',
-            '<h2>How one weekly report is made</h2>']
-    steps = [
-        ("Collect", "Check configured party sites and feeds, official parliamentary records, and configured discovery searches."),
-        ("Preserve", "Store the source URL and a local text snapshot so later deletion or editing does not erase the record."),
-        ("Screen", "Retain dated, substantive material about a monitored party; keep rejected rows visible in the review audit."),
-        ("Describe", "Extract a factual summary, named actors, verbatim quotations, and an observable action type."),
-        ("Present", "Give direct party documents full evidence cards; present outside reporting as linked context."),
-        ("Compare", "Compare retained action types and direct-document volume with the preceding archived week."),
-    ]
-    for n, (title, text) in enumerate(steps, 1):
+    copy = page_content("methodology")
+    title = copy.get("title") or "Methodology and revision log"
+    body = [f'<h1>{e(title)}</h1>',
+            f'<p class="lede">{e(copy.get("lede"))}</p>',
+            f'<h2>{e(copy.get("weekly_heading") or "How one weekly report is made")}</h2>']
+    for n, step in enumerate(copy.get("steps") or [], 1):
         body.append(f'<div class="method-step"><div class="step">{n}</div><div>'
-                    f'<strong>{e(title)}</strong><p>{e(text)}</p></div></div>')
+                    f'<strong>{e(step.get("title"))}</strong>'
+                    f'<p>{e(step.get("text"))}</p></div></div>')
     unit = (research or {}).get("unit_of_analysis") or {}
     body += ['<h2>Unit of analysis</h2>',
              f'<p><strong>{e(unit.get("label") or "Evidence record")}</strong>: '
@@ -1961,48 +2097,29 @@ def methodology_page(parties, prompt_versions, revisions, out_dir, research=None
              '<p class="meta">The unit is not a party-week, ideological topic, sentence, '
              'or estimate of public opinion.</p>']
     body += [
-        '<h2>What the labels mean</h2>',
-        '<p><strong>Direct record</strong> means a party-controlled source, a named leader’s '
-        'direct channel, or an official parliamentary record. <strong>Outside reporting</strong> '
-        'means journalism or another contextual source. Action labels describe the form of an '
-        'observable act, such as a parliamentary intervention or mobilisation; they are not '
-        'ideological topic labels. <strong>far-left</strong> and <strong>far-right</strong> '
-        'are the two operational roster buckets used throughout this project. They are not '
-        'claims of academic consensus or party self-identification.</p>',
-        '<h2>Coverage and limits</h2>',
-        '<p>Collection coverage is reported party by party. “No dated activity retained” means '
-        'the configured source was checked but produced no qualifying dated record. “Official '
-        'source inaccessible” means the check failed. “No archived check” means this database '
-        'contains no collection log for that party and week. Search fallback use is shown '
-        'separately. Automated collection can still miss posts, dynamic pages, deleted content, '
-        'and material on unconfigured platforms.</p>',
-        '<p>Translations and model-written interpretations can contain errors. Original text, '
-        'source links, prompt-version records, confidence labels, and the audit trail exist so '
-        'a reader can verify the evidence. Week-over-week change describes the retained archive, '
-        'not the totality of a party’s behaviour.</p>',
-        '<h2>Negative-evidence protocol</h2>',
-        '<p>A missing item is not a negative finding. The following rules govern any statement '
-        'about silence or non-observation:</p><ol>']
+        f'<h2>{e(copy.get("labels_heading") or "What the labels mean")}</h2>',
+        f'<p>{e(copy.get("labels_text"))}</p>',
+        f'<h2>{e(copy.get("coverage_heading") or "Coverage and limits")}</h2>',
+        f'<p>{e(copy.get("coverage_text"))}</p>',
+        f'<p>{e(copy.get("coverage_caution"))}</p>',
+        f'<h2>{e(copy.get("negative_heading") or "Negative-evidence protocol")}</h2>',
+        f'<p>{e(copy.get("negative_intro"))}</p><ol>']
     body.extend(f'<li>{e(rule)}</li>' for rule in (research or {}).get("negative_evidence") or [])
     body += ['</ol>',
-        '<h2>AI-output labelling</h2>',
-        '<p>Every full evidence card distinguishes source metadata and source quotations from '
-        'AI-assisted screening, summary, translation, translation audit, and interpretation. '
-        'A separate human-coded label appears only where a researcher code is stored. No '
-        'unlabelled model output should be read as source evidence.</p>',
+        f'<h2>{e(copy.get("ai_heading") or "AI-output labelling")}</h2>',
+        f'<p>{e(copy.get("ai_text"))}</p>',
         '<p>See the <a href="prompts.html">versioned prompt archive</a>, '
         '<a href="quality.html">quality and validation dashboard</a>, and '
         '<a href="inclusion.html">party-inclusion dossiers</a>.</p>',
-        '<h2>Monitored roster</h2>',
-        f'<p class="meta">{len(parties)} parties are configured. Inclusion is a research-roster '
-        'decision, not an endorsement or a claim that every party is equivalent.</p>',
+        f'<h2>{e(copy.get("roster_heading") or "Monitored roster")}</h2>',
+        f'<p class="meta">{len(parties)} {e(copy.get("roster_note"))}</p>',
         '<ul class="link-list">']
     for party in sorted(parties, key=lambda p: (p.get("country", ""), p.get("short", ""))):
         body.append(f'<li><a class="link-title" href="parties/{e(party["id"])}.html">'
                     f'{e(party.get("short") or party.get("name"))}</a>'
                     f'<span class="link-meta">{e(party.get("country"))} · '
                     f'{camp_label(party.get("camp"))} · {e(party.get("name"))}</span></li>')
-    body.append('</ul><h2>Analysis versions in this archive</h2>'
+    body.append(f'</ul><h2>{e(copy.get("versions_heading") or "Analysis versions in this archive")}</h2>'
                 '<table class="rev"><thead><tr><th>Stage</th><th>Model</th><th>Prompt</th>'
                 '<th>Records</th><th>First run</th><th>Latest run</th></tr></thead><tbody>')
     for row in prompt_versions:
@@ -2010,7 +2127,7 @@ def methodology_page(parties, prompt_versions, revisions, out_dir, research=None
                     f'<td>{e(row.get("prompt_ver"))}</td><td class="n">{row.get("n", 0)}</td>'
                     f'<td class="n">{e((row.get("first") or "")[:10])}</td>'
                     f'<td class="n">{e((row.get("last") or "")[:10])}</td></tr>')
-    body.append('</tbody></table><h2>Revision log</h2>')
+    body.append(f'</tbody></table><h2>{e(copy.get("revisions_heading") or "Revision log")}</h2>')
     if not revisions:
         body.append('<p class="meta">No revisions have been recorded yet.</p>')
     for revision in revisions:
@@ -2020,12 +2137,15 @@ def methodology_page(parties, prompt_versions, revisions, out_dir, research=None
         body.append('</ul>')
     path = os.path.join(out_dir, "methodology.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Methodology", "".join(body), subtitle="method and changes"))
+        f.write(layout(title, "".join(body),
+                       subtitle=copy.get("subtitle") or "method and changes"))
     return path
 
 
 def dataset_page(index, parties, years, out_dir, research=None, export_info=None):
     """Human-readable dataset landing page and compact codebook."""
+    copy = page_content("dataset")
+    title = copy.get("title") or "Dataset and exports"
     total = sum(int(row.get("items") or 0) for row in index)
     year_links = "".join(
         f'<li><a class="link-title" href="corpus/{e(year)}.json" download>'
@@ -2036,10 +2156,8 @@ def dataset_page(index, parties, years, out_dir, research=None, export_info=None
         f'{e(row.get("week"))} coding rows (CSV)</a><span class="link-meta">'
         f'{e(row.get("range"))} · {row.get("items", 0)} retained items</span></li>'
         for row in index)
-    body = f'''<h1>Dataset and exports</h1>
-<p class="lede">Download the public evidence index behind RAPPORT. Each record retains its
-source URL, date, party, country, evidence class, observable action type, factual summary,
-and stable weekly-report identifier.</p>
+    body = f'''<h1>{e(title)}</h1>
+<p class="lede">{e(copy.get("lede"))}</p>
 <div class="statline"><div class="stat"><div class="v">{total}</div><div class="k">retained records</div></div>
 <div class="stat"><div class="v">{len(parties)}</div><div class="k">monitored parties</div></div>
 <div class="stat"><div class="v">{len(index)}</div><div class="k">weekly issues</div></div>
@@ -2057,7 +2175,7 @@ and stable weekly-report identifier.</p>
 <li><a class="link-title" href="downloads/rapport-records.ris" download>All evidence records (RIS)</a></li>
 <li><a class="link-title" href="CITATION.cff" download>Platform citation (CITATION.cff)</a></li>
 </ul></section></div>
-<h2>Expanded codebook</h2>
+<h2>{e(copy.get("codebook_heading") or "Expanded codebook")}</h2>
 <table class="rev"><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody>
 <tr><td class="n">id / w / d</td><td>Stable record identifier, ISO reporting week, and publication date.</td></tr>
 <tr><td class="n">p / pn / c</td><td>Party identifier, display name, and country code.</td></tr>
@@ -2072,29 +2190,30 @@ and stable weekly-report identifier.</p>
 <tr><td class="n">cf</td><td>Automated relevance confidence; not a probability or human-validation score.</td></tr>
 <tr><td class="n">cd</td><td>Researcher coding category, blank when no human code is recorded.</td></tr>
 </tbody></table>
-<h2>Unit of analysis</h2><p>{e(((research or {}).get('unit_of_analysis') or {}).get('definition') or '')}</p>
-<h2>Use and limitations</h2><p>These are records retained by an automated collection and
-screening system, not a complete census of political activity. Dynamic, blocked, deleted,
-or unconfigured sources may be missed. Verify analytical claims against the linked primary
-source and cite the specific weekly issue and record. See the <a href="methodology.html">full methodology</a>
-and <a href="citation.html">suggested citation</a>. The teaching sample is not independently
-human-validated unless a row explicitly says <em>researcher-coded</em>.</p>
-<h2>Stable links</h2><p>Weekly reports use <code>issues/YYYY-Www.html</code>; individual
+<h2>{e(copy.get("unit_heading") or "Unit of analysis")}</h2><p>{e(((research or {}).get('unit_of_analysis') or {}).get('definition') or '')}</p>
+<h2>{e(copy.get("limitations_heading") or "Use and limitations")}</h2>
+<p>{e(copy.get("limitations"))} See the <a href="methodology.html">full methodology</a>
+and <a href="citation.html">suggested citation</a>.</p>
+<h2>{e(copy.get("stable_heading") or "Stable links")}</h2>
+<p>{e(copy.get("stable_intro"))}</p><p>Weekly reports use <code>issues/YYYY-Www.html</code>; individual
 records add <code>#item-ID</code>; party pages use <code>parties/PARTY-ID.html</code>.
 These identifiers do not change when the site is rebuilt.</p>'''
     path = os.path.join(out_dir, "dataset.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Dataset and exports", body, subtitle="public research data"))
+        f.write(layout(title, body,
+                       subtitle=copy.get("subtitle") or "public research data"))
     return path
 
 
 def citation_page(out_dir):
     """Citable descriptions for the project, dataset, and individual issues."""
-    site_citation = ("Bar, Neil. RAPPORT: Radicalism and Party Politics: Observation, "
-                     "Reporting and Tracking. Automated research monitoring platform. "
-                     "https://www.neilbar.com.")
-    dataset_citation = ("Bar, Neil. RAPPORT public evidence dataset [data set]. "
-                        "Radicalism and Party Politics: Observation, Reporting and Tracking.")
+    copy = page_content("citation")
+    title = copy.get("title") or "Suggested citation"
+    site_citation = ("Bar, N. (2026). RAPPORT: Radicalism and Party Politics: Observation, "
+                     f"Reporting and Tracking. {PUBLIC_URL}")
+    dataset_citation = ("Bar, N. (2026). RAPPORT public evidence dataset [Data set]. "
+                        f"RAPPORT. {PUBLIC_URL}dataset.html")
+    example_plain, example_html = report_citation("2026-W39", "21–27 September 2026")
     bib = """@misc{bar_rapport,
   author = {Neil Bar},
   title = {RAPPORT: Radicalism and Party Politics: Observation, Reporting and Tracking},
@@ -2102,21 +2221,20 @@ def citation_page(out_dir):
   url = {https://www.neilbar.com},
   note = {Accessed: YYYY-MM-DD}
 }"""
-    body = f'''<h1>Suggested citation</h1>
-<p class="lede">Cite the narrowest stable object that supports the claim: an individual
-evidence record where possible, otherwise its weekly report, dataset version, or the platform.</p>
-<section class="box"><h4>Platform</h4><p>{e(site_citation)}</p>
+    body = f'''<h1>{e(title)}</h1>
+<p class="lede">{e(copy.get("lede"))}</p>
+<section class="box"><h4>{e(copy.get("platform_heading") or "Platform")}</h4><p>{e(site_citation)}</p>
 <button type="button" data-copy-text="{e(site_citation)}">Copy citation</button></section>
-<section class="box"><h4>Weekly report</h4><p>Bar, Neil. “RAPPORT: Week YYYY-Www
-(date range).” <em>Radicalism and Party Politics: Observation, Reporting and Tracking</em>.
-Permanent weekly-report URL.</p></section>
-<section class="box"><h4>Dataset</h4><p>{e(dataset_citation)} Add the download date and
+<section class="box"><h4>{e(copy.get("report_heading") or "Weekly report")}</h4>
+<p>{example_html}</p><button type="button" data-copy-text="{e(example_plain)}">Copy example</button>
+<p class="meta">{e(copy.get("report_note"))}</p></section>
+<section class="box"><h4>{e(copy.get("dataset_heading") or "Dataset")}</h4><p>{e(dataset_citation)} Add the download date and
 the corpus or weekly-export URL used.</p></section>
 <div class="tool-actions"><a href="CITATION.cff" download>Download CITATION.cff</a>
 <a href="downloads/rapport-records.bib" download>Download record BibTeX</a>
 <a href="downloads/rapport-records.ris" download>Download record RIS</a></div>
 <h2>BibTeX</h2><pre class="bib">{e(bib)}</pre>
-<h2>Stable-link hierarchy</h2><ul>
+<h2>{e(copy.get("stable_heading") or "Stable-link hierarchy")}</h2><ul>
 <li>Report: <code>issues/YYYY-Www.html</code></li>
 <li>Evidence record: <code>issues/YYYY-Www.html#item-ID</code></li>
 <li>Party archive: <code>parties/PARTY-ID.html</code></li>
@@ -2128,7 +2246,8 @@ catch(_e){{button.textContent='Select the citation above'}}
 }}));</script>'''
     path = os.path.join(out_dir, "citation.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Suggested citation", body, subtitle="how to cite RAPPORT"))
+        f.write(layout(title, body,
+                       subtitle=copy.get("subtitle") or "how to cite RAPPORT"))
     return path
 
 
@@ -2522,34 +2641,18 @@ def events_page(events, items, parties, out_dir):
 
 
 def tutorials_page(out_dir):
-    body = '''<h1>Usage tutorials</h1>
-<p class="lede">Short workflows for reading RAPPORT as evidence rather than as an
-authoritative summary of everything a party did.</p>
-<h2>Read one weekly report</h2><div class="tutorial">
-<div class="tutorial-step"><strong>Begin with the Research Passport.</strong> Check how many parties
-had an archived collection attempt and how many records were screened and retained.</div>
-<div class="tutorial-step"><strong>Read “The week in one minute”.</strong> Follow each point to its
-stable evidence record instead of citing the overview alone.</div>
-<div class="tutorial-step"><strong>Open Collection coverage.</strong> Distinguish a checked zero from
-an inaccessible source or a missing run.</div>
-<div class="tutorial-step"><strong>Inspect provenance.</strong> Use the original URL, captured date,
-source class, model/prompt version, translation status, and human-review label.</div></div>
-<h2>Compare parties or periods</h2><div class="tutorial">
-<div class="tutorial-step">Open <a href="compare.html">Compare</a>, choose a date range and
-party, country, evidence, or document-type filters.</div>
-<div class="tutorial-step">Treat chart counts as retained-document counts, not public support,
-ideological intensity, or total political activity.</div>
-<div class="tutorial-step">Download the figure and the exact filtered CSV/JSON used to make it.</div></div>
-<h2>Reuse data in research or teaching</h2><div class="tutorial">
-<div class="tutorial-step">Download annual corpus shards or weekly CSV files from the
-<a href="dataset.html">dataset page</a>.</div>
-<div class="tutorial-step">Start with the replication notebook and preserve the dataset version,
-download date, filters, and stable record links.</div>
-<div class="tutorial-step">Use the teaching sample only for exercises. Its AI summaries are not
-independently human-validated unless the row explicitly says otherwise.</div></div>'''
+    copy = page_content("tutorials")
+    title = copy.get("title") or "Usage tutorials"
+    body = [f'<h1>{e(title)}</h1>', f'<p class="lede">{e(copy.get("lede"))}</p>']
+    for section in copy.get("sections") or []:
+        body.append(f'<h2>{e(section.get("title"))}</h2><div class="tutorial">')
+        for step in section.get("steps") or []:
+            body.append(f'<div class="tutorial-step">{e(step)}</div>')
+        body.append('</div>')
     path = os.path.join(out_dir, "tutorials.html")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(layout("Usage tutorials", body, subtitle="how to use RAPPORT"))
+        f.write(layout(title, "".join(body),
+                       subtitle=copy.get("subtitle") or "how to use RAPPORT"))
     return path
 
 
@@ -2946,11 +3049,12 @@ def _home_map(parties, country_names):
 
     source = geometry.get("source") or "Natural Earth"
     source_url = geometry.get("source_url") or "https://www.naturalearthdata.com/"
+    home_copy = SITE_COPY.get("homepage") or {}
     return f"""<section class="map-section" aria-labelledby="map-heading">
 <div class="section-kicker">Explore the monitored field</div>
 <div class="map-section-head"><div class="map-section-title">
-<h2 id="map-heading">Parties, placed in context.</h2>
-<p>Select a country to see its monitored parties. Every party name opens a stable research dossier.</p></div>
+<h2 id="map-heading">{e(home_copy.get("map_title") or "Where RAPPORT looks")}</h2>
+<p>{e(home_copy.get("map_intro"))} Every party name opens a stable research dossier.</p></div>
 <div class="map-legend" aria-label="Map legend"><span><i class="watched"></i>Monitored</span>
 <span><i></i>Other country</span></div></div>
 <div class="map-shell">
@@ -2998,15 +3102,23 @@ def home_page(latest, index, parties, country_names, out_dir, research=None):
 <span><strong>Dataset:</strong> version {e(version)}</span>
 <span><strong>Release:</strong> {e(release_label or 'not dated')}</span>
 <a href="citation.html">How to cite RAPPORT</a></div>"""
+    home_copy = SITE_COPY.get("homepage") or {}
+    notice = SITE_COPY.get("research_notice") or {}
+    notice_html = (
+        f'{e(notice.get("system"))} It was created by '
+        f'<strong>{e(notice.get("creator"))}</strong> and is developed at '
+        f'{e(notice.get("institution"))} under the mentorship of '
+        f'<strong>{e(notice.get("mentor"))}</strong>. {e(notice.get("purpose"))} '
+        f'{e(notice.get("contact_intro"))} '
+        f'<a class="email" href="{e(notice.get("contact_url"))}" rel="me">'
+        f'<strong>{e(notice.get("contact_label"))}</strong></a>. '
+        f'{e(notice.get("disclaimer"))}'
+    )
     hero = f"""<header class="home-hero">
-<div class="home-kicker">Automated academic research infrastructure</div>
-<h1 class="home-title">A clearer weekly record of party activity.</h1>
-<p class="home-lede">{e(SITE_DESCRIPTION)}</p>{release_html}
-<p class="research-note">RAPPORT is an automated AI system powered by the Claude API,
-created by <strong>Dr. Neil Bar</strong> solely for academic research into contemporary
-far-right and far-left parties. Project information:
-<a class="email" href="https://www.neilbar.com" rel="me">www.neilbar.com</a>.
-AI-generated material may contain errors; consult the cited primary sources.</p></header>
+<div class="home-kicker">{e(home_copy.get("kicker"))}</div>
+<h1 class="home-title">{e(home_copy.get("title"))}</h1>
+<p class="home-lede">{e(home_copy.get("lede") or SITE_DESCRIPTION)}</p>{release_html}
+<p class="research-note">{notice_html}</p></header>
 <section class="front-stats" aria-label="Monitoring overview">
  <div class="front-stat"><span class="v">{country_count}</span><span class="k">countries monitored</span></div>
  <div class="front-stat"><span class="v">{len(parties)}</span><span class="k">active parties tracked</span></div>
@@ -3014,9 +3126,9 @@ AI-generated material may contain errors; consult the cited primary sources.</p>
  <div class="front-stat"><span class="v">Weekly</span><span class="k">collection and publication cycle</span></div>
 </section>"""
     map_html = _home_map(parties, country_names)
-    research_spine = """<section class="research-spine" aria-labelledby="research-spine-heading">
-<div class="research-spine-head"><h2 id="research-spine-heading">The research spine</h2>
-<p>Transparent methods, reusable records and stable references.</p></div>
+    research_spine = f"""<section class="research-spine" aria-labelledby="research-spine-heading">
+<div class="research-spine-head"><h2 id="research-spine-heading">{e(home_copy.get("research_title") or "The research spine")}</h2>
+<p>{e(home_copy.get("research_intro"))}</p></div>
 <div class="research-spine-links">
  <a href="methodology.html"><strong>Methodology →</strong><span>Scope, inclusion rules, source hierarchy and AI-assisted workflow.</span></a>
  <a href="dataset.html"><strong>Dataset &amp; exports →</strong><span>Weekly CSV, JSON and citation-manager formats.</span></a>
@@ -3024,17 +3136,17 @@ AI-generated material may contain errors; consult the cited primary sources.</p>
  <a href="quality.html"><strong>Quality &amp; validation →</strong><span>Coverage, review status and validation limits.</span></a>
 </div></section>"""
     if not latest:
-        latest_html = """<section class="latest-section" id="latest">
-<div class="latest-head"><div><div class="section-kicker">Latest report</div>
-<h2>The week, distilled.</h2></div></div>
+        latest_html = f"""<section class="latest-section" id="latest">
+<div class="latest-head"><div><div class="section-kicker">{e(home_copy.get("latest_kicker") or "Latest report")}</div>
+<h2>{e(home_copy.get("latest_title") or "The week, distilled.")}</h2></div></div>
 <div class="box dashed"><p>No issues yet.</p>
 <p class="meta">Run <code>python run.py weekly</code> to build the first one.</p></div></section>"""
         recent_html = ""
     else:
         latest_html = f"""<section class="latest-section" id="latest" aria-labelledby="latest-heading">
-<div class="latest-head"><div><div class="section-kicker">Latest report</div>
-<h2 id="latest-heading">The week, distilled.</h2></div>
-<p>Read the report, inspect every record, or export the issue.</p></div>
+<div class="latest-head"><div><div class="section-kicker">{e(home_copy.get("latest_kicker") or "Latest report")}</div>
+<h2 id="latest-heading">{e(home_copy.get("latest_title") or "The week, distilled.")}</h2></div>
+<p>{e(home_copy.get("latest_intro"))}</p></div>
 <div class="latest-panel"><div>
  <span class="latest-label">Issue</span><span class="latest-week">{e(latest['week'])}</span>
  <span class="latest-range">{e(latest.get('range'))}</span>

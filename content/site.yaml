@@ -1,0 +1,48 @@
+name: RAPPORT
+expansion: "Radicalism and Party Politics: Observation, Reporting and Tracking"
+description: >-
+  A weekly record of what monitored European and Israeli far-left and
+  far-right parties did and said.
+public_url: "https://neilmegas.github.io/radicalneilbar/"
+
+homepage:
+  kicker: Automated academic research infrastructure
+  title: A clearer weekly record of radical party activity.
+  lede: >-
+    A weekly record of what monitored European and Israeli far-left and
+    far-right parties did and said.
+  map_title: Where RAPPORT looks
+  map_intro: Select a monitored country to see the parties tracked there.
+  latest_kicker: Latest report
+  latest_title: The week, distilled.
+  latest_intro: Read the report, inspect every record, or export the issue.
+  research_title: The research spine
+  research_intro: Transparent methods, reusable records and stable references.
+
+research_notice:
+  system: >-
+    RAPPORT is an automated, AI-assisted research system powered by the Claude API.
+  creator: Neil Bar
+  institution: the School of Political Science at the University of Haifa
+  mentor: Ayelet Banai
+  purpose: >-
+    It is intended solely for academic research on contemporary far-right and
+    far-left parties.
+  contact_intro: For project information and enquiries, visit
+  contact_label: www.neilbar.com
+  contact_url: "https://www.neilbar.com/"
+  disclaimer: >-
+    AI-generated material may contain errors; verify analytical claims against
+    the cited primary sources.
+
+footer:
+  description: Automated academic research monitoring powered by the Claude API.
+  disclaimer: AI-generated material may contain errors; consult the cited primary sources.
+  creator_label: Neil Bar
+  creator_url: "https://www.neilbar.com/"
+
+citation:
+  author: "Bar, N."
+  report_title: Neil’s Parties Report
+  publisher: RAPPORT
+

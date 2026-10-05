@@ -1,5 +1,5 @@
-version: "1.4"
-release_date: "2026-09-25"
+version: "1.5"
+release_date: "2026-10-05"
 versioning:
   policy: >-
     The website version changes only for a meaningful public feature,

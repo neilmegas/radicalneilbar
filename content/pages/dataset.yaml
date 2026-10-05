@@ -1,0 +1,21 @@
+title: Dataset and exports
+subtitle: public research data
+lede: >-
+  Download the public evidence index behind RAPPORT. Each record retains its
+  source URL, date, party, country, evidence class, observable action type,
+  factual summary, and stable weekly-report identifier.
+codebook_heading: Expanded codebook
+unit_heading: Unit of analysis
+limitations_heading: Use and limitations
+limitations: >-
+  These are records retained by an automated collection and screening system,
+  not a complete census of political activity. Dynamic, blocked, deleted, or
+  unconfigured sources may be missed. Verify analytical claims against the
+  linked primary source and cite the specific weekly issue and record. The
+  teaching sample is not independently human-validated unless a row explicitly
+  says researcher-coded.
+stable_heading: Stable links
+stable_intro: >-
+  Weekly reports, individual evidence records, and party archives use durable
+  identifiers that remain unchanged when the website is rebuilt.
+

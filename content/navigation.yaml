@@ -1,0 +1,33 @@
+menus:
+  - label: Reports
+    items:
+      - {label: Latest weekly report, url: "index.html#latest"}
+      - {label: Report archive, url: archive.html}
+      - {label: Build custom report, url: report.html}
+  - label: Explore
+    items:
+      - {label: Countries and parties, url: parties.html}
+      - {label: Compare parties and periods, url: compare.html}
+      - {label: Quotation explorer, url: quotes.html}
+      - {label: Cross-party events, url: events.html}
+      - {label: Speakers, url: speakers.html}
+      - {label: Party network, url: network.html}
+  - label: Research
+    columns:
+      - label: Method and audit
+        items:
+          - {label: Methodology, url: methodology.html}
+          - {label: Quality and validation, url: quality.html}
+          - {label: Source registry, url: sources.html}
+          - {label: Party-inclusion dossiers, url: inclusion.html}
+          - {label: Prompt archive, url: prompts.html}
+          - {label: Collection status, url: health.html}
+      - label: Data and reuse
+        items:
+          - {label: Verified election series, url: elections.html}
+          - {label: Dataset and exports, url: dataset.html}
+          - {label: Usage tutorials, url: tutorials.html}
+          - {label: Suggested citation, url: citation.html}
+links:
+  - {label: Search, url: search.html}
+
