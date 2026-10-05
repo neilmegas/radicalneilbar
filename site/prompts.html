@@ -13,36 +13,10 @@
   <span class="brand-lockup"><span class="brand-mark" aria-hidden="true">R</span>
     <span class="brand-copy"><a class="brand" href="index.html">RAPPORT</a>
       <small>Radicalism and Party Politics: Observation, Reporting and Tracking</small></span></span>
-  <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
-    <a href="index.html#latest">Latest weekly report</a>
-    <a href="archive.html">Report archive</a>
-    <a href="report.html">Build custom report</a>
-  </div></details>
-  <details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown">
-    <a href="parties.html">Countries and parties</a>
-    <a href="compare.html">Compare parties and periods</a>
-    <a href="quotes.html">Quotation explorer</a>
-    <a href="events.html">Cross-party events</a>
-    <a href="speakers.html">Speakers</a>
-    <a href="network.html">Party network</a>
-  </div></details>
-  <details class="nav-menu"><summary>Research</summary><div class="nav-dropdown nav-dropdown-wide">
-    <div class="nav-column"><span class="nav-label">Method and audit</span>
-      <a href="methodology.html">Methodology</a>
-      <a href="quality.html">Quality and validation</a>
-      <a href="sources.html">Source registry</a>
-      <a href="inclusion.html">Party-inclusion dossiers</a>
-      <a href="prompts.html">Prompt archive</a>
-      <a href="health.html">Collection status</a></div>
-    <div class="nav-column"><span class="nav-label">Data and reuse</span>
-      <a href="elections.html">Verified election series</a>
-      <a href="dataset.html">Dataset and exports</a>
-      <a href="tutorials.html">Usage tutorials</a>
-      <a href="citation.html">Suggested citation</a></div>
-  </div></details>
-  <a href="search.html">Search</a>
+  <div class="desktop-nav"><details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown"><div class="nav-column"><a href="index.html#latest">Latest weekly report</a><a href="archive.html">Report archive</a><a href="report.html">Build custom report</a></div></div></details><details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown"><div class="nav-column"><a href="parties.html">Countries and parties</a><a href="compare.html">Compare parties and periods</a><a href="quotes.html">Quotation explorer</a><a href="events.html">Cross-party events</a><a href="speakers.html">Speakers</a><a href="network.html">Party network</a></div></div></details><details class="nav-menu"><summary>Research</summary><div class="nav-dropdown nav-dropdown-wide"><div class="nav-column"><span class="nav-label">Method and audit</span><a href="methodology.html">Methodology</a><a href="quality.html">Quality and validation</a><a href="sources.html">Source registry</a><a href="inclusion.html">Party-inclusion dossiers</a><a href="prompts.html">Prompt archive</a><a href="health.html">Collection status</a></div><div class="nav-column"><span class="nav-label">Data and reuse</span><a href="elections.html">Verified election series</a><a href="dataset.html">Dataset and exports</a><a href="tutorials.html">Usage tutorials</a><a href="citation.html">Suggested citation</a></div></div></details><a class="nav-direct" href="search.html">Search</a></div>
   <span class="spacer"></span>
   <span class="meta">versioned AI instructions</span>
+  <details class="mobile-nav"><summary aria-label="Open navigation">Menu</summary><div class="mobile-nav-panel"><details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown"><div class="nav-column"><a href="index.html#latest">Latest weekly report</a><a href="archive.html">Report archive</a><a href="report.html">Build custom report</a></div></div></details><details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown"><div class="nav-column"><a href="parties.html">Countries and parties</a><a href="compare.html">Compare parties and periods</a><a href="quotes.html">Quotation explorer</a><a href="events.html">Cross-party events</a><a href="speakers.html">Speakers</a><a href="network.html">Party network</a></div></div></details><details class="nav-menu"><summary>Research</summary><div class="nav-dropdown nav-dropdown-wide"><div class="nav-column"><span class="nav-label">Method and audit</span><a href="methodology.html">Methodology</a><a href="quality.html">Quality and validation</a><a href="sources.html">Source registry</a><a href="inclusion.html">Party-inclusion dossiers</a><a href="prompts.html">Prompt archive</a><a href="health.html">Collection status</a></div><div class="nav-column"><span class="nav-label">Data and reuse</span><a href="elections.html">Verified election series</a><a href="dataset.html">Dataset and exports</a><a href="tutorials.html">Usage tutorials</a><a href="citation.html">Suggested citation</a></div></div></details><a class="nav-direct" href="search.html">Search</a></div></details>
 </nav>
 <main id="main-content" tabindex="-1"><h1>Prompt archive</h1><p class="lede">Versioned instructions used for AI-assisted stages. Dynamic source text is not republished here; the template shows which contextual fields were supplied. A prompt version documents procedure, not model determinism.</p><section class="box"><h2>analyze · analyze/3</h2><p>Historical screening and extraction prompt represented in the current archive; its former topic field is retired and is neither displayed nor exported.</p><p class="meta">Records in database: 1101 · model: claude-sonnet-4-5</p><h3>System instruction</h3><pre class="bib">You are a careful research assistant monitoring political-party output.
 Return JSON only. Never decide whether a statement is racist, antisemitic,
@@ -63,7 +37,7 @@ Language hint: {language}
 SOURCE TEXT
 {up to 18,000 characters of captured source text}</pre><h3>Expected output</h3><p>relevant; triaged_out; historical retired topic field; confidence; actors;
 one-sentence factual summary; verbatim quotations with English translations
-and speakers; and organisation relations.</p></section><section class="box"><h2>analyze · analyze/5</h2><p>Relevance screening, factual description, quotations, actors, action type, and organisational relations.</p><p class="meta">Records in database: 1796 · model: claude-sonnet-4-5</p><h3>System instruction</h3><pre class="bib">You are a careful research assistant monitoring political-party output.
+and speakers; and organisation relations.</p></section><section class="box"><h2>analyze · analyze/5</h2><p>Relevance screening, factual description, quotations, actors, action type, and organisational relations.</p><p class="meta">Records in database: 1988 · model: claude-sonnet-4-5</p><h3>System instruction</h3><pre class="bib">You are a careful research assistant monitoring political-party output.
 Return JSON only. Never decide whether a statement is racist, antisemitic,
 extremist, true, or false. Preserve the boundary between source material
 and inference. Relevant means the item contains a substantive position,
@@ -94,9 +68,10 @@ differences that could cause a researcher to misstate the claim.</pre><h3>Input 
 original and round-trip text in the same language.</pre><h3>Expected output</h3><p>Round-trip text; preserved true/false; severity none/minor/material; and a
 specific difference note.</p></section><p class="meta">Archive configuration version: 2026-09-23.</p></main>
 <footer class="meta">
-<strong>RAPPORT</strong> — Radicalism and Party Politics: Observation, Reporting and Tracking. Automated research monitoring
-powered by the Claude API. AI-generated material may contain errors; consult the
-cited primary sources. <a href="https://www.neilbar.com" rel="me">Dr. Neil Bar</a>.
+<strong>RAPPORT</strong> — Radicalism and Party Politics: Observation, Reporting and Tracking.
+Automated academic research monitoring powered by the Claude API.
+AI-generated material may contain errors; consult the cited primary sources.
+<a href="https://www.neilbar.com/" rel="me">Neil Bar</a>.
 </footer>
 </div><script>
 const navMenus=[...document.querySelectorAll('.nav-menu')];

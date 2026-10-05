@@ -1,0 +1,1 @@
+Microsoft recommande de télécharger et d’installer le dernier pilote d’imprimante pour une imprimante. L’installation du dernier pilote d’imprimante peut résoudre les problèmes connus de l’imprimante, augmenter les performances ou ajouter des fonctionnalités supplémentaires.

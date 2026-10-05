@@ -1,0 +1,1 @@
+Definition Power is the rate at which work is done or energy is transferred. [3] It is given by: where P is power, E is the energy transferred, and t is time. In terms of work, power is also expressed as: where W is the work done on the system.

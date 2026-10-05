@@ -5,6 +5,6 @@ type: dataset
 authors:
   - family-names: Bar
     given-names: Neil
-version: "1.4"
-date-released: "2026-09-25"
+version: "1.5"
+date-released: "2026-10-05"
 url: "https://neilmegas.github.io/radicalneilbar/"

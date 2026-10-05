@@ -1,0 +1,1 @@
+Workers allows you to fully test your changes locally and allow you to get in the flow, ahead of pushing your changes with workerd, our open-source runtime. Choose from a template in your language to kickstart building an app. Workers are built on unique architecture called isolates.

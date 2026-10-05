@@ -1,0 +1,1 @@
+The plugs work with Home Assistant, SmartThings, and Echo devices with ZigBee hubs, providing voice and remote control. Safety features include customizable power-on states, while automation capabilities let you schedule multiple devices or group them for simultaneous control.

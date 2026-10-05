@@ -1,0 +1,1 @@
+The top smart plugs that integrate natively with Home Assistant — no cloud required. Covers Zigbee, Z-Wave, and Wi-Fi options with setup tips.

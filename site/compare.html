@@ -13,36 +13,10 @@
   <span class="brand-lockup"><span class="brand-mark" aria-hidden="true">R</span>
     <span class="brand-copy"><a class="brand" href="index.html">RAPPORT</a>
       <small>Radicalism and Party Politics: Observation, Reporting and Tracking</small></span></span>
-  <details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown">
-    <a href="index.html#latest">Latest weekly report</a>
-    <a href="archive.html">Report archive</a>
-    <a href="report.html">Build custom report</a>
-  </div></details>
-  <details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown">
-    <a href="parties.html">Countries and parties</a>
-    <a href="compare.html">Compare parties and periods</a>
-    <a href="quotes.html">Quotation explorer</a>
-    <a href="events.html">Cross-party events</a>
-    <a href="speakers.html">Speakers</a>
-    <a href="network.html">Party network</a>
-  </div></details>
-  <details class="nav-menu"><summary>Research</summary><div class="nav-dropdown nav-dropdown-wide">
-    <div class="nav-column"><span class="nav-label">Method and audit</span>
-      <a href="methodology.html">Methodology</a>
-      <a href="quality.html">Quality and validation</a>
-      <a href="sources.html">Source registry</a>
-      <a href="inclusion.html">Party-inclusion dossiers</a>
-      <a href="prompts.html">Prompt archive</a>
-      <a href="health.html">Collection status</a></div>
-    <div class="nav-column"><span class="nav-label">Data and reuse</span>
-      <a href="elections.html">Verified election series</a>
-      <a href="dataset.html">Dataset and exports</a>
-      <a href="tutorials.html">Usage tutorials</a>
-      <a href="citation.html">Suggested citation</a></div>
-  </div></details>
-  <a href="search.html">Search</a>
+  <div class="desktop-nav"><details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown"><div class="nav-column"><a href="index.html#latest">Latest weekly report</a><a href="archive.html">Report archive</a><a href="report.html">Build custom report</a></div></div></details><details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown"><div class="nav-column"><a href="parties.html">Countries and parties</a><a href="compare.html">Compare parties and periods</a><a href="quotes.html">Quotation explorer</a><a href="events.html">Cross-party events</a><a href="speakers.html">Speakers</a><a href="network.html">Party network</a></div></div></details><details class="nav-menu"><summary>Research</summary><div class="nav-dropdown nav-dropdown-wide"><div class="nav-column"><span class="nav-label">Method and audit</span><a href="methodology.html">Methodology</a><a href="quality.html">Quality and validation</a><a href="sources.html">Source registry</a><a href="inclusion.html">Party-inclusion dossiers</a><a href="prompts.html">Prompt archive</a><a href="health.html">Collection status</a></div><div class="nav-column"><span class="nav-label">Data and reuse</span><a href="elections.html">Verified election series</a><a href="dataset.html">Dataset and exports</a><a href="tutorials.html">Usage tutorials</a><a href="citation.html">Suggested citation</a></div></div></details><a class="nav-direct" href="search.html">Search</a></div>
   <span class="spacer"></span>
   <span class="meta">interactive longitudinal explorer</span>
+  <details class="mobile-nav"><summary aria-label="Open navigation">Menu</summary><div class="mobile-nav-panel"><details class="nav-menu"><summary>Reports</summary><div class="nav-dropdown"><div class="nav-column"><a href="index.html#latest">Latest weekly report</a><a href="archive.html">Report archive</a><a href="report.html">Build custom report</a></div></div></details><details class="nav-menu"><summary>Explore</summary><div class="nav-dropdown"><div class="nav-column"><a href="parties.html">Countries and parties</a><a href="compare.html">Compare parties and periods</a><a href="quotes.html">Quotation explorer</a><a href="events.html">Cross-party events</a><a href="speakers.html">Speakers</a><a href="network.html">Party network</a></div></div></details><details class="nav-menu"><summary>Research</summary><div class="nav-dropdown nav-dropdown-wide"><div class="nav-column"><span class="nav-label">Method and audit</span><a href="methodology.html">Methodology</a><a href="quality.html">Quality and validation</a><a href="sources.html">Source registry</a><a href="inclusion.html">Party-inclusion dossiers</a><a href="prompts.html">Prompt archive</a><a href="health.html">Collection status</a></div><div class="nav-column"><span class="nav-label">Data and reuse</span><a href="elections.html">Verified election series</a><a href="dataset.html">Dataset and exports</a><a href="tutorials.html">Usage tutorials</a><a href="citation.html">Suggested citation</a></div></div></details><a class="nav-direct" href="search.html">Search</a></div></details>
 </nav>
 <main id="main-content" tabindex="-1"><h1>Compare parties and periods</h1>
 <p class="lede">Explore retained evidence by party, country, period, action, document type,
@@ -90,9 +64,10 @@ ce('cmp-csv').addEventListener('click',()=>save('rapport-filtered.csv','text/csv
 async function load(){try{const idx=await fetch('corpus/index.json').then(r=>r.json());corpus=(await Promise.all(idx.years.map(y=>fetch(`corpus/${y}.json`).then(r=>r.json())))).flat();const opts=(id,vals)=>vals.forEach(([v,l])=>ce(id).insertAdjacentHTML('beforeend',`<option value="${esc(v)}">${esc(l)}</option>`));const parties=[...new Map(corpus.map(x=>[x.p,x.pn||x.p])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));opts('cmp-a',parties);opts('cmp-b',parties);opts('cmp-country',[...new Set(corpus.map(x=>x.c).filter(Boolean))].sort().map(x=>[x,x]));opts('cmp-action',[...new Set(corpus.map(x=>x.at).filter(Boolean))].sort().map(x=>[x,x]));opts('cmp-type',[...new Set(corpus.map(x=>x.st).filter(Boolean))].sort().map(x=>[x,x.replaceAll('_',' ')]));update()}catch(err){ce('cmp-status').textContent='The corpus could not be loaded. Open this page through the published GitHub Pages URL.'}}load();
 </script></main>
 <footer class="meta">
-<strong>RAPPORT</strong> — Radicalism and Party Politics: Observation, Reporting and Tracking. Automated research monitoring
-powered by the Claude API. AI-generated material may contain errors; consult the
-cited primary sources. <a href="https://www.neilbar.com" rel="me">Dr. Neil Bar</a>.
+<strong>RAPPORT</strong> — Radicalism and Party Politics: Observation, Reporting and Tracking.
+Automated academic research monitoring powered by the Claude API.
+AI-generated material may contain errors; consult the cited primary sources.
+<a href="https://www.neilbar.com/" rel="me">Neil Bar</a>.
 </footer>
 </div><script>
 const navMenus=[...document.querySelectorAll('.nav-menu')];
