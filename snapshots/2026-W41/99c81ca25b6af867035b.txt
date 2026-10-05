@@ -1,0 +1,1 @@
+For my application I need to embed Facebook page in an iframe, here is the html code: ... But it does not work, any idea why and how to circumvent ?

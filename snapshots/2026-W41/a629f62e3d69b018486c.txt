@@ -1,0 +1,1 @@
+This will make the Facebook Page Plugin responsive, but only on the initial page render, with a minimum width of 180px. I'm still trying to figure out how to make it truly dynamically responsive, in spite of Facebook's caveat (I'll post an update if I ever find the answer).

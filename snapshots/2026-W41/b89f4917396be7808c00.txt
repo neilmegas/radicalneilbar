@@ -1,0 +1,1 @@
+To provide an insight into the software that is available, we have compiled a list of 18 useful tools for performing binary analysis. Only free and open source software is eligible for inclusion here.

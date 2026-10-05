@@ -1,0 +1,1 @@
+This is a recursive firmware extractor that aims to extract a kernel image and/or compressed filesystem from a Linux-based firmware image. A number of heuristics are included to avoid extraction of certain blacklisted file types, and to avoid unproductive extraction beyond certain breadth and depth limitations.

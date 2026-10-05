@@ -1,0 +1,1 @@
+How do you convert meters to kilometers? To convert meters to kilometers, you need to divide the number of meters by 1000. This is because there are 1000 meters in one kilometer. The formula for the conversion is as follows: Kilometers = Meters / 1000. For example, let's say you have a distance of 5000 meters that you want to convert to kilometers.

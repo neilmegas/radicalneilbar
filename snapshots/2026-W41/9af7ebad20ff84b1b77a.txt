@@ -1,0 +1,1 @@
+The Facebook SDK for Unity gets the wrong key hash. It gets the key from "C:\Users\"your user".android\debug.keystore" and, in a perfect world, it should get it from the keystore you created in your project.

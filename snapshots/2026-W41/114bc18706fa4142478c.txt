@@ -1,0 +1,1 @@
+There are so many tools for firmware reversing and analysis that are already available and can help extract and disassemble firmware. Even better, these tools are extensible with scripts and plugins so you can customize them to your needs.

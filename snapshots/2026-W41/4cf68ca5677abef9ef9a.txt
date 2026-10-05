@@ -1,0 +1,1 @@
+Depending on the target device, firmware can be extracted through physical, semi-physical, or software-only methods. This page covers both invasive and non-invasive approaches.

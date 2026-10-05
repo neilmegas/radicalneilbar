@@ -1,0 +1,1 @@
+Download Binwalk, the open-source firmware analysis tool for identifying, validating, and extracting embedded files, file systems, compressed data, executables, and other content from binary images.

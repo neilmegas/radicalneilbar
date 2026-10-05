@@ -1,0 +1,1 @@
+Nous avons entraîné un modèle capable d’interagir de manière conversationnelle. Son nom ? ChatGPT. Cette capacité à dialoguer permet à ChatGPT de répondre à des questions de suivi, de reconnaître ses erreurs, de souligner les informations incorrectes et de rejeter les demandes inappropriées.

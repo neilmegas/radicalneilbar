@@ -1,0 +1,1 @@
+Some languages distinguish between inclusive we, which includes both the speaker and the addressee (s), and exclusive we, which excludes the addressee (s). English does not make this distinction grammatically, though we can have both inclusive and exclusive semantics.

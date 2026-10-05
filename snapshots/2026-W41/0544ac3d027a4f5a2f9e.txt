@@ -1,0 +1,1 @@
+I have a React/Horizon app with facebook login. I am wondering if there is any option to work with facebook login from localhost?

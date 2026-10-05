@@ -1,0 +1,1 @@
+The event calendar shows upcoming club events. Select a view then use the navigation buttons to move between dates. Click on the event to view more information, including the event description, times, location, fees and any rules regarding attendance; you can also register for events from this screen. Click on the magnifying glass on the toolbar to see search and filter options.

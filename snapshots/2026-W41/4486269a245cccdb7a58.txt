@@ -1,0 +1,1 @@
+The tool is essential for reverse engineering, security research, and firmware modification. As of version 3 (released 2024), binwalk was completely rewritten in Rust for greatly improved scanning speed, fewer false positives, and more built-in extractors.

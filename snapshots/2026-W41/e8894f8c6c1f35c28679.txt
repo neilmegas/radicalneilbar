@@ -1,0 +1,1 @@
+I want to add facebook share button on my website, that should just post my website's content on the wall. Can anyone help me?
