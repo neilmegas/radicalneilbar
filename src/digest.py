@@ -26,16 +26,27 @@ DEFAULT_CONFIG = {
         "European radical parties politics",
         "Israel political parties Knesset",
     ],
-    "world_queries": [
-        "global politics elections diplomacy",
-        "international politics governments conflict",
-    ],
+    # Country-specific context queries are generated from the live roster.
+    "world_queries": [],
     "queries": [
         "European far-right parties analysis",
         "European far-left parties analysis",
     ],
     "limit_per_panel": 6,
     "minimum_per_panel": 2,
+}
+
+COUNTRY_ALIASES = {
+    "Greece": ["Greek"], "Germany": ["German"], "France": ["French"],
+    "Austria": ["Austrian"], "Netherlands": ["Dutch"],
+    "Belgium": ["Belgian"], "Sweden": ["Swedish"],
+    "Finland": ["Finnish"], "Italy": ["Italian"], "Spain": ["Spanish"],
+    "United Kingdom": ["UK", "Britain", "British"],
+    "Israel": ["Israeli"], "Cyprus": ["Cypriot"],
+    "Portugal": ["Portuguese"], "Norway": ["Norwegian"],
+    "Denmark": ["Danish"], "Ireland": ["Irish"],
+    "Luxembourg": ["Luxembourgish"], "Switzerland": ["Swiss"],
+    "Iceland": ["Icelandic"],
 }
 
 
@@ -108,17 +119,25 @@ def fetch_reading_feeds(config: dict, since, until=None) -> list[dict]:
     return out
 
 
-def search_news(queries: list[str], since, until=None, kind: str = "reporting",
-                per_query: int = 16) -> list[dict]:
+def search_news(queries: list, since, until=None, kind: str = "reporting",
+                per_query: int = 16, max_queries: int = 8) -> list[dict]:
     """Dated news search used when direct sites or specialist feeds are thin."""
     since = _as_datetime(since) or datetime.now(timezone.utc) - timedelta(days=7)
     until = _as_datetime(until) if until else datetime.now(timezone.utc) + timedelta(days=1)
     # Never ask a feed for future material when building the current partial week.
     until = min(until, datetime.now(timezone.utc) + timedelta(days=1))
-    selected_queries = list(queries or [])[:8]
+    selected_queries = list(queries or [])[:max_queries]
 
-    def fetch(query):
+    def fetch(query_spec):
         rows = []
+        if isinstance(query_spec, dict):
+            query = str(query_spec.get("query") or "").strip()
+            scope_country = str(query_spec.get("country") or "").strip()
+        else:
+            query = str(query_spec or "").strip()
+            scope_country = ""
+        if not query:
+            return rows
         after = (since.date() - timedelta(days=1)).isoformat()
         before = until.date().isoformat()
         search = f"{query} after:{after} before:{before}"
@@ -140,6 +159,11 @@ def search_news(queries: list[str], since, until=None, kind: str = "reporting",
                 source = (src.get("title") if isinstance(src, dict) else "") or "Google News"
                 row = _row(entry, source, kind)
                 row["published"] = published
+                if scope_country:
+                    # The row came from a query explicitly restricted to one
+                    # monitored country.  Keeping that provenance lets the
+                    # report enforce and display its geographic scope.
+                    row["country"] = scope_country
                 rows.append(row)
         except Exception:
             pass
@@ -206,6 +230,64 @@ def curate(candidates: list[dict], limit: int = 6, minimum: int = 2) -> list[dic
     # ``minimum`` is an assertion target, not permission to invent a story.
     # The caller records an explicit coverage warning if searches return fewer.
     return chosen[:max(minimum, limit)]
+
+
+def curate_monitored_countries(candidates: list[dict], limit: int = 6,
+                               minimum: int = 2) -> list[dict]:
+    """Keep world-context links inside the monitored-country universe.
+
+    Country-specific searches annotate every candidate.  The first pass takes
+    one result per country so a single high-volume news market cannot occupy
+    the whole panel; a second pass fills any remaining slots.
+    """
+    scoped = [row for row in candidates if row.get("country")]
+    pool = curate(scoped, limit=max(limit * 6, 36), minimum=minimum)
+    chosen, used_countries = [], set()
+    for row in pool:
+        country = str(row.get("country") or "").casefold()
+        if country in used_countries:
+            continue
+        chosen.append(row)
+        used_countries.add(country)
+        if len(chosen) >= limit:
+            return chosen
+    for row in pool:
+        if row not in chosen:
+            chosen.append(row)
+        if len(chosen) >= limit:
+            break
+    return chosen[:limit]
+
+
+def restrict_to_monitored_countries(rows: list[dict], countries: list[str]) -> list[dict]:
+    """Drop context that cannot be tied to one of the monitored countries.
+
+    New rows carry an explicit country from their country-specific query.  The
+    text match is only a migration path for panels saved before that metadata
+    existed; it keeps older static issues from retaining unrelated global news.
+    """
+    allowed = {str(country).strip() for country in countries if str(country).strip()}
+    out = []
+    for raw in rows or []:
+        if not isinstance(raw, dict):
+            continue
+        row = dict(raw)
+        if row.get("country") in allowed:
+            out.append(row)
+            continue
+        haystack = " ".join(str(row.get(key) or "")
+                            for key in ("title", "description", "why")).casefold()
+        matched = ""
+        for country in sorted(allowed):
+            terms = [country] + COUNTRY_ALIASES.get(country, [])
+            if any(re.search(r"(?<!\w)" + re.escape(term.casefold()) + r"(?!\w)",
+                             haystack) for term in terms):
+                matched = country
+                break
+        if matched:
+            row["country"] = matched
+            out.append(row)
+    return out
 
 
 def highlights(items: list[dict], context: list[dict] | None = None,
@@ -278,8 +360,9 @@ def highlights(items: list[dict], context: list[dict] | None = None,
     return out[:limit]
 
 
-def build_panels(config: dict, items: list[dict], since, until) -> tuple[list, list, list]:
-    """Return highlights, world politics, and worth-reading rows."""
+def build_panels(config: dict, items: list[dict], since, until,
+                 monitored_countries: list[str] | None = None) -> tuple[list, list, list]:
+    """Return concrete highlights, monitored-country context, and reading."""
     limit = max(2, int(config.get("limit_per_panel") or 6))
     minimum = max(2, int(config.get("minimum_per_panel") or 2))
 
@@ -291,13 +374,27 @@ def build_panels(config: dict, items: list[dict], since, until) -> tuple[list, l
                 break
         return rows
 
+    monitored = list(dict.fromkeys(
+        str(country).strip() for country in (monitored_countries or [])
+        if str(country).strip()
+    ))
+    world_queries = (
+        [{"country": country,
+          "query": f'"{country}" politics election government parliament'}
+         for country in monitored]
+        if monitored else list(config.get("world_queries") or [])
+    )
+
     # The four source groups are independent. Fetching them together keeps a
     # slow feed from serially delaying the scheduled workflow.
     with ThreadPoolExecutor(max_workers=4) as pool:
         future_europe = pool.submit(
             retry, lambda: search_news(config.get("highlights_queries") or [], since, until))
         future_world = pool.submit(
-            retry, lambda: search_news(config.get("world_queries") or [], since, until))
+            retry, lambda: search_news(
+                world_queries, since, until, per_query=8,
+                max_queries=max(8, len(world_queries)),
+            ))
         future_feeds = pool.submit(
             retry, lambda: fetch_reading_feeds(config, since, until))
         future_reading = pool.submit(
@@ -306,7 +403,8 @@ def build_panels(config: dict, items: list[dict], since, until) -> tuple[list, l
         world_candidates = future_world.result()
         reading_candidates = future_feeds.result() + future_reading.result()
 
-    world = curate(world_candidates, limit=limit, minimum=minimum)
+    world = (curate_monitored_countries(world_candidates, limit=limit, minimum=minimum)
+             if monitored else curate(world_candidates, limit=limit, minimum=minimum))
     reading = curate(reading_candidates, limit=limit, minimum=minimum)
     highlight_rows = highlights(items, europe_israel, limit=limit, minimum=minimum)
     return highlight_rows, world, reading
