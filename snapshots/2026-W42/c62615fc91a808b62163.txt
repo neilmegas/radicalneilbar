@@ -1,0 +1,1 @@
+Contact the Partner Engineering team or your Cash App Point of Contact to set up the API credentials for your integration and to get the download and install instructions for the Sandbox App (both for Android and iOS).

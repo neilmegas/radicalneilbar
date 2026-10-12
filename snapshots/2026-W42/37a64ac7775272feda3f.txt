@@ -1,0 +1,1 @@
+Comparison covers 66 of the 71 aces projections we made in 2025. A match needs five earlier matches on record before the baseline exists. The baseline predicts a player's aces as the average of their last five matches. Our model beats it when its projections land closer to what actually happened.
