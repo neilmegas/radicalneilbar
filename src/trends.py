@@ -112,37 +112,65 @@ def action_type(item: dict) -> str:
 
 def week_in_one_minute(items: list[dict], highlights: list[dict] | None = None,
                        limit: int = 5) -> list[dict]:
-    """A short evidence-linked account of the week's most important actions."""
-    relevant = [i for i in items if (i.get("analysis") or {}).get("relevant")]
-    by_id = {i["id"]: i for i in relevant}
-    ordered = []
-    for row in highlights or []:
-        item = by_id.get(row.get("item_id")) if isinstance(row, dict) else None
-        if item and item not in ordered:
-            ordered.append(item)
-    ordered += [i for i in sorted(
-        relevant,
-        key=lambda x: (is_direct(x), x.get("published") or ""),
-        reverse=True,
-    ) if i not in ordered]
+    """Summarise the shape of the week without repeating the headline list.
 
-    out, used_parties = [], set()
-    for item in ordered:
-        pid = item.get("party_id")
-        if pid in used_parties and len(out) < min(limit, len({i.get('party_id') for i in ordered})):
-            continue
-        used_parties.add(pid)
-        analysis = item.get("analysis") or {}
-        text = analysis.get("summary") or item.get("title") or "Recorded activity"
+    Highlights are concrete, consequential records.  This section instead
+    reports scope and recurring action patterns across the retained corpus.
+    A representative record supports each pattern, with preference given to
+    evidence that is not already used as a highlight.
+    """
+    relevant = [i for i in items if (i.get("analysis") or {}).get("relevant")]
+    if not relevant:
+        return []
+
+    highlighted = {
+        row.get("item_id") for row in (highlights or [])
+        if isinstance(row, dict) and row.get("item_id")
+    }
+    parties = {i.get("party_id") for i in relevant if i.get("party_id")}
+    countries = {i.get("country") for i in relevant if i.get("country")}
+    direct_count = sum(1 for item in relevant if is_direct(item))
+    out = [{
+        "item_id": "",
+        "party": "Scope",
+        "action": "Weekly coverage",
+        "text": (f"{len(relevant)} retained records involved {len(parties)} monitored "
+                 f"parties across {len(countries)} countries; {direct_count} came from "
+                 "party-controlled or official parliamentary sources."),
+    }]
+
+    grouped = {}
+    for item in relevant:
+        grouped.setdefault(action_type(item), []).append(item)
+    ordered_groups = sorted(
+        grouped.items(),
+        key=lambda pair: (-len(pair[1]), pair[0]),
+    )
+    for action, group in ordered_groups:
+        group.sort(key=lambda item: (is_direct(item), item.get("published") or ""),
+                   reverse=True)
+        representative = next(
+            (item for item in group if item.get("id") not in highlighted), group[0])
+        group_parties = sorted({
+            item.get("party_name") or item.get("party_id")
+            for item in group if item.get("party_name") or item.get("party_id")
+        })
+        group_countries = {item.get("country") for item in group if item.get("country")}
+        named = ", ".join(group_parties[:3])
+        if len(group_parties) > 3:
+            named += f" and {len(group_parties) - 3} more"
         out.append({
-            "item_id": item.get("id"),
-            "party": item.get("party_name") or pid,
-            "action": action_type(item),
-            "text": _clip(text),
+            "item_id": representative.get("id"),
+            "party": action,
+            "action": "Weekly pattern",
+            "text": (f"{len(group)} record{'s' if len(group) != 1 else ''} involved "
+                     f"{len(group_parties)} part{'ies' if len(group_parties) != 1 else 'y'} "
+                     f"in {len(group_countries)} countr{'ies' if len(group_countries) != 1 else 'y'}"
+                     + (f": {named}." if named else ".")),
         })
         if len(out) >= limit:
             break
-    return out
+    return out[:limit]
 
 
 def week_changes(current: list[dict], previous: list[dict], previous_week: str = "",

@@ -65,7 +65,7 @@ DEFAULT_SITE = {
     },
     "citation": {
         "author": "Bar, N.",
-        "report_title": "Neil’s Parties Report",
+        "report_title": "RAPPORT weekly report",
         "publisher": "RAPPORT",
     },
 }

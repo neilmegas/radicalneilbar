@@ -278,11 +278,14 @@ details[open].timeline-period>summary::before{content:'−'}
   min-height:2.45rem;padding:.42rem .5rem;border:1px solid var(--hair);border-radius:4px;
   background:var(--paper);color:var(--ink)}
 .party-directory-status{display:flex;align-items:end;justify-content:flex-end;font-size:.76rem;
-  color:var(--muted);padding-bottom:.42rem}
+  color:var(--muted);padding-bottom:.42rem;gap:.55rem}
+.party-directory-status button{border:1px solid var(--hair);background:var(--paper);color:var(--ink);
+  padding:.28rem .52rem;border-radius:3px;cursor:pointer;font-size:.72rem}
 .party-directory-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.35rem;
   margin-top:.45rem;border-top:2px solid var(--ink)}
 .party-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:.55rem;
   min-width:0;padding:.68rem .35rem;border-bottom:1px solid var(--hair);transition:background .12s ease}
+.party-row.is-filtered-out{display:none!important}
 .party-row:hover{background:var(--surface)}
 .party-camp-mark{display:block;width:9px;height:9px;margin-top:.35rem;background:var(--right)}
 .party-row.left .party-camp-mark{background:var(--left)}
@@ -1211,6 +1214,9 @@ def panel_html(title, rows, item_by_id):
                   if url else e(item_title))
         source = (src.get("party_name") or src.get("source") or src.get("outlet")
                   or src.get("party_id") or "Source")
+        scope_country = row.get("country") if isinstance(row, dict) else ""
+        if scope_country and scope_country.casefold() not in source.casefold():
+            source = f"{source} · {scope_country}"
         published = (src.get("published") or row.get("published") or "")[:10]
         description = str(row.get("description") or row.get("line")
                           or (src.get("analysis") or {}).get("summary") or "")
@@ -1240,8 +1246,9 @@ def minute_html(rows):
     if not entries:
         entries.append('<li class="meta">No retained activity was available for a summary.</li>')
     return ('<section class="minute"><h2>The week in one minute</h2>'
-            '<p class="meta"><span class="ai-label ai">AI-assisted digest</span> The shortest route through the most consequential retained '
-            'party activity. Every point opens its supporting record.</p>'
+            '<p class="meta"><span class="ai-label ai">Structured digest</span> '
+            'A corpus-level view of coverage and recurring forms of activity. '
+            'Highlights below identify the week’s most consequential individual developments.</p>'
             f'<ul>{"".join(entries)}</ul></section>')
 
 
@@ -1307,14 +1314,20 @@ def four_week_timeline_html(periods):
             f'<div class="four-week-grid">{"".join(cards)}</div></section>')
 
 
+def weekly_report_title(week, week_range):
+    """Human-readable title tied to one dated weekly issue."""
+    citation_copy = SITE_COPY.get("citation") or {}
+    base = citation_copy.get("report_title") or "RAPPORT weekly report"
+    return f"{base}: {week_range or week}"
+
+
 def report_citation(week, week_range):
     """Stable APA 7 report citation using the ISO week as report number."""
     citation_copy = SITE_COPY.get("citation") or {}
     author = citation_copy.get("author") or "Bar, N."
-    title = citation_copy.get("report_title") or "Neil’s Parties Report"
     publisher = citation_copy.get("publisher") or SITE_NAME
     year = str(week).split("-")[0]
-    report_title = f"{title}: {week_range}"
+    report_title = weekly_report_title(week, week_range)
     url = f"{PUBLIC_URL}issues/{week}.html"
     plain = f"{author} ({year}). {report_title} (Report No. {week}). {publisher}. {url}"
     html_citation = (f'{e(author)} ({e(year)}). <em>{e(report_title)}</em> '
@@ -1463,9 +1476,7 @@ def issue_page(week, items, overview, briefings, country_names, parties,
     flagged = sum(1 for i in relevant
                   if (i.get("interpretation") or {}).get("significance") in ("notable", "unusual"))
 
-    report_name = ((SITE_COPY.get("citation") or {}).get("report_title")
-                   or "Neil’s Parties Report")
-    visible_title = f"{report_name}: {week_range or week}"
+    visible_title = weekly_report_title(week, week_range)
     body = [f'<div class="section-kicker">Report No. {e(week)}</div>',
             f'<h1>{e(visible_title)}</h1>',
             f'<p class="meta">{e(week)} · {len(relevant)} items · '
@@ -1482,7 +1493,7 @@ def issue_page(week, items, overview, briefings, country_names, parties,
     item_by_id = {i["id"]: i for i in relevant}
     body.append('<div class="weekly-panels">')
     body.append(panel_html("Highlights", highlights, item_by_id))
-    body.append(panel_html("This week in the world", world, item_by_id))
+    body.append(panel_html("This week across monitored countries", world, item_by_id))
     body.append(panel_html("Worth reading", reading, item_by_id))
     body.append('</div>')
     if overview:
@@ -2785,12 +2796,18 @@ def parties_page(parties, totals, country_names, out_dir, representation=None):
         power = (f'{seats} / {total} national seats' if verified
                  else 'national seat total pending')
         records = int(totals.get(party["id"], 0))
+        search_text = " ".join([
+            party_display_name(party), party.get("name") or "",
+            party.get("original_name") or "", party.get("acronym") or "",
+            party.get("short") or "", country, family,
+        ]).casefold()
         rows.append(
             f'<article class="party-row {e(party.get("camp") or "right")}" '
             f'data-name="{e(party_display_name(party).casefold())}" '
             f'data-country="{e(country_code)}" data-country-name="{e(country.casefold())}" '
             f'data-family="{e(party.get("camp") or "right")}" data-status="{status}" '
-            f'data-records="{records}" data-seats="{seats}">'
+            f'data-records="{records}" data-seats="{seats}" '
+            f'data-search="{e(search_text)}">'
             '<span class="party-camp-mark" aria-hidden="true"></span>'
             '<div class="party-row-main">'
             f'<h2><a href="parties/{e(party["id"])}.html">{e(party_display_name(party))}</a></h2>'
@@ -2815,7 +2832,8 @@ English / original language (acronym). Political-power figures are dated on each
  <label>Sort<select id="party-sort"><option value="name">Name A–Z</option>
   <option value="country">Country A–Z</option><option value="family">Party family</option>
   <option value="records">Most records</option><option value="seats">Most national seats</option></select></label>
- <div class="party-directory-status" id="party-count" aria-live="polite">{len(parties)} parties</div>
+ <div class="party-directory-status"><span id="party-count" aria-live="polite">{len(parties)} parties</span>
+  <button id="party-reset" type="button">Reset</button></div>
 </div>
 <div class="party-directory-list" id="party-grid">{''.join(rows)}</div>
 <div class="party-directory-empty" id="party-empty" hidden>No parties match these filters.</div>
@@ -2829,33 +2847,44 @@ English / original language (acronym). Political-power figures are dated on each
   const status = document.getElementById('party-status');
   const sort = document.getElementById('party-sort');
   const count = document.getElementById('party-count');
+  const reset = document.getElementById('party-reset');
   const empty = document.getElementById('party-empty');
-  const text = value => (value || '').toLocaleLowerCase();
+  const text = value => (value || '').normalize('NFKD').toLowerCase().trim();
   function apply() {{
     const needle = text(query.value.trim());
     const visible = cards.filter(card => {{
-      const matches = (!needle || text(card.textContent).includes(needle)) &&
+      const matches = (!needle || text(card.dataset.search || card.textContent).includes(needle)) &&
         (!country.value || card.dataset.country === country.value) &&
         (!family.value || card.dataset.family === family.value) &&
         (!status.value || card.dataset.status === status.value);
-      card.hidden = !matches;
+      card.classList.toggle('is-filtered-out', !matches);
+      card.setAttribute('aria-hidden', matches ? 'false' : 'true');
       return matches;
     }});
     const compareText = (a, b, field) => a.dataset[field].localeCompare(
       b.dataset[field], undefined, {{sensitivity:'base'}});
-    visible.sort((a, b) => {{
+    const ordered = cards.slice().sort((a, b) => {{
       if (sort.value === 'records') return Number(b.dataset.records) - Number(a.dataset.records) || compareText(a,b,'name');
       if (sort.value === 'seats') return Number(b.dataset.seats) - Number(a.dataset.seats) || compareText(a,b,'name');
       if (sort.value === 'country') return compareText(a,b,'countryName') || compareText(a,b,'name');
       if (sort.value === 'family') return compareText(a,b,'family') || compareText(a,b,'name');
       return compareText(a,b,'name');
     }});
-    visible.forEach(card => grid.append(card));
+    ordered.forEach(card => grid.append(card));
     count.textContent = `${{visible.length}} ${{visible.length === 1 ? 'party' : 'parties'}}`;
     empty.hidden = visible.length !== 0;
   }}
-  [query, country, family, status, sort].forEach(control => control.addEventListener(
-    control === query ? 'input' : 'change', apply));
+  query.addEventListener('input', apply);
+  [country, family, status, sort].forEach(control => control.addEventListener('change', apply));
+  reset.addEventListener('click', () => {{
+    query.value = '';
+    country.value = '';
+    family.value = '';
+    status.value = '';
+    sort.value = 'name';
+    apply();
+    query.focus();
+  }});
   apply();
 }})();
 </script>'''
@@ -3021,9 +3050,8 @@ def _home_map(parties, country_names):
   for (const target of targets) {
     target.addEventListener('pointerenter', event => {
       const record = records[target.dataset.country];
-      showCountry(target.dataset.country);
       tipCountry.textContent = record.name;
-      tipParties.textContent = record.parties.map(party => party.name).join(' · ');
+      tipParties.textContent = `${record.parties.length} ${record.parties.length === 1 ? 'party' : 'parties'} · click to select`;
       tip.hidden = false;
       positionTip(event);
     });
@@ -3031,7 +3059,6 @@ def _home_map(parties, country_names):
     target.addEventListener('pointerleave', () => { tip.hidden = true; });
     target.addEventListener('focus', () => {
       tip.hidden = true;
-      showCountry(target.dataset.country);
     });
     target.addEventListener('click', event => {
       event.preventDefault();
@@ -3063,7 +3090,7 @@ def _home_map(parties, country_names):
  aria-labelledby="map-title map-description">
  <title id="map-title">Countries monitored by {SITE_NAME}</title>
  <desc id="map-description">A map focused on Europe and Israel. Highlighted countries
- show the monitored parties when selected or pointed to.</desc>
+ update the persistent party panel when selected.</desc>
  <rect class="map-sea" width="100%" height="100%"/>
  <g aria-hidden="true">{background}</g>
  <g>{''.join(watched)}</g>{israel_inset}
@@ -3074,7 +3101,7 @@ def _home_map(parties, country_names):
 <aside class="map-detail" id="map-detail" aria-live="polite">
  <span class="eyebrow">Monitored country</span>
  <h3 id="map-detail-country">Explore the map</h3>
- <p id="map-detail-intro">Move over a highlighted country, or select it, to see the parties tracked there.</p>
+ <p id="map-detail-intro">Select a highlighted country to see the parties tracked there.</p>
  <div class="map-party-list" id="map-detail-parties"></div>
 </aside></div>
 <p class="map-credit">Map geometry: <a href="{e(source_url)}">{e(source)}</a>.</p>

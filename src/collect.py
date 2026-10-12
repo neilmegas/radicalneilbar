@@ -127,10 +127,11 @@ def from_feed(party: dict, feed_url: str, since: datetime,
 
 
 def from_google_news(party: dict, since: datetime, days: int = 7,
-                     until: datetime | None = None) -> list[dict]:
+                     until: datetime | None = None,
+                     max_terms: int | None = None) -> list[dict]:
     terms = list(dict.fromkeys((party.get("queries") or []) + [party.get("name", "")]))
     out, seen = [], set()
-    term_limit = 6 if until else 3
+    term_limit = max_terms if max_terms is not None else (6 if until else 3)
     for term in [t for t in terms if t][:term_limit]:
         if until:
             # Google treats ``after`` and ``before`` as boundaries.  Move the
@@ -302,7 +303,8 @@ def from_sitemaps(party: dict, since: datetime, until: datetime,
     return out
 
 
-def from_site_scrape(party: dict, since: datetime) -> list[dict]:
+def from_site_scrape(party: dict, since: datetime,
+                     until: datetime | None = None) -> list[dict]:
     """Conservative fallback: collect article-looking links from the homepage."""
     site = party.get("site")
     if not site:
@@ -337,7 +339,7 @@ def from_site_scrape(party: dict, since: datetime) -> list[dict]:
                 continue
             # Do not turn an undated navigation/static page into activity
             # for this week merely because it appears on the homepage.
-            if not published or not _within(published.isoformat(), since):
+            if not published or not _within(published.isoformat(), since, until):
                 continue
             out.append(_item(party, "site_scrape", page_title or title, url,
                              published, body))
