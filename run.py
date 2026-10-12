@@ -31,6 +31,7 @@ import math
 import os
 import shutil
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 
@@ -378,87 +379,114 @@ def cmd_collect(cfg, args):
     week = args.week or (iso_week(since.isoformat(), current_week()) if historical
                          else current_week())
     yt_key = os.environ.get("YOUTUBE_API_KEY")
+    parties = selected_parties(cfg, args)
+    # A scheduled seven-day issue needs an exact date window, but it must not
+    # crawl years of sitemap history.  Deep sitemap traversal is reserved for
+    # the explicit backfill command.
+    archive_mode = historical and args.command == "backfill"
     new = total = 0
 
-    def run_channel(p, name, fn):
-        """Every attempt is logged, successful or not. Success-only records
-        cannot tell a party that went quiet from a feed that died."""
-        try:
-            got = fn() or []
-            st.log_collection(conn, week, p["id"], name, True, len(got))
-            return got
-        except Exception as ex:
-            st.log_collection(conn, week, p["id"], name, False, 0, str(ex))
-            return []
+    def collect_party(p):
+        """Fetch one party without touching SQLite.
 
-    for p in selected_parties(cfg, args):
-        items, direct, website_direct = [], [], []
-        if p.get("feeds"):
-            for feed in p["feeds"]:
-                got = run_channel(
-                    p, "site_feed",
-                    lambda f=feed: co.from_feed(p, f, since, until),
-                )
-                items += got
-                direct += got
-                website_direct += got
-        if historical and p.get("site"):
+        Party jobs run concurrently because network waits, rather than CPU,
+        dominate a 90-party issue.  Every channel returns an audit row even
+        when it fails or finds zero dated items; database writes remain on the
+        main thread.
+        """
+        logs = []
+
+        def run_channel(name, fn):
+            try:
+                got = fn() or []
+                logs.append((name, True, len(got), ""))
+                return got
+            except Exception as ex:
+                logs.append((name, False, 0, f"{type(ex).__name__}: {ex}"))
+                return []
+
+        items, website_direct = [], []
+
+        # The configured roster intentionally stays small and readable.  Feed
+        # discovery happens at collection time so every official site gets a
+        # fresh probe even when it has no hand-maintained RSS URL.
+        feed_urls = list(p.get("feeds") or [])
+        if p.get("site") and not feed_urls:
+            try:
+                result = co.discover_feeds(p.get("site"))
+            except Exception as ex:
+                result = {"reachable": False, "feeds": [],
+                          "error": f"{type(ex).__name__}: {ex}"}
+            feed_urls = list(result.get("feeds") or [])[:3]
+            logs.append(("feed_discovery", bool(result.get("reachable")),
+                         len(feed_urls), result.get("error") or ""))
+
+        for feed in feed_urls[:3]:
             got = run_channel(
-                p, "party_archive",
-                lambda: co.from_sitemaps(p, since, until),
-            )
+                "site_feed", lambda f=feed: co.from_feed(p, f, since, until))
             items += got
-            direct += got
             website_direct += got
-        elif not website_direct and p.get("site"):
-            got = run_channel(p, "site_scrape", lambda: co.from_site_scrape(p, since))
+
+        if archive_mode and p.get("site"):
+            got = run_channel(
+                "party_archive", lambda: co.from_sitemaps(p, since, until))
             items += got
-            direct += got
             website_direct += got
+        elif p.get("site") and not website_direct:
+            got = run_channel(
+                "site_scrape", lambda: co.from_site_scrape(p, since, until))
+            items += got
+            website_direct += got
+
         if p.get("telegram"):
-            got = run_channel(
-                p, "telegram", lambda: co.from_telegram(p, since, until),
-            )
-            items += got
-            direct += got
+            items += run_channel(
+                "telegram", lambda: co.from_telegram(p, since, until))
         if p.get("youtube_channel"):
-            got = run_channel(
-                p, "youtube", lambda: co.from_youtube(p, since, yt_key, until),
-            )
-            items += got
-            direct += got
+            items += run_channel(
+                "youtube", lambda: co.from_youtube(p, since, yt_key, until))
+
         parl, perr = [], None
         if p.get("parliament"):
             try:
                 parl, perr = hn.collect(p, since)
-                st.log_collection(conn, week, p["id"], "parliament", not perr,
-                                  len(parl), perr)
+                logs.append(("parliament", not perr, len(parl), perr or ""))
             except Exception as ex:
-                st.log_collection(conn, week, p["id"], "parliament", False, 0, str(ex))
-        items += parl
-        direct += parl
+                perr = f"{type(ex).__name__}: {ex}"
+                logs.append(("parliament", False, 0, perr))
+            items += parl
 
-        # A blocked homepage is not treated as silence. Search the public web
-        # index for dated pages on that exact official domain; if that also
-        # finds nothing, use a normal web search as a second fallback. Press
-        # search still runs for every party, independently of these fallbacks.
-        if not website_direct and p.get("site"):
+        # Official-domain search always runs.  It is an independent route to
+        # dated party documents and prevents a working but incomplete home
+        # page from suppressing discovery of press releases deeper in a site.
+        if p.get("site"):
             got = run_channel(
-                p, "party_search",
+                "party_search",
                 lambda: co.from_web_search(p, since, until, official_only=True),
             )
             items += got
-            direct += got
             website_direct += got
+
+        # Named-party web search is the fallback for blocked or unproductive
+        # official sources.  News search runs for every party independently.
         if not website_direct:
             items += run_channel(
-                p, "web_search",
+                "web_search",
                 lambda: co.from_web_search(p, since, until, official_only=False),
             )
         items += run_channel(
-            p, "press",
-            lambda: co.from_google_news(p, since, days=args.days, until=until),
+            "press",
+            lambda: co.from_google_news(
+                p, since, days=args.days, until=until,
+                max_terms=6 if archive_mode else 3,
+            ),
         )
+        return p, items, parl, perr, logs
+
+    def save_party(result):
+        nonlocal new, total
+        p, items, parl, perr, logs = result
+        for channel, ok, count, error in logs:
+            st.log_collection(conn, week, p["id"], channel, ok, count, error)
 
         fetched_here = len(items)
         unique = {}
@@ -471,7 +499,7 @@ def cmd_collect(cfg, args):
                         "telegram", "youtube", "parliament", "hansard",
                         "parliamentary_record"}
         # Stable sorting keeps newest-first within each class while putting
-        # direct records before press results when the safety cap is active.
+        # direct records before outside reporting when the safety cap is active.
         items.sort(key=lambda item: 0 if item.get("source_type") in direct_types else 1)
         if args.max_items_per_party and args.max_items_per_party > 0:
             items = items[:args.max_items_per_party]
@@ -493,8 +521,50 @@ def cmd_collect(cfg, args):
             kept += 1
         flag = f"  [parl {len(parl)}]" if parl else ("  [parl err]" if perr else "")
         selected = f"; newest {len(items)} processed" if len(items) < fetched_here else ""
-        print(f"{p['short']:<14} {kept:>3} new / {fetched_here:>3} fetched"
-              f"{selected}{flag}")
+        print(f"{p['short']:<22} {kept:>3} new / {fetched_here:>3} fetched"
+              f"{selected}{flag}", flush=True)
+        return p["id"], {row[0] for row in logs}
+
+    attempted, official_attempted, press_attempted = set(), set(), set()
+    workers = max(1, min(int(os.environ.get("RW_COLLECTION_WORKERS", "8")), len(parties)))
+    print(f"Monitoring {len(parties)} parties with {workers} bounded network workers...",
+          flush=True)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(collect_party, p): p for p in parties}
+        for future in as_completed(futures):
+            party = futures[future]
+            try:
+                party_id, channels = save_party(future.result())
+            except Exception as ex:
+                party_id = party["id"]
+                channels = set()
+                st.log_collection(conn, week, party_id, "collector", False, 0,
+                                  f"{type(ex).__name__}: {ex}")
+                print(f"{party.get('short') or party_id:<22} collector failed: "
+                      f"{type(ex).__name__}", flush=True)
+            attempted.add(party_id)
+            if channels & {"feed_discovery", "site_feed", "site_scrape",
+                           "party_archive", "party_search"}:
+                official_attempted.add(party_id)
+            if "press" in channels:
+                press_attempted.add(party_id)
+
+    expected = {p["id"] for p in parties}
+    missing = sorted(expected - attempted)
+    missing_official = sorted(expected - official_attempted)
+    missing_press = sorted(expected - press_attempted)
+    if missing or missing_official or missing_press:
+        problems = []
+        if missing:
+            problems.append("no collection task: " + ", ".join(missing))
+        if missing_official:
+            problems.append("no official-source attempt: " + ", ".join(missing_official))
+        if missing_press:
+            problems.append("no news-search attempt: " + ", ".join(missing_press))
+        raise RuntimeError("Incomplete party monitoring; " + "; ".join(problems))
+
+    print(f"Coverage gate passed: {len(attempted)}/{len(expected)} parties received "
+          "official-source and news-search checks.", flush=True)
 
     if historical:
         label = f"{args.dfrom} to {args.dto}"
@@ -570,19 +640,30 @@ def cmd_analyze(cfg, args):
     by_id = {p["id"]: p for p in cfg["parties"]}
     pending = st.unanalyzed(conn, week)
     print(f"Analyzing {len(pending)} items...")
-    for i, it in enumerate(pending, 1):
-        party = by_id.get(it["party_id"])
-        if not party:
-            continue
-        a = an.analyze_item(it, party)
-        st.set_analysis(conn, it["id"], a)
-        st.set_meta(conn, it["id"], "analyze", an.MODEL, an.PROMPT_VERSION)
-        if a.get("relations"):
-            st.set_relations(conn, it["id"], a["relations"])
-        pc = ev.classify(it, a)
-        st.set_evidence(conn, it["id"], pc, ev.rank(pc), None)
-        if i % 25 == 0:
-            print(f"  {i}/{len(pending)}")
+    analysable = [(it, by_id.get(it["party_id"])) for it in pending]
+    analysable = [(it, party) for it, party in analysable if party]
+    workers = max(1, min(int(os.environ.get("RW_ANALYSIS_WORKERS", "4")),
+                         len(analysable) or 1))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(an.analyze_item, it, party): it
+                   for it, party in analysable}
+        for i, future in enumerate(as_completed(futures), 1):
+            it = futures[future]
+            # analyze_item has its own explicit fallback, but keep the weekly
+            # build alive if a future itself is interrupted unexpectedly.
+            try:
+                a = future.result()
+            except Exception as exc:
+                a = an._fallback(it, by_id[it["party_id"]])
+                a["error"] = f"analysis worker failed: {type(exc).__name__}"
+            st.set_analysis(conn, it["id"], a)
+            st.set_meta(conn, it["id"], "analyze", an.MODEL, an.PROMPT_VERSION)
+            if a.get("relations"):
+                st.set_relations(conn, it["id"], a["relations"])
+            pc = ev.classify(it, a)
+            st.set_evidence(conn, it["id"], pc, ev.rank(pc), None)
+            if i % 25 == 0 or i == len(analysable):
+                print(f"  {i}/{len(analysable)}", flush=True)
 
     # Cluster wire copy after analysis, per party. A syndicated story is one
     # event, not six; counting it six times corrupts every frequency series.
@@ -665,12 +746,18 @@ def cmd_world(cfg, args):
     start, end = week_bounds(week)
     items = _enrich(st.week_items(conn, week, analyzed_only=True), cfg)
     rcfg = dg.load_reading_config()
-    print("Building Highlights, This week in the world, and Worth reading...")
+    names = country_names(load_countries())
+    monitored_countries = sorted({
+        names.get(p.get("country"), p.get("country"))
+        for p in cfg["parties"] if p.get("country")
+    })
+    print("Building Highlights, monitored-country context, and Worth reading...")
     hl, world, reading = dg.build_panels(
-        rcfg, items, start, end + timedelta(minutes=1),
+        rcfg, items, start, end + timedelta(minutes=1), monitored_countries,
     )
+    world = dg.restrict_to_monitored_countries(world, monitored_countries)
 
-    def keep_previous(scope, fresh):
+    def keep_previous(scope, fresh, validator=None):
         """A transient feed outage must not erase an already complete panel."""
         if len(fresh) >= 2:
             return fresh
@@ -678,16 +765,22 @@ def cmd_world(cfg, args):
             previous = json.loads(st.get_briefing(conn, week, scope) or "[]")
         except Exception:
             previous = []
-        return previous if isinstance(previous, list) and len(previous) >= 2 else fresh
+        usable = (isinstance(previous, list) and len(previous) >= 2
+                  and (validator is None or all(validator(row) for row in previous)))
+        return previous if usable else fresh
 
     hl = keep_previous(HIGHLIGHT_SCOPE, hl)
-    world = keep_previous(WORLD_SCOPE, world)
+    monitored_set = set(monitored_countries)
+    world = keep_previous(
+        WORLD_SCOPE, world,
+        lambda row: row.get("country") in monitored_set,
+    )
     reading = keep_previous(READING_SCOPE, reading)
     st.set_briefing(conn, week, HIGHLIGHT_SCOPE, json.dumps(hl, ensure_ascii=False))
     st.set_briefing(conn, week, WORLD_SCOPE, json.dumps(world, ensure_ascii=False))
     st.set_briefing(conn, week, READING_SCOPE, json.dumps(reading, ensure_ascii=False))
     print(f"  {len(hl)} highlights · {len(world)} world · {len(reading)} reading")
-    for label, rows in (("Highlights", hl), ("This week in the world", world),
+    for label, rows in (("Highlights", hl), ("Monitored-country context", world),
                         ("Worth reading", reading)):
         if len(rows) < 2:
             print(f"  WARNING: {label} has only {len(rows)} verified result(s).")
@@ -981,6 +1074,11 @@ def cmd_site(cfg, args):
                 world = []
         except Exception:
             world = []
+        monitored_countries = sorted({
+            names.get(p.get("country"), p.get("country"))
+            for p in cfg["parties"] if p.get("country")
+        })
+        world = dg.restrict_to_monitored_countries(world, monitored_countries)
         briefs.pop(BACKTRANS_SCOPE, None)
         try:
             retractions = json.loads(briefs.pop(RETRACT_SCOPE, "[]"))
@@ -1474,8 +1572,11 @@ def main():
     if args.command == "weekly":
         cmd_collect(cfg, args)
         cmd_analyze(cfg, args)
+        # Watched programme and parliamentary pages are a small, bounded set;
+        # keep them in the fast scheduled run so configured parties are not
+        # silently skipped between monthly refreshes.
+        cmd_diff(cfg, args)
         if not args.fast:
-            cmd_diff(cfg, args)
             cmd_brief(cfg, args)
             cmd_interpret(cfg, args)
             cmd_archive(cfg, args)

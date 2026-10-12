@@ -192,7 +192,7 @@ table before treating the result as research data.
 | Workflow | When | Purpose |
 |---|---|---|
 | Publish website | after repository changes | rebuilds and publishes the URL |
-| Weekly issue | Monday at 05:00 UTC | collects and builds a full issue |
+| Weekly issue | Monday at 08:00 Asia/Jerusalem | checks every monitored party, builds the previous week, and publishes it |
 | Historical collection | only when you manually run it | adds a date range in manageable chunks |
 
 To stop any schedule: open **Actions**, choose the workflow, click the `…`

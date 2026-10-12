@@ -10,10 +10,10 @@ highlights_queries:
   - European far-left parties politics
   - Israel political parties Knesset
 
-world_queries:
-  - global politics elections governments diplomacy
-  - international politics conflict diplomacy United Nations
-  - world political developments democracy elections
+# Generated at run time from the countries represented in sources.yaml. This
+# keeps context inside the monitored-country universe instead of drifting into
+# unrelated global news.
+world_queries: []
 
 # Specialist/long-form sources for Worth reading. Feed failures are followed
 # by dated web-news searches, so the section does not silently stay blank.

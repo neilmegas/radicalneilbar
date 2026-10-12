@@ -1,0 +1,126 @@
+name: 0 · Publish website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["2 · Weekly issue", "3 · Monthly refresh", "4 · Daily watch"]
+    types: [completed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Verify RAPPORT update consistency
+        env:
+          PYTHONPATH: src
+        run: |
+          python - <<'PY'
+          import inspect
+          from pathlib import Path
+          import yaml
+          from portal import issue_page
+
+          content_files = {
+              "content/site.yaml", "content/navigation.yaml",
+              "content/pages/methodology.yaml", "content/pages/dataset.yaml",
+              "content/pages/citation.yaml", "content/pages/tutorials.yaml",
+          }
+          missing_content = sorted(path for path in content_files if not Path(path).is_file())
+          if missing_content:
+              raise SystemExit(
+                  "Incomplete content-editor upload. Missing: " + ", ".join(missing_content)
+              )
+          with open("content/site.yaml", encoding="utf-8") as handle:
+              site_copy = yaml.safe_load(handle) or {}
+          if (site_copy.get("homepage") or {}).get("title") != (
+                  "A clearer weekly record of radical party activity."):
+              raise SystemExit("content/site.yaml is from an older website release.")
+          if (site_copy.get("citation") or {}).get("report_title") != "RAPPORT weekly report":
+              raise SystemExit("The weekly citation title is from an older release.")
+
+          with open("config/research.yaml", encoding="utf-8") as handle:
+              research = yaml.safe_load(handle) or {}
+          version = str(research.get("version") or "")
+          if not version.startswith("0.0") or "alpha" not in version:
+              raise SystemExit("Website version must use the alpha 0.0x series.")
+
+          with open("config/sources.yaml", encoding="utf-8") as handle:
+              parties = yaml.safe_load(handle).get("parties") or []
+          party_ids = {party.get("id") for party in parties}
+          required = {
+              "symmachiaellinon", "forzanuova", "poterealpopolo", "rifondazione",
+              "daam", "zehut", "fvd", "pvdd", "denk", "akel", "elam",
+              "bsw", "dielinke", "greenparty", "reformuk", "lega", "syriza",
+              "podemos", "bloco", "roedt", "enhedslisten", "pbp",
+              "antarsya", "mlpd", "lo", "npaa", "npar", "bij1", "afs",
+              "skp", "pci", "pce", "fejons", "cpb", "religiouszionism",
+              "norgesdemokratene", "nkp", "nationalpartyie", "irishfreedom",
+              "workerspartyie", "kpl", "pda", "yourparty",
+          }
+          missing = sorted(required - party_ids)
+          if len(parties) != 90 or missing:
+              raise SystemExit(
+                  "Incomplete config upload: expected 90 parties; "
+                  f"found {len(parties)}. Missing required IDs: {missing}"
+              )
+          if "research" not in inspect.signature(issue_page).parameters:
+              raise SystemExit(
+                  "Incomplete src upload: src/portal.py is from an older release."
+              )
+          print("Consistency check passed: 90 parties and matching report generator.")
+          PY
+
+      - name: Build website
+        run: |
+          if [ -f data/items.db ]; then
+            python run.py site
+          else
+            echo "No database yet; publishing the safe sample website."
+            python run.py demo
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+          include-hidden-files: true
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v4

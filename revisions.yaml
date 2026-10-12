@@ -1,4 +1,22 @@
 revisions:
+  - date: "2026-10-11"
+    title: "Scheduled coverage and report-clarity release (website 0.06-alpha)"
+    changes:
+      - "Reset the public version label to the alpha 0.0x series; routine weekly data refreshes continue without a version increment."
+      - "Changed the homepage map so hovering only previews a country and clicking selects it in the persistent party panel."
+      - "Scheduled the weekly issue for Monday at 08:00 in Asia/Jerusalem, with daylight-saving handling supplied by GitHub's timezone-aware scheduler."
+      - "Rebuilt collection as a bounded concurrent pass that probes every official site, discovers feeds, searches each official domain, runs a named-party news search, and fails the coverage gate if any roster party receives no attempt."
+      - "Repaired party-directory filtering with explicit hidden-state classes, deterministic sorting, and a reset control."
+      - "Separated corpus-level weekly patterns from concrete Highlights and restricted the context panel to politics in monitored countries."
+      - "Replaced the generic Neil’s Parties Report label with a dated RAPPORT weekly-report title in every page title and APA 7 citation."
+  - date: "2026-10-05"
+    title: "Editorial content and responsive-access release (website 1.5)"
+    changes:
+      - "Separated human-written website copy from generated research output and added a password-protected editor for the homepage, navigation, methodology, dataset, citation, and tutorials pages."
+      - "Added desktop, tablet, and phone layouts with a compact mobile menu, touch-sized controls, stacked report sections, and horizontally scrollable data tables."
+      - "Gave every weekly report a stable APA 7 citation using its ISO week as the permanent report number and its own issue URL."
+      - "Updated the homepage title and research statement to identify Neil Bar, the School of Political Science at the University of Haifa, Ayelet Banai, the Claude API, the academic-only purpose, project contact, and the need to verify AI-generated material against primary sources."
+      - "Kept the public GitHub Pages site fully static: visitors cannot access the private editor, trigger Claude, or spend API tokens."
   - date: "2026-09-25"
     title: "Representation-source correction (website 1.4)"
     changes:
