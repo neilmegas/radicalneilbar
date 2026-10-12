@@ -42,8 +42,33 @@ jobs:
         run: |
           python - <<'PY'
           import inspect
+          from pathlib import Path
           import yaml
           from portal import issue_page
+
+          content_files = {
+              "content/site.yaml", "content/navigation.yaml",
+              "content/pages/methodology.yaml", "content/pages/dataset.yaml",
+              "content/pages/citation.yaml", "content/pages/tutorials.yaml",
+          }
+          missing_content = sorted(path for path in content_files if not Path(path).is_file())
+          if missing_content:
+              raise SystemExit(
+                  "Incomplete content-editor upload. Missing: " + ", ".join(missing_content)
+              )
+          with open("content/site.yaml", encoding="utf-8") as handle:
+              site_copy = yaml.safe_load(handle) or {}
+          if (site_copy.get("homepage") or {}).get("title") != (
+                  "A clearer weekly record of radical party activity."):
+              raise SystemExit("content/site.yaml is from an older website release.")
+          if (site_copy.get("citation") or {}).get("report_title") != "RAPPORT weekly report":
+              raise SystemExit("The weekly citation title is from an older release.")
+
+          with open("config/research.yaml", encoding="utf-8") as handle:
+              research = yaml.safe_load(handle) or {}
+          version = str(research.get("version") or "")
+          if not version.startswith("0.0") or "alpha" not in version:
+              raise SystemExit("Website version must use the alpha 0.0x series.")
 
           with open("config/sources.yaml", encoding="utf-8") as handle:
               parties = yaml.safe_load(handle).get("parties") or []

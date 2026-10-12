@@ -2,7 +2,9 @@ name: 2 · Weekly issue
 
 on:
   schedule:
-    - cron: "0 5 * * 1"
+    # Every Monday at 08:00 in Israel, including daylight-saving changes.
+    - cron: "0 8 * * 1"
+      timezone: "Asia/Jerusalem"
   workflow_dispatch:
 
 permissions:
@@ -24,13 +26,37 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
 
+      - name: Resolve the last completed reporting week
+        id: period
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
+
+          today = datetime.now(ZoneInfo("Asia/Jerusalem")).date()
+          this_monday = today - timedelta(days=today.weekday())
+          date_to = this_monday - timedelta(days=1)
+          date_from = date_to - timedelta(days=6)
+          iso = date_from.isocalendar()
+
+          print(f"week={iso.year}-W{iso.week:02d}")
+          print(f"from={date_from.isoformat()}")
+          print(f"to={date_to.isoformat()}")
+          PY
+
       - name: Collect, analyse, and build with live progress
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           DIP_API_KEY: ${{ secrets.DIP_API_KEY }}
-        run: python -u run.py weekly --fast --max-items-per-party 8
+        run: >-
+          python -u run.py weekly
+          --week "${{ steps.period.outputs.week }}"
+          --from "${{ steps.period.outputs.from }}"
+          --to "${{ steps.period.outputs.to }}"
+          --fast
+          --max-items-per-party 8
 
       - name: Save the new issue and research record
         run: |
@@ -40,6 +66,6 @@ jobs:
           for path in snapshots exports background; do
             [ ! -e "$path" ] || git add -f "$path"
           done
-          git diff --staged --quiet || git commit -m "Weekly issue $(date -u +%F)"
+          git diff --staged --quiet || git commit -m "Weekly issue ${{ steps.period.outputs.week }}"
           git pull --rebase origin main
           git push
