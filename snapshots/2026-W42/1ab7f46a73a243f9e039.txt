@@ -1,0 +1,1 @@
+Chat with your files and images Upload a document or image, then ask questions about it. ChatGPT can read, summarize, or explain what it sees.

@@ -1,0 +1,1 @@
+Since Microsoft has shifted focus to Windows 10 and Windows 11, official direct downloads for Windows 8 ISOs are no longer prominently available from Microsoft. Here are the recommended options: 1. Microsoft’s Official Download Page (via Windows 8 or 8.1 Product Key) 2. Some sites host ISO files, but they may be unverified or unsafe.

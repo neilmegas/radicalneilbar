@@ -247,11 +247,14 @@ details[open].timeline-period>summary::before{content:'−'}
   min-height:2.45rem;padding:.42rem .5rem;border:1px solid var(--hair);border-radius:4px;
   background:var(--paper);color:var(--ink)}
 .party-directory-status{display:flex;align-items:end;justify-content:flex-end;font-size:.76rem;
-  color:var(--muted);padding-bottom:.42rem}
+  color:var(--muted);padding-bottom:.42rem;gap:.55rem}
+.party-directory-status button{border:1px solid var(--hair);background:var(--paper);color:var(--ink);
+  padding:.28rem .52rem;border-radius:3px;cursor:pointer;font-size:.72rem}
 .party-directory-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.35rem;
   margin-top:.45rem;border-top:2px solid var(--ink)}
 .party-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:.55rem;
   min-width:0;padding:.68rem .35rem;border-bottom:1px solid var(--hair);transition:background .12s ease}
+.party-row.is-filtered-out{display:none!important}
 .party-row:hover{background:var(--surface)}
 .party-camp-mark{display:block;width:9px;height:9px;margin-top:.35rem;background:var(--right)}
 .party-row.left .party-camp-mark{background:var(--left)}
