@@ -1,0 +1,1 @@
+The tool finds the domain, then builds the four URL patterns that almost every company uses for jobs, plus the common About and Pricing paths that sales researchers check next.
