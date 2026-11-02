@@ -1,0 +1,1 @@
+When I attempt to open the download as provided by HP via 123.hp.com the following message appears:- The file "HP-Easy-start-app. download" doesn't appear to be a valid download file.
