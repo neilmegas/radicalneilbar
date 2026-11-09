@@ -1,0 +1,1 @@
+This guide explains how to find the slope of a line using (x, y) points from graphs. We’ll also explain how the slope formula works, and how to recognize positive, negative, zero, and undefined slopes.

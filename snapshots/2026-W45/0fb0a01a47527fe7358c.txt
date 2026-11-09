@@ -1,0 +1,1 @@
+Find slope from a graph using rise over run. Follow a labeled graph example, check unequal axis scales, and review positive, negative, zero and undefined slope.
